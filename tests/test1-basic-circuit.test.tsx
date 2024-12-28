@@ -25,5 +25,16 @@ it("should render a basic circuit", () => {
 
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
-  ).toMatchInlineSnapshot()
+  ).toMatchInlineSnapshot(`
+"NET: connectivity_net11
+  - R1 Pin2
+
+NET: connectivity_net12
+  - C1 Pin2
+
+NET: connectivity_net13
+  - R1 Pin1
+  - C1 Pin1
+"
+`)
 })
