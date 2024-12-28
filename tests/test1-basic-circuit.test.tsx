@@ -22,19 +22,20 @@ it("should render a basic circuit", () => {
       <trace from=".R1 > .pin1" to=".C1 > .pin1" />
     </board>,
   )
+  console.log(circuitJson.filter((e) => e.type.startsWith("source_")))
 
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
 "NET: connectivity_net11
-  - R1 Pin2
+  - R1 Pin2 (-)
 
 NET: connectivity_net12
-  - C1 Pin2
+  - C1 Pin2 (-)
 
 NET: connectivity_net13
-  - R1 Pin1
-  - C1 Pin1
+  - R1 Pin1 (+)
+  - C1 Pin1 (+)
 "
 `)
 })

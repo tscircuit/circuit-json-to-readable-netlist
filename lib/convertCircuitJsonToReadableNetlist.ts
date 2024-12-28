@@ -53,8 +53,22 @@ export const convertCircuitJsonToReadableNetlist = (
       )
       if (!component) continue
 
-      // Add component connection line
-      const pinInfo = port.pin_number ? `Pin${port.pin_number}` : port.name
+      // Determine pin polarity from hints
+      const isPositive = port.port_hints?.some(hint => 
+        ["anode", "pos", "positive"].includes(hint.toLowerCase())
+      )
+      const isNegative = port.port_hints?.some(hint => 
+        ["cathode", "neg", "negative"].includes(hint.toLowerCase())
+      )
+      
+      // Format pin description
+      let pinInfo = port.pin_number ? `Pin${port.pin_number}` : port.name
+      if (isPositive) {
+        pinInfo += " (+)"
+      } else if (isNegative) {
+        pinInfo += " (-)"
+      }
+
       const displayValue = component.display_value
         ? ` (${component.display_value})`
         : ""
