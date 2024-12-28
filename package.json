@@ -5,12 +5,14 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.0.2",
-    "react": "^19.0.0"
+    "debug": "^4.4.0",
+    "react": "18"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.245"
+    "@tscircuit/core": "^0.0.245",
+    "circuit-json-to-connectivity-map": "^0.0.17"
   }
 }

@@ -25,5 +25,13 @@ it("should render a basic circuit", () => {
 
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
-  ).toMatchInlineSnapshot()
+  ).toMatchInlineSnapshot(`
+"Components:
+- R1 (1000Ω)
+- C1 (1e-9F)
+
+Connections:
+- R1 (1000Ω) <-> C1 (1e-9F)
+"
+`)
 })
