@@ -31,7 +31,7 @@ it("test2 chip", () => {
       <trace from=".R1 > .pin1" to=".C1 > .pin1" />
       <trace from=".U1 .GND" to="net.GND" />
       <trace from=".U1 .AGND" to="net.GND" />
-      <trace from=".U1 .GPIO1" to="net.GPIO1" />
+      <trace from=".U1 .GPIO1" to="net.GND" />
       <trace from=".U1 .GPIO2" to=".R1 .pin2" />
       <trace from=".U1 .GPIO3" to="net.GPIO4" />
       <trace from=".U1 .VDD" to="net.V5" />
@@ -42,33 +42,31 @@ it("test2 chip", () => {
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
-"NET: connectivity_net8
-  - U1 Pin3
-
-NET: connectivity_net11
+"NET: connectivity_net10
   - U1 Pin4
   - R1 Pin2 (-)
 
-NET: connectivity_net14
+NET: connectivity_net13
   - U1 Pin5
 
-NET: connectivity_net17
+NET: connectivity_net16
   - U1 Pin8
 
-NET: connectivity_net44
+NET: connectivity_net43
   - U1 Pin6
 
-NET: connectivity_net45
+NET: connectivity_net44
   - U1 Pin7
 
-NET: connectivity_net46
+NET: connectivity_net45
   - C1 Pin2 (-)
 
-NET: connectivity_net47
+NET: connectivity_net46
   - R1 Pin1 (+)
   - C1 Pin1 (+)
 
 NET: connectivity_net48
+  - U1 Pin3
   - U1 Pin2
   - U1 Pin1
 "
