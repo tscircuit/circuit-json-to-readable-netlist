@@ -1,5 +1,12 @@
 import { renderCircuit } from "tests/fixtures/render-circuit"
+import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import { it, expect } from "bun:test"
+
+declare module "bun:test" {
+  interface Matchers<T = unknown> {
+    toMatchInlineSnapshot(snapshot?: string | null): Promise<MatcherResult>
+  }
+}
 
 it("should render a basic circuit", () => {
   const circuitJson = renderCircuit(
@@ -16,5 +23,7 @@ it("should render a basic circuit", () => {
     </board>,
   )
 
-  // expect
+  expect(
+    convertCircuitJsonToReadableNetlist(circuitJson),
+  ).toMatchInlineSnapshot()
 })

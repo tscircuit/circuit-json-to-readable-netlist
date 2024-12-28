@@ -1,7 +1,9 @@
 import { Circuit } from "@tscircuit/core"
+import type { CircuitJson } from "circuit-json"
 
-export const renderCircuit = (reactNode: React.ReactElement) => {
+export const renderCircuit = (reactNode: React.ReactElement): CircuitJson => {
   const circuit = new Circuit()
   circuit.add(reactNode)
-  return circuit.render()
+  circuit.render()
+  return circuit.getCircuitJson()
 }
