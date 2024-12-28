@@ -8,7 +8,7 @@ declare module "bun:test" {
   }
 }
 
-it("should render a basic circuit", () => {
+it("test1 should render a basic circuit", () => {
   const circuitJson = renderCircuit(
     <board width="10mm" height="10mm">
       <resistor resistance="1k" footprint="0402" name="R1" schX={3} pcbX={3} />
