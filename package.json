@@ -17,11 +17,11 @@
     "@types/react": "^19.0.2",
     "circuit-json": "^0.0.123",
     "debug": "^4.4.0",
-    "react": "18",
+    "react": "^18.3.1",
     "tsup": "^8.3.5"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@tscircuit/core": "^0.0.245",

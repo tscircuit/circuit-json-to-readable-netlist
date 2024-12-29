@@ -14,6 +14,12 @@ it("test2 chip", () => {
       <chip
         name="U1"
         footprint="soic8"
+        manufacturerPartNumber="CL05B102KB5NNNC"
+        supplierPartNumbers={{
+          digikey: ["1276-1018-1-ND"],
+          mouser: ["187-CL05B102KB5NNNC"],
+          lcsc: ["C89040"],
+        }}
         pinLabels={{
           pin1: ["GND"],
           pin2: ["AGND"],
@@ -43,7 +49,7 @@ it("test2 chip", () => {
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
 "COMPONENTS:
- - U1: N/A, N/A
+ - U1: CL05B102KB5NNNC, digikey: 1276-1018-1-ND; mouser: 187-CL05B102KB5NNNC; lcsc: C89040
  - R1: N/A, N/A
  - C1: N/A, N/A
 
