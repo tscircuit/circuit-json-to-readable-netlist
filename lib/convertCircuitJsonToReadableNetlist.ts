@@ -28,9 +28,13 @@ export const convertCircuitJsonToReadableNetlist = (
   for (const component of source_components) {
     // Using `supplier_part_numbers` property
     const supplierNumbers = component.supplier_part_numbers
-      ? Object.entries(component.supplier_part_numbers).map(([supplier, numbers]) => `${supplier}: ${numbers.join(", ")}`).join("; ")
-      : "N/A";
-    netlist.push(` - ${component.name}: ${component.manufacturer_part_number || "N/A"}, ${supplierNumbers}`)
+      ? Object.entries(component.supplier_part_numbers)
+          .map(([supplier, numbers]) => `${supplier}: ${numbers.join(", ")}`)
+          .join("; ")
+      : "N/A"
+    netlist.push(
+      ` - ${component.name}: ${component.manufacturer_part_number || "N/A"}, ${supplierNumbers}`,
+    )
   }
   netlist.push("")
 

@@ -7,10 +7,12 @@
   ],
   "scripts": {
     "build": "tsup ./lib/index.ts --format esm --dts",
-    "test": "bun test"
+    "test": "bun test",
+    "format": "biome format . --write"
   },
   "type": "module",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest",
     "@types/react": "^19.0.2",
     "circuit-json": "^0.0.123",
