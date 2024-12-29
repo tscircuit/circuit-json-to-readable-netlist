@@ -6,24 +6,15 @@ import type {
 } from "circuit-json"
 import { su } from "@tscircuit/soup-util"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
-
-/*
-declare class ConnectivityMap {
-    netMap: Record<string, string[]>;
-    idToNetMap: Record<string, string>;
-    constructor(netMap: Record<string, string[]>);
-    addConnections(connections: string[][]): void;
-    getIdsConnectedToNet(netId: string): string[];
-    getNetConnectedToId(id: string): string | undefined;
-    areIdsConnected(id1: string, id2: string): boolean;
-    areAllIdsConnected(ids: string[]): boolean;
-}
-*/
+import { generateNetName } from "./generateNetName"
+import { getReadableNameForPin } from "./getReadableNameForPin"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
-  const connectivityMap = getFullConnectivityMapFromCircuitJson(circuitJson)
+  const connectivityMap = getFullConnectivityMapFromCircuitJson(
+    circuitJson.filter((e) => e.type.startsWith("source_")),
+  )
   const netMap = connectivityMap.netMap
   const source_ports = su(circuitJson).source_port.list()
   const source_components = su(circuitJson).source_component.list()
@@ -35,48 +26,62 @@ export const convertCircuitJsonToReadableNetlist = (
   // Process each net
   for (const [netId, connectedIds] of Object.entries(netMap)) {
     // Get net name
-    const net = source_nets.find((n) => n.source_net_id === netId)
-    const netName = net?.name || netId
+    const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
+
+    let netName = net?.name
+
+    if (!netName) {
+      // Generate a net name from the connected port names
+      netName = generateNetName({ circuitJson, connectedIds })
+    }
+
+    const connectedPortCount = connectedIds.filter((id) =>
+      id.startsWith("source_port"),
+    ).length
+
+    if (connectedPortCount <= 1) continue
 
     // Add net header
     netlist.push(`NET: ${netName}`)
 
     // Process connected components
     for (const id of connectedIds) {
-      // Find the port
-      const port = source_ports.find((p) => p.source_port_id === id)
-      if (!port) continue
-
-      // Find the component this port belongs to
-      const component = source_components.find(
-        (c) => c.source_component_id === port.source_component_id,
-      )
-      if (!component) continue
-
-      // Determine pin polarity from hints
-      const isPositive = port.port_hints?.some(hint => 
-        ["anode", "pos", "positive"].includes(hint.toLowerCase())
-      )
-      const isNegative = port.port_hints?.some(hint => 
-        ["cathode", "neg", "negative"].includes(hint.toLowerCase())
-      )
-      
-      // Format pin description
-      let pinInfo = port.pin_number ? `Pin${port.pin_number}` : port.name
-      if (isPositive) {
-        pinInfo += " (+)"
-      } else if (isNegative) {
-        pinInfo += " (-)"
+      const pinName = getReadableNameForPin({
+        circuitJson,
+        source_port_id: id,
+      })
+      if (pinName) {
+        netlist.push(`  - ${pinName}`)
       }
-
-      const displayValue = component.display_value
-        ? ` (${component.display_value})`
-        : ""
-      netlist.push(`  - ${component.name} ${pinInfo}${displayValue}`)
     }
 
     // Add blank line between nets
     netlist.push("")
+  }
+
+  // Process nets with only one connection
+  let hasEmptyNets = false
+  for (const [netId, connectedIds] of Object.entries(netMap)) {
+    const connectedPortCount = connectedIds.filter((id) =>
+      id.startsWith("source_port"),
+    ).length
+    if (connectedPortCount === 1) {
+      if (!hasEmptyNets) {
+        netlist.push("")
+        netlist.push("EMPTY NET PINS:")
+        hasEmptyNets = true
+      }
+      const source_port_id = netMap[netId].find((id) =>
+        id.startsWith("source_port"),
+      )!
+      const pinName = getReadableNameForPin({
+        circuitJson,
+        source_port_id,
+      })
+      if (pinName) {
+        netlist.push(`  - ${pinName}`)
+      }
+    }
   }
 
   return netlist.join("\n")

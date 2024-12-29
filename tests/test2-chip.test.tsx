@@ -37,38 +37,27 @@ it("test2 chip", () => {
       <trace from=".U1 .VDD" to="net.V5" />
     </board>,
   )
-  console.log(circuitJson.filter((e) => e.type.startsWith("source_")))
+  // console.log(circuitJson.filter((e) => e.type.startsWith("source_")))
 
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
-"NET: connectivity_net10
-  - U1 Pin4
-  - R1 Pin2 (-)
+"NET: C1_pos
+  - R1 pin1
+  - C1 pin1 (+)
 
-NET: connectivity_net13
-  - U1 Pin5
+NET: GND
+  - U1 GPIO1 (SCL)
+  - U1 AGND
+  - U1 GND
 
-NET: connectivity_net16
-  - U1 Pin8
+NET: U1_SDA
+  - U1 GPIO2 (SDA)
+  - R1 pin2
 
-NET: connectivity_net43
-  - U1 Pin6
 
-NET: connectivity_net44
-  - U1 Pin7
-
-NET: connectivity_net45
-  - C1 Pin2 (-)
-
-NET: connectivity_net46
-  - R1 Pin1 (+)
-  - C1 Pin1 (+)
-
-NET: connectivity_net48
-  - U1 Pin3
-  - U1 Pin2
-  - U1 Pin1
-"
+EMPTY NET PINS:
+  - U1 GPIO3
+  - U1 VDD"
 `)
 })
