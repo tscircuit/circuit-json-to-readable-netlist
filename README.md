@@ -2,6 +2,27 @@
 
 Convert Circuit JSON into a readable netlist suitable for input to AI
 
+[![npm version](https://badge.fury.io/js/circuit-json-to-readable-netlist.svg)](https://badge.fury.io/js/circuit-json-to-readable-netlist) [![GitHub](https://img.shields.io/github/stars/tscircuit/circuit-json-to-readable-netlist?style=social)](https://github.com/tscircuit/circuit-json-to-readable-netlist) ⋅ [tscircuit](https://github.com/tscircuit/tscircuit) ⋅ [discord](https://tscircuit.com/join) ⋅ [use tscircuit online](https://tscircuit.com)
+
+## Installation
+
+```bash
+bun add circuit-json-to-readable-netlist
+```
+
+## Usage
+
+### TypeScript
+
+```typescript
+import { convertCircuitJsonToReadableNetlist } from 'circuit-json-to-readable-netlist'
+import type { CircuitJson } from 'circuit-json'
+
+const circuitJson: CircuitJson = // ... your circuit JSON
+const readableNetlist = convertCircuitJsonToReadableNetlist(circuitJson)
+console.log(readableNetlist)
+```
+
 ## Example Readable Netlist
 
 ```txt
