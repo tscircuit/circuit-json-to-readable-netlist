@@ -1,7 +1,7 @@
 {
   "name": "circuit-json-to-readable-netlist",
   "main": "dist/index.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "build": "tsup ./lib/index.ts --format esm --dts",
     "test": "bun test"
