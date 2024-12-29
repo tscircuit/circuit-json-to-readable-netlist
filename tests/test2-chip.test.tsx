@@ -42,7 +42,12 @@ it("test2 chip", () => {
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
-"NET: C1_pos
+"COMPONENTS:
+ - U1: N/A, N/A
+ - R1: N/A, N/A
+ - C1: N/A, N/A
+
+NET: C1_pos
   - R1 pin1
   - C1 pin1 (+)
 
