@@ -26,15 +26,29 @@ export const convertCircuitJsonToReadableNetlist = (
   // Add COMPONENTS section
   netlist.push("COMPONENTS:")
   for (const component of source_components) {
-    // Using `supplier_part_numbers` property
-    const supplierNumbers = component.supplier_part_numbers
-      ? Object.entries(component.supplier_part_numbers)
-          .map(([supplier, numbers]) => `${supplier}: ${numbers.join(", ")}`)
-          .join("; ")
-      : "N/A"
-    netlist.push(
-      ` - ${component.name}: ${component.manufacturer_part_number || "N/A"}, ${supplierNumbers}`,
-    )
+    let componentDescription = ""
+    let footprint = "unknown footprint"
+
+    // Get the cad_component associated with the source_component
+    const cadComponent = su(circuitJson).cad_component.getWhere({
+      source_component_id: component.source_component_id,
+    })
+
+    if (cadComponent) {
+      footprint = cadComponent.footprinter_string || "unknown footprint"
+    }
+
+    if (component.ftype === "simple_resistor") {
+      componentDescription = `${component.display_resistance} ${footprint} resistor`
+    } else if (component.ftype === "simple_capacitor") {
+      componentDescription = `${component.display_capacitance} ${footprint} capacitor`
+    } else if (component.ftype === "simple_chip") {
+      componentDescription = `${component.name} ${footprint} simple_chip`
+    } else {
+      componentDescription = `${component.name}, ${component.type}`
+    }
+
+    netlist.push(` - ${component.name}: ${componentDescription}`)
   }
   netlist.push("")
 
