@@ -27,16 +27,13 @@ export const convertCircuitJsonToReadableNetlist = (
   netlist.push("COMPONENTS:")
   for (const component of source_components) {
     let componentDescription = ""
-    let footprint = "unknown footprint"
 
     // Get the cad_component associated with the source_component
     const cadComponent = su(circuitJson).cad_component.getWhere({
       source_component_id: component.source_component_id,
     })
 
-    if (cadComponent) {
-      footprint = cadComponent.footprinter_string || "unknown footprint"
-    }
+    const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance} ${footprint} resistor`
