@@ -23,6 +23,33 @@ export const convertCircuitJsonToReadableNetlist = (
   // Build readable netlist
   const netlist: string[] = []
 
+  // Add COMPONENTS section
+  netlist.push("COMPONENTS:")
+  for (const component of source_components) {
+    let componentDescription = ""
+
+    // Get the cad_component associated with the source_component
+    const cadComponent = su(circuitJson).cad_component.getWhere({
+      source_component_id: component.source_component_id,
+    })
+
+    const footprint = cadComponent?.footprinter_string
+
+    if (component.ftype === "simple_resistor") {
+      componentDescription = `${component.display_resistance} ${footprint} resistor`
+    } else if (component.ftype === "simple_capacitor") {
+      componentDescription = `${component.display_capacitance} ${footprint} capacitor`
+    } else if (component.ftype === "simple_chip") {
+      const manufacturerPartNumber = component.manufacturer_part_number
+      componentDescription = `${manufacturerPartNumber}, ${footprint}`
+    } else {
+      componentDescription = `${component.name}, ${component.type}`
+    }
+
+    netlist.push(` - ${component.name}: ${componentDescription}`)
+  }
+  netlist.push("")
+
   // Process each net
   for (const [netId, connectedIds] of Object.entries(netMap)) {
     // Get net name
