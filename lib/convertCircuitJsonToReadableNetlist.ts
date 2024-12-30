@@ -40,7 +40,8 @@ export const convertCircuitJsonToReadableNetlist = (
     } else if (component.ftype === "simple_capacitor") {
       componentDescription = `${component.display_capacitance} ${footprint} capacitor`
     } else if (component.ftype === "simple_chip") {
-      componentDescription = `${component.name} ${footprint} simple_chip`
+      const manufacturerPartNumber = component.manufacturer_part_number
+      componentDescription = `${manufacturerPartNumber}, ${footprint}`
     } else {
       componentDescription = `${component.name}, ${component.type}`
     }
