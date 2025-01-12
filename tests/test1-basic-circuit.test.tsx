@@ -32,6 +32,7 @@ it("test1 should render a basic circuit", () => {
  - C1: 1nF 0402 capacitor
 
 NET: C1_pos
+  - [UNRESOLVED_PORT: source_trace_0]
   - R1 pin1
   - C1 pin1 (+)
 "

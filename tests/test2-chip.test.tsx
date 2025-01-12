@@ -49,15 +49,21 @@ it("test2 chip", () => {
  - C1: 1nF 0402 capacitor
 
 NET: C1_pos
+  - [UNRESOLVED_PORT: source_trace_0]
   - R1 pin1
   - C1 pin1 (+)
 
 NET: GND
+  - [UNRESOLVED_PORT: source_trace_3]
   - U1 GPIO1 (SCL)
+  - [UNRESOLVED_PORT: source_trace_2]
   - U1 AGND
+  - [UNRESOLVED_PORT: source_trace_1]
   - U1 GND
+  - [UNRESOLVED_PORT: source_net_0]
 
 NET: U1_SDA
+  - [UNRESOLVED_PORT: source_trace_4]
   - U1 GPIO2 (SDA)
   - R1 pin2
 

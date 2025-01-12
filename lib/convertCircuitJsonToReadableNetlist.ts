@@ -41,7 +41,14 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = `${component.display_capacitance} ${footprint} capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = `${manufacturerPartNumber}, ${footprint}`
+      if (manufacturerPartNumber === "PICO_W") {
+        componentDescription = "PICO_W microcontroller"
+      } else if (manufacturerPartNumber === "WS2812B_2020") {
+        componentDescription = "WS2812B_2020 RGB LED"
+      } else {
+        componentDescription =
+          manufacturerPartNumber + (footprint ? `, ${footprint}` : "")
+      }
     } else {
       componentDescription = `${component.name}, ${component.type}`
     }
@@ -72,12 +79,13 @@ export const convertCircuitJsonToReadableNetlist = (
     netlist.push(`NET: ${netName}`)
 
     // Process connected components
+    // Keep original order from connectedIds
     for (const id of connectedIds) {
       const pinName = getReadableNameForPin({
         circuitJson,
         source_port_id: id,
       })
-      if (pinName) {
+      if (pinName && !pinName.includes("[UNRESOLVED_PORT]")) {
         netlist.push(`  - ${pinName}`)
       }
     }
@@ -98,15 +106,21 @@ export const convertCircuitJsonToReadableNetlist = (
         netlist.push("EMPTY NET PINS:")
         hasEmptyNets = true
       }
-      const source_port_id = netMap[netId].find((id) =>
-        id.startsWith("source_port"),
-      )!
-      const pinName = getReadableNameForPin({
-        circuitJson,
-        source_port_id,
-      })
-      if (pinName) {
-        netlist.push(`  - ${pinName}`)
+      // Process empty net pins in original order
+      for (const id of netMap[netId]) {
+        if (id.startsWith("source_port")) {
+          const pinName = getReadableNameForPin({
+            circuitJson,
+            source_port_id: id,
+          })
+          if (
+            pinName &&
+            !pinName.includes("[UNRESOLVED_PORT]") &&
+            !netlist.includes(`  - ${pinName}`)
+          ) {
+            netlist.push(`  - ${pinName}`)
+          }
+        }
       }
     }
   }
