@@ -42,8 +42,8 @@ export const convertCircuitJsonToReadableNetlist = (
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = footprint
-      ? `${manufacturerPartNumber}, ${footprint}`
-      : `${manufacturerPartNumber}`
+        ? `${manufacturerPartNumber}, ${footprint}`
+        : `${manufacturerPartNumber}`
     } else {
       componentDescription = `${component.name}, ${component.type}`
     }
