@@ -35,15 +35,15 @@ jobs:
       run: echo "BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']")" >> $GITHUB_OUTPUT
 
     - name: Install @biomejs/biome
-      run: npm install @biomejs/biome@${{ steps.get-biome-version.outputs.BIOME_VERSION }}
+      run: bun add @biomejs/biome@${{ steps.get-biome-version.outputs.BIOME_VERSION }}
 
     - name: Run Formatter and autofix
       if: steps.check_fork.outputs.is_fork == 'false'
-      run: npx @biomejs/biome format . --write
+      run: bunx @biomejs/biome format . --write
 
     - name: Format Check (cannot autofix against forks)
       if: steps.check_fork.outputs.is_fork == 'true'
-      run: npx @biomejs/biome format .
+      run: bunx @biomejs/biome format .
 
     - name: Restore lock files
       if: steps.check_fork.outputs.is_fork == 'false'
