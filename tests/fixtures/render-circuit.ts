@@ -5,5 +5,5 @@ export const renderCircuit = (reactNode: React.ReactElement): CircuitJson => {
   const circuit = new Circuit()
   circuit.add(reactNode)
   circuit.render()
-  return circuit.getCircuitJson()
+  return circuit.getCircuitJson() as CircuitJson
 }
