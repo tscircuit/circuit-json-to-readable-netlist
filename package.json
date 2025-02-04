@@ -24,7 +24,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@tscircuit/core": "^0.0.286",
+    "@tscircuit/core": "^0.0.299",
     "@tscircuit/soup-util": "^0.0.41",
     "circuit-json-to-connectivity-map": "^0.0.17"
   }
