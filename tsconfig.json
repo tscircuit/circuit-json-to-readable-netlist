@@ -13,7 +13,7 @@
       "tests/*": ["tests/*"]
     },
 
-    "types": ["@tscircuit/core"],
+    "types": ["@tscircuit/core", "@types/bun"],
 
     // Bundler mode
     "moduleResolution": "bundler",

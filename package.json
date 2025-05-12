@@ -18,7 +18,7 @@
     "@tscircuit/core": "^0.0.401",
     "@tscircuit/math-utils": "^0.0.18",
     "@tscircuit/props": "^0.0.178",
-    "@types/bun": "latest",
+    "@types/bun": "^1.2.13",
     "@types/react": "18",
     "circuit-json": "^0.0.170",
     "circuit-json-to-connectivity-map": "^0.0.17",
