@@ -1,29 +1,33 @@
 {
   "name": "circuit-json-to-readable-netlist",
   "main": "dist/index.js",
-  "version": "0.0.3",
+  "version": "0.0.8",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup ./lib/index.ts --format esm --dts",
-    "test": "bun test"
+    "test": "bun test",
+    "format": "biome format . --write",
+    "format:check": "biome check --write"
   },
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/react": "^19.0.2",
-    "circuit-json": "^0.0.123",
-    "debug": "^4.4.0",
-    "react": "18",
-    "tsup": "^8.3.5",
-    "@tscircuit/core": "^0.0.245",
+    "@biomejs/biome": "^1.9.4",
     "@tscircuit/circuit-json-util": "^0.0.47",
-    "circuit-json-to-connectivity-map": "^0.0.17"
+    "@tscircuit/core": "^0.0.401",
+    "@tscircuit/math-utils": "^0.0.18",
+    "@tscircuit/props": "^0.0.178",
+    "@types/bun": "latest",
+    "circuit-json": "^0.0.170",
+    "circuit-json-to-connectivity-map": "^0.0.17",
+    "debug": "^4.4.0",
+    "tsup": "^8.3.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0",
     "@tscircuit/circuit-json-util": "*",
+    "@tscircuit/math-utils": "*",
     "circuit-json-to-connectivity-map": "*"
   }
 }

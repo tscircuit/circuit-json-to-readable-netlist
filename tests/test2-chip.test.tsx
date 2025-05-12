@@ -14,6 +14,7 @@ it("test2 chip", () => {
       <chip
         name="U1"
         footprint="soic8"
+        manufacturerPartNumber="ATMEGA328P"
         pinLabels={{
           pin1: ["GND"],
           pin2: ["AGND"],
@@ -42,7 +43,12 @@ it("test2 chip", () => {
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
-"NET: C1_pos
+"COMPONENTS:
+ - U1: ATMEGA328P, soic8
+ - R1: 1kΩ 0402 resistor
+ - C1: 1nF 0402 capacitor
+
+NET: C1_pos
   - R1 pin1
   - C1 pin1 (+)
 
