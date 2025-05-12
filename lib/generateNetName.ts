@@ -6,6 +6,7 @@ import { scorePhrase } from "./scorePhrase"
 // Order components by how much better they are as a reference (chips are
 // better than capacitors, caps are better than resistors)
 const scoreComponentOrder = (component: AnySourceComponent) => {
+  if (!("ftype" in component)) return 0
   if (component.ftype === "simple_resistor") return 0
   if (component.ftype === "simple_capacitor") return 1
   return 2
