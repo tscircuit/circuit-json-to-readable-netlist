@@ -13,6 +13,8 @@
       "tests/*": ["tests/*"]
     },
 
+    "types": ["@tscircuit/core"],
+
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

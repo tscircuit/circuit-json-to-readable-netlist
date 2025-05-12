@@ -19,9 +19,11 @@
     "@tscircuit/math-utils": "^0.0.18",
     "@tscircuit/props": "^0.0.178",
     "@types/bun": "latest",
+    "@types/react": "18",
     "circuit-json": "^0.0.170",
     "circuit-json-to-connectivity-map": "^0.0.17",
     "debug": "^4.4.0",
+    "react": "18",
     "tsup": "^8.3.5"
   },
   "peerDependencies": {
