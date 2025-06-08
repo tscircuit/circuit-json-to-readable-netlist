@@ -10,7 +10,7 @@ declare module "bun:test" {
 
 it("chip without footprint doesn't output undefined", () => {
   const circuitJson = renderCircuit(
-    <board width="10mm" height="10mm">
+    <board width="10mm" height="10mm" routingDisabled>
       <chip name="LED1" manufacturerPartNumber="WS2812B_2020" />
     </board>,
   )
@@ -19,6 +19,10 @@ it("chip without footprint doesn't output undefined", () => {
   expect(netlist).toMatchInlineSnapshot(`
     "COMPONENTS:
      - LED1: WS2812B_2020
+
+
+    COMPONENT_PINS:
+    LED1 (WS2812B_2020)
     "
   `)
 })
