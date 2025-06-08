@@ -36,14 +36,23 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance} ${footprint} resistor`
+      componentDescription = `${component.display_resistance}${
+        footprint ? ` ${footprint}` : ""} resistor`
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance} ${footprint} capacitor`
+      componentDescription = `${component.display_capacitance}${
+        footprint ? ` ${footprint}` : ""} capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = `${manufacturerPartNumber}, ${footprint}`
+      componentDescription = [
+        manufacturerPartNumber,
+        footprint,
+      ]
+        .filter(Boolean)
+        .join(", ")
     } else {
-      componentDescription = `${component.name}, ${component.type}`
+      componentDescription = [component.name, component.type]
+        .filter(Boolean)
+        .join(", ")
     }
 
     netlist.push(` - ${component.name}: ${componentDescription}`)
