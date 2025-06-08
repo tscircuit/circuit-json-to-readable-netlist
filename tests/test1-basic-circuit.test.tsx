@@ -34,6 +34,16 @@ it("test1 should render a basic circuit", () => {
 NET: C1_pos
   - R1 pin1
   - C1 pin1 (+)
+
+
+COMPONENT_PINS:
+R1 (1kΩ 0402)
+- pin1(anode, pos, left): NETS(C1_pos)
+- pin2(cathode, neg, right): NOT_CONNECTED
+
+C1 (1nF 0402)
+- pin1(anode, pos, left): NETS(C1_pos)
+- pin2(cathode, neg, right): NOT_CONNECTED
 "
 `)
 })

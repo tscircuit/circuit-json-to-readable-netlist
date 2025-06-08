@@ -111,5 +111,63 @@ export const convertCircuitJsonToReadableNetlist = (
     }
   }
 
+  // build map of port ids to the nets they connect to
+  const portIdToNetNames: Record<string, string[]> = {}
+  for (const [netId, connectedIds] of Object.entries(netMap)) {
+    const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
+    if (portIds.length === 0) continue
+    const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
+    let netName = net?.name
+    if (!netName) {
+      netName = generateNetName({ circuitJson, connectedIds })
+    }
+    for (const portId of portIds) {
+      if (!portIdToNetNames[portId]) portIdToNetNames[portId] = []
+      portIdToNetNames[portId].push(netName)
+    }
+  }
+
+  if (source_components.length > 0) {
+    netlist.push("")
+    netlist.push("COMPONENT_PINS:")
+    for (const component of source_components) {
+      const cadComponent = su(circuitJson).cad_component.getWhere({
+        source_component_id: component.source_component_id,
+      })
+      const footprint = cadComponent?.footprinter_string
+      let header = component.name
+      if (component.ftype === "simple_resistor") {
+        header = `${component.name} (${component.display_resistance} ${footprint})`
+      } else if (component.ftype === "simple_capacitor") {
+        header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.manufacturer_part_number) {
+        header = `${component.name} (${component.manufacturer_part_number})`
+      }
+      netlist.push(header)
+      const ports = source_ports
+        .filter((p) => p.source_component_id === component.source_component_id)
+        .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
+      for (const port of ports) {
+        const mainPin =
+          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+        const aliases: string[] = []
+        if (port.name && port.name !== mainPin) aliases.push(port.name)
+        for (const hint of port.port_hints ?? []) {
+          if (hint === String(port.pin_number)) continue
+          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
+        }
+        const aliasPart =
+          aliases.length > 0
+            ? `(${Array.from(new Set(aliases)).join(", ")})`
+            : ""
+        const nets = portIdToNetNames[port.source_port_id] ?? []
+        const netsPart =
+          nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
+        netlist.push(`- ${mainPin}${aliasPart}: ${netsPart}`)
+      }
+      netlist.push("")
+    }
+  }
+
   return netlist.join("\n")
 }
