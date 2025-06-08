@@ -1,7 +1,7 @@
 {
   "name": "circuit-json-to-readable-netlist",
   "main": "dist/index.js",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "files": [
     "dist"
   ],
