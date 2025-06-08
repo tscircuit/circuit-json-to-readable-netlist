@@ -1,10 +1,10 @@
+import { su } from "@tscircuit/soup-util"
 import type {
-  CircuitJson,
   AnyCircuitElement,
+  CircuitJson,
   SourceNet,
   SourcePort,
 } from "circuit-json"
-import { su } from "@tscircuit/soup-util"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
