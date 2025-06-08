@@ -1,6 +1,6 @@
-import { renderCircuit } from "tests/fixtures/render-circuit"
+import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
-import { it, expect } from "bun:test"
+import { renderCircuit } from "tests/fixtures/render-circuit"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
@@ -64,6 +64,26 @@ NET: U1_SDA
 
 EMPTY NET PINS:
   - U1 GPIO3
-  - U1 VDD"
+  - U1 VDD
+
+COMPONENT_PINS:
+U1 (ATMEGA328P)
+- pin1(GND): NETS(GND)
+- pin2(AGND): NETS(GND)
+- pin3(GPIO1, SCL): NETS(GND)
+- pin4(GPIO2, SDA): NETS(U1_SDA)
+- pin5(GPIO3): NETS(GPIO4)
+- pin6(GPIO4, UART_TX): NOT_CONNECTED
+- pin7(GPIO5, UART_RX): NOT_CONNECTED
+- pin8(VDD): NETS(V5)
+
+R1 (1kΩ 0402)
+- pin1(anode, pos, left): NETS(C1_pos)
+- pin2(cathode, neg, right): NETS(U1_SDA)
+
+C1 (1nF 0402)
+- pin1(anode, pos, left): NETS(C1_pos)
+- pin2(cathode, neg, right): NOT_CONNECTED
+"
 `)
 })
