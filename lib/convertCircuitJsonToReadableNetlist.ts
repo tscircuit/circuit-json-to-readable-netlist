@@ -1,4 +1,4 @@
-import { su } from "@tscircuit/soup-util"
+import { su } from "@tscircuit/circuit-json-util"
 import type {
   AnyCircuitElement,
   CircuitJson,
@@ -37,16 +37,15 @@ export const convertCircuitJsonToReadableNetlist = (
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""} resistor`
+        footprint ? ` ${footprint}` : ""
+      } resistor`
     } else if (component.ftype === "simple_capacitor") {
       componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""} capacitor`
+        footprint ? ` ${footprint}` : ""
+      } capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [
-        manufacturerPartNumber,
-        footprint,
-      ]
+      componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
     } else {
