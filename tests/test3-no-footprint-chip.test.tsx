@@ -1,6 +1,6 @@
-import { renderCircuit } from "tests/fixtures/render-circuit"
+import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
-import { it, expect } from "bun:test"
+import { renderCircuit } from "tests/fixtures/render-circuit"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
