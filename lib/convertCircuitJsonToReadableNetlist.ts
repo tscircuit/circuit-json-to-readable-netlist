@@ -36,7 +36,7 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string ?? null
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance} ${footprint} resistor`
+      componentDescription = `${component.display_resistance}${footprint ? ` ${footprint}` : ""} resistor`
     } else if (component.ftype === "simple_capacitor") {
       componentDescription = `${component.display_capacitance} ${footprint} capacitor`
     } else if (component.ftype === "simple_chip") {
