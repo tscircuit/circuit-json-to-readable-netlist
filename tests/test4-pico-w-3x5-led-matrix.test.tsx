@@ -1,6 +1,8 @@
 import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import { renderCircuit } from "tests/fixtures/render-circuit"
+import { Circuit } from "@tscircuit/core"
+import { writeFileSync, mkdirSync } from "fs"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
@@ -8,8 +10,9 @@ declare module "bun:test" {
   }
 }
 
-it("should handle chip with GP pins and no footprint", () => {
-  const circuitJson = renderCircuit(
+it("should handle chip with GP pins and no footprint", async () => {
+  const circuit = new Circuit()
+  circuit.add(
     <board width="10mm" height="10mm" routingDisabled>
       <chip
         name="U1"
@@ -26,6 +29,9 @@ it("should handle chip with GP pins and no footprint", () => {
     </board>,
   )
 
+  circuit.render()
+  const circuitJson = circuit.getCircuitJson()
+
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
   expect(netlist).not.toContain("undefined")
   expect(netlist).toMatchInlineSnapshot(`
@@ -41,4 +47,27 @@ it("should handle chip with GP pins and no footprint", () => {
     - pin4(RUN): NOT_CONNECTED
     "
   `)
+
+  // Generate SVG snapshots for visual proof
+  mkdirSync("tests/__snapshots__", { recursive: true })
+
+  try {
+    console.log("Generating PCB SVG...")
+    const pcbSvg = await circuit.getSvg({ view: "pcb" })
+    console.log("PCB SVG generated, length:", pcbSvg.length)
+    writeFileSync("tests/__snapshots__/pico-w-chip-pcb.svg", pcbSvg)
+    console.log("PCB SVG snapshot saved successfully")
+  } catch (e: any) {
+    console.warn("Could not generate PCB SVG:", e.message)
+  }
+
+  try {
+    console.log("Generating schematic SVG...")
+    const schematicSvg = await circuit.getSvg({ view: "schematic" as any })
+    console.log("Schematic SVG generated, length:", schematicSvg.length)
+    writeFileSync("tests/__snapshots__/pico-w-chip-schematic.svg", schematicSvg)
+    console.log("Schematic SVG snapshot saved successfully")
+  } catch (e: any) {
+    console.warn("Could not generate schematic SVG:", e.message)
+  }
 })

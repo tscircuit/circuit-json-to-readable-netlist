@@ -31,5 +31,8 @@
     "@tscircuit/circuit-json-util": "*",
     "circuit-json-to-connectivity-map": "*",
     "circuit-json": "*"
+  },
+  "dependencies": {
+    "circuit-to-svg": "^0.0.262"
   }
 }
