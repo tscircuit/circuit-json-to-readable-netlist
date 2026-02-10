@@ -156,8 +156,17 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+        // Fix undefined handling: ensure mainPin is never undefined
+        let mainPin: string
+        if (port.pin_number !== undefined) {
+          mainPin = `pin${port.pin_number}`
+        } else if (port.name) {
+          mainPin = port.name
+        } else {
+          // Fallback if both are undefined
+          mainPin = "unknown_pin"
+        }
+
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
