@@ -36,15 +36,18 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
+      const resistance = component.display_resistance ?? "unknown"
+      componentDescription = `${resistance}${
         footprint ? ` ${footprint}` : ""
       } resistor`
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
+      const capacitance = component.display_capacitance ?? "unknown"
+      componentDescription = `${capacitance}${
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
+      const manufacturerPartNumber =
+        component.manufacturer_part_number ?? undefined
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
@@ -145,9 +148,11 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const resistance = component.display_resistance ?? "unknown"
+        header = `${component.name} (${resistance} ${footprint ?? ""})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const capacitance = component.display_capacitance ?? "unknown"
+        header = `${component.name} (${capacitance} ${footprint ?? ""})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
