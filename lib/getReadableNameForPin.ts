@@ -48,11 +48,10 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  // Include more port_hints by lowering threshold from > 1 to > 0
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 0) {
+    if (score > 1) {
       additionalPinLabels.push(port_hint)
     }
   }
