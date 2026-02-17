@@ -74,7 +74,7 @@ export const generateNetName = ({
 
   const bestPhrase = phrases.sort((a, b) => b.score - a.score)[0]
   if (!bestPhrase) {
-    return `net_unknown`
+    return "net_unknown"
   }
 
   const bestPortName = bestPhrase.name
