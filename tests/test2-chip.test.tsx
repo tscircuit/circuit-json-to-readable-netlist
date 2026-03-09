@@ -43,47 +43,47 @@ it("test2 chip", () => {
   expect(
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
-"COMPONENTS:
- - U1: ATMEGA328P, soic8
- - R1: 1kΩ 0402 resistor
- - C1: 1nF 0402 capacitor
+    "COMPONENTS:
+     - U1: ATMEGA328P, soic8
+     - R1: 1kΩ 0402 resistor
+     - C1: 1nF 0402 capacitor
 
-NET: C1_pos
-  - R1 pin1
-  - C1 pin1 (+)
+    NET: C1_pos
+      - R1 pin1
+      - C1 pin1 (+)
 
-NET: GND
-  - U1 GPIO1 (SCL)
-  - U1 AGND
-  - U1 GND
+    NET: GND
+      - U1 GPIO1 (SCL)
+      - U1 AGND
+      - U1 GND
 
-NET: U1_SDA
-  - U1 GPIO2 (SDA)
-  - R1 pin2
+    NET: U1_SDA
+      - U1 GPIO2 (SDA)
+      - R1 pin2
 
 
-EMPTY NET PINS:
-  - U1 GPIO3
-  - U1 VDD
+    EMPTY NET PINS:
+      - U1 GPIO3
+      - U1 VDD
 
-COMPONENT_PINS:
-U1 (ATMEGA328P)
-- pin1(GND): NETS(GND)
-- pin2(AGND): NETS(GND)
-- pin3(GPIO1, SCL): NETS(GND)
-- pin4(GPIO2, SDA): NETS(U1_SDA)
-- pin5(GPIO3): NETS(GPIO4)
-- pin6(GPIO4, UART_TX): NOT_CONNECTED
-- pin7(GPIO5, UART_RX): NOT_CONNECTED
-- pin8(VDD): NETS(V5)
+    COMPONENT_PINS:
+    U1 (ATMEGA328P)
+    - pin1(GND): NETS(GND)
+    - pin2(AGND): NETS(GND)
+    - pin3(GPIO1, SCL): NETS(GND)
+    - pin4(GPIO2, SDA): NETS(U1_SDA)
+    - pin5(GPIO3): NETS(GPIO4)
+    - pin6(GPIO4, UART_TX): NOT_CONNECTED
+    - pin7(GPIO5, UART_RX): NOT_CONNECTED
+    - pin8(VDD): NETS(V5)
 
-R1 (1kΩ 0402)
-- pin1(anode, pos, left): NETS(C1_pos)
-- pin2(cathode, neg, right): NETS(U1_SDA)
+    R1 (1kΩ 0402)
+    - pin1(anode, pos, left): NETS(C1_pos)
+    - pin2(cathode, neg, right): NETS(U1_SDA)
 
-C1 (1nF 0402)
-- pin1(anode, pos, left): NETS(C1_pos)
-- pin2(cathode, neg, right): NOT_CONNECTED
-"
-`)
+    C1 (1nF 0402)
+    - pin1(pos, anode, left): NETS(C1_pos)
+    - pin2(neg, cathode, right): NOT_CONNECTED
+    "
+  `)
 })
