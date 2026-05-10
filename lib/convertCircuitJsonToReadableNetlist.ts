@@ -45,9 +45,8 @@ export const convertCircuitJsonToReadableNetlist = (
       } capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [manufacturerPartNumber, footprint]
-        .filter(Boolean)
-        .join(", ")
+      componentDescription =
+        [manufacturerPartNumber, footprint].filter(Boolean).join(", ") || "chip"
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -157,7 +156,9 @@ export const convertCircuitJsonToReadableNetlist = (
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          port.pin_number !== undefined
+            ? `pin${port.pin_number}`
+            : port.name || port.source_port_id
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {

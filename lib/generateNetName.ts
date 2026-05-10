@@ -61,6 +61,22 @@ export const generateNetName = ({
       ),
     )
     .concat(nets.map((n) => n.name))
+    .filter(Boolean)
+
+  if (possibleNames.length === 0) {
+    const fallbackPort = ports[0]
+    const fallbackComponent = all_source_components.find(
+      (c) => c.source_component_id === fallbackPort?.source_component_id,
+    )
+    return [
+      fallbackComponent?.name,
+      fallbackPort?.pin_number !== undefined
+        ? `pin${fallbackPort.pin_number}`
+        : fallbackPort?.source_port_id,
+    ]
+      .filter(Boolean)
+      .join("_")
+  }
 
   const phrases = possibleNames.map((name) => ({
     name,
