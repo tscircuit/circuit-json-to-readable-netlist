@@ -1,6 +1,10 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  normalizeReadableLabel,
+  normalizeReadableLabels,
+} from "./normalizeReadableLabel"
 import { scorePhrase } from "./scorePhrase"
 
 // Order components by how much better they are as a reference (chips are
@@ -54,28 +58,42 @@ export const generateNetName = ({
     connectedIds.includes(t.source_trace_id),
   )
 
-  const possibleNames = ports
-    .flatMap((p) =>
-      Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
-      ),
-    )
-    .concat(nets.map((n) => n.name))
+  const possibleNames: Array<{ name: string; source_port_id?: string }> = []
+  for (const port of ports) {
+    for (const name of normalizeReadableLabels([
+      port.name,
+      ...(port.port_hints ?? []),
+    ])) {
+      possibleNames.push({
+        name,
+        source_port_id: port.source_port_id,
+      })
+    }
+  }
+  for (const net of nets) {
+    const name = normalizeReadableLabel(net.name)
+    if (name) {
+      possibleNames.push({ name })
+    }
+  }
 
   const phrases = possibleNames.map((name) => ({
-    name,
-    score: scorePhrase(name),
+    ...name,
+    score: scorePhrase(name.name),
   }))
 
-  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0].name
+  const bestPhrase = phrases.sort((a, b) => b.score - a.score)[0]
+  if (!bestPhrase) return "unnamed_net"
 
   // Find the component that has the best port name
   const bestPort = ports.find(
-    (p) => p.name === bestPortName || p.port_hints?.includes(bestPortName),
+    (p) => p.source_port_id === bestPhrase.source_port_id,
   )
 
   const componentWithBestPort = all_source_components.find(
     (c) => c.source_component_id === bestPort?.source_component_id,
   )
-  return [componentWithBestPort?.name, bestPortName].filter(Boolean).join("_")
+  return [componentWithBestPort?.name, bestPhrase.name]
+    .filter(Boolean)
+    .join("_")
 }
