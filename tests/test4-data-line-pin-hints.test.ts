@@ -1,0 +1,174 @@
+import { expect, it } from "bun:test"
+import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+
+declare module "bun:test" {
+  interface Matchers<T = unknown> {
+    toMatchInlineSnapshot(snapshot?: string | null): Promise<MatcherResult>
+  }
+}
+
+it("keeps data-line hints for generic chip pin labels", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      ftype: "simple_chip",
+      source_component_id: "source_component_0",
+      name: "U1",
+      manufacturer_part_number: "WS2812B",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_0",
+      source_component_id: "source_component_0",
+      name: "pin14",
+      pin_number: 14,
+      port_hints: ["DOUT"],
+    },
+    {
+      type: "source_component",
+      ftype: "simple_chip",
+      source_component_id: "source_component_1",
+      name: "U2",
+      manufacturer_part_number: "WS2812B",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_1",
+      source_component_id: "source_component_1",
+      name: "pin1",
+      pin_number: 1,
+      port_hints: ["DIN"],
+    },
+    {
+      type: "source_component",
+      ftype: "simple_chip",
+      source_component_id: "source_component_2",
+      name: "U3",
+      manufacturer_part_number: "SERIAL_FLASH",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_2",
+      source_component_id: "source_component_2",
+      name: "pin5",
+      pin_number: 5,
+      port_hints: ["DATA0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_3",
+      source_component_id: "source_component_2",
+      name: "pin6",
+      pin_number: 6,
+      port_hints: ["CLK0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_4",
+      source_component_id: "source_component_2",
+      name: "pin7",
+      pin_number: 7,
+      port_hints: ["CS0"],
+    },
+    {
+      type: "source_component",
+      ftype: "simple_chip",
+      source_component_id: "source_component_3",
+      name: "J1",
+      manufacturer_part_number: "GENERIC_HEADER",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_5",
+      source_component_id: "source_component_3",
+      name: "pin1",
+      pin_number: 1,
+      port_hints: ["DATA0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_6",
+      source_component_id: "source_component_3",
+      name: "pin2",
+      pin_number: 2,
+      port_hints: ["CLK0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_7",
+      source_component_id: "source_component_3",
+      name: "pin3",
+      pin_number: 3,
+      port_hints: ["CS0"],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_0",
+      connected_source_port_ids: ["source_port_0", "source_port_1"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_1",
+      connected_source_port_ids: ["source_port_2", "source_port_5"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_2",
+      connected_source_port_ids: ["source_port_3", "source_port_6"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_3",
+      connected_source_port_ids: ["source_port_4", "source_port_7"],
+      connected_source_net_ids: [],
+    },
+  ] as any
+
+  expect(
+    convertCircuitJsonToReadableNetlist(circuitJson),
+  ).toMatchInlineSnapshot(`
+    "COMPONENTS:
+     - U1: WS2812B
+     - U2: WS2812B
+     - U3: SERIAL_FLASH
+     - J1: GENERIC_HEADER
+
+    NET: U1_DOUT
+      - U1 pin14 (DOUT)
+      - U2 pin1 (DIN)
+
+    NET: U3_DATA0
+      - U3 pin5 (DATA0)
+      - J1 pin1 (DATA0)
+
+    NET: U3_CLK0
+      - U3 pin6 (CLK0)
+      - J1 pin2 (CLK0)
+
+    NET: U3_CS0
+      - U3 pin7 (CS0)
+      - J1 pin3 (CS0)
+
+
+    COMPONENT_PINS:
+    U1 (WS2812B)
+    - pin14(DOUT): NETS(U1_DOUT)
+
+    U2 (WS2812B)
+    - pin1(DIN): NETS(U1_DOUT)
+
+    U3 (SERIAL_FLASH)
+    - pin5(DATA0): NETS(U3_DATA0)
+    - pin6(CLK0): NETS(U3_CLK0)
+    - pin7(CS0): NETS(U3_CS0)
+
+    J1 (GENERIC_HEADER)
+    - pin1(DATA0): NETS(U3_DATA0)
+    - pin2(CLK0): NETS(U3_CLK0)
+    - pin3(CS0): NETS(U3_CS0)
+    "
+  `)
+})

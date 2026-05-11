@@ -11,8 +11,13 @@ const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
+  CLK: 1.15,
   SDA: 1.2,
   SCL: 1.2,
+  CS: 1.15,
+  DATA: 1.1,
+  DIN: 1.1,
+  DOUT: 1.1,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +40,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isDataLineLabel = (phrase: string) => {
+  const normalized = phrase.toUpperCase()
+  return /^(?:DATA|DIN|DOUT|CLK|CS)\d*$/.test(normalized)
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isDataLineLabel(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
