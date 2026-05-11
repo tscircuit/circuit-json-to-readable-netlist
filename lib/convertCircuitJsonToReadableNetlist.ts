@@ -49,9 +49,7 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter(Boolean)
         .join(", ")
     } else {
-      componentDescription = [component.name, component.type]
-        .filter(Boolean)
-        .join(", ")
+      componentDescription = getReadableComponentType(component.ftype)
     }
 
     netlist.push(` - ${component.name}: ${componentDescription}`)
@@ -178,4 +176,9 @@ export const convertCircuitJsonToReadableNetlist = (
   }
 
   return netlist.join("\n")
+}
+
+const getReadableComponentType = (ftype?: string): string => {
+  if (!ftype) return "component"
+  return ftype.replace(/^simple_/, "").replaceAll("_", " ")
 }
