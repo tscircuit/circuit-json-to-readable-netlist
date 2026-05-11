@@ -9,6 +9,26 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+type ComponentWithSupplierPartNumbers = {
+  supplier_part_numbers?: Partial<Record<string, string[]>>
+}
+
+const getFirstSupplierPartNumber = (
+  component: ComponentWithSupplierPartNumbers,
+) => {
+  const supplierPartNumbers = component.supplier_part_numbers
+  if (!supplierPartNumbers) return undefined
+
+  for (const [supplierName, partNumbers] of Object.entries(
+    supplierPartNumbers,
+  )) {
+    const partNumber = partNumbers?.find((value) => value.trim())
+    if (partNumber) return `${supplierName}: ${partNumber.trim()}`
+  }
+
+  return undefined
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -45,7 +65,11 @@ export const convertCircuitJsonToReadableNetlist = (
       } capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [manufacturerPartNumber, footprint]
+      const supplierPartNumber = getFirstSupplierPartNumber(component)
+      componentDescription = [
+        manufacturerPartNumber ?? supplierPartNumber,
+        footprint,
+      ]
         .filter(Boolean)
         .join(", ")
     } else {
@@ -150,6 +174,11 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (component.ftype === "simple_chip") {
+        const supplierPartNumber = getFirstSupplierPartNumber(component)
+        if (supplierPartNumber) {
+          header = `${component.name} (${supplierPartNumber})`
+        }
       }
       netlist.push(header)
       const ports = source_ports
