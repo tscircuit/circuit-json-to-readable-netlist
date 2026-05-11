@@ -36,6 +36,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (phrase.match(/^(TS\d*|TEMP\d*|THERM\d*|NTC\d*|PTC\d*)$/i)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
