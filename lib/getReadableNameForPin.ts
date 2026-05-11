@@ -7,6 +7,49 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const lowInformationPinHints = new Set([
+  "anode",
+  "cathode",
+  "left",
+  "neg",
+  "negative",
+  "pos",
+  "positive",
+  "right",
+])
+
+const isGenericPinReference = (name: string, pinNumber?: number) => {
+  const normalizedName = name.trim().toLowerCase()
+  return (
+    normalizedName === "pin" ||
+    normalizedName === `pin${pinNumber}` ||
+    normalizedName === String(pinNumber)
+  )
+}
+
+const shouldIncludePinHint = ({
+  hint,
+  mainPinName,
+  pinNumber,
+}: {
+  hint: string
+  mainPinName: string
+  pinNumber?: number
+}) => {
+  const normalizedHint = hint.trim().toLowerCase()
+  if (!normalizedHint) return false
+  if (hint === mainPinName) return false
+  if (isGenericPinReference(hint, pinNumber)) return false
+
+  if (scorePhrase(hint) > 1) return true
+
+  return (
+    isGenericPinReference(mainPinName, pinNumber) &&
+    !lowInformationPinHints.has(normalizedHint) &&
+    /[a-z]/i.test(hint)
+  )
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -45,9 +88,14 @@ export const getReadableNameForPin = ({
   }
 
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (
+      shouldIncludePinHint({
+        hint: port_hint,
+        mainPinName,
+        pinNumber: port.pin_number,
+      }) &&
+      !additionalPinLabels.includes(port_hint)
+    ) {
       additionalPinLabels.push(port_hint)
     }
   }
