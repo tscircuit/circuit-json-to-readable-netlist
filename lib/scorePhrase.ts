@@ -8,6 +8,8 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  VBUS: 1.2,
+  VCONN: 1.2,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -31,11 +33,22 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const exactPhraseScore = {
+  CC1: 1.2,
+  CC2: 1.2,
+  SBU1: 1.2,
+  SBU2: 1.2,
+}
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
 export const scorePhrase = (phrase: string) => {
+  const exactScore = exactPhraseScore[phrase as keyof typeof exactPhraseScore]
+  if (exactScore !== undefined) {
+    return exactScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
