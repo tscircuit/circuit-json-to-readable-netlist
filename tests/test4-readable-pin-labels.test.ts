@@ -1,6 +1,7 @@
 import { expect, it } from "bun:test"
 import type { AnyCircuitElement } from "circuit-json"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { getReadableNameForPin } from "lib/getReadableNameForPin"
 
 it("uses descriptive numbered pin hints instead of generic pin labels", () => {
   const circuitJson: AnyCircuitElement[] = [
@@ -49,4 +50,31 @@ it("uses descriptive numbered pin hints instead of generic pin labels", () => {
   expect(netlist).not.toContain("  - U1 pin14")
   expect(netlist).toContain("- pin14(GP10, SPI1_SCK): NETS(U1_GP10)")
   expect(netlist).not.toContain("undefined")
+})
+
+it("keeps lowercase descriptive pin hints from falling back to generic pin labels", () => {
+  const circuitJson: AnyCircuitElement[] = [
+    {
+      type: "source_component",
+      ftype: "simple_chip",
+      source_component_id: "source_component_0",
+      name: "U1",
+      manufacturer_part_number: "RP2040",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_0",
+      source_component_id: "source_component_0",
+      name: "pin14",
+      pin_number: 14,
+      port_hints: ["14", "pin14", "gp10", "spi1_sck"],
+    },
+  ]
+
+  expect(
+    getReadableNameForPin({
+      circuitJson,
+      source_port_id: "source_port_0",
+    }),
+  ).toBe("U1 gp10 (spi1_sck)")
 })
