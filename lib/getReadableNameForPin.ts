@@ -7,6 +7,16 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (name: string, pinNumber?: number) => {
+  const normalizedName = name.toLowerCase().replace(/\s+/g, "")
+  return (
+    normalizedName === "pin" ||
+    normalizedName === String(pinNumber) ||
+    normalizedName === `pin${pinNumber}` ||
+    /^pin\d+$/.test(normalizedName)
+  )
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +44,13 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const fallbackPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const meaningfulHint = (port.port_hints ?? []).find(
+    (hint) => !isGenericPinName(hint, port.pin_number) && scorePhrase(hint) > 1,
+  )
+  const mainPinName = isGenericPinName(fallbackPinName, port.pin_number)
+    ? (meaningfulHint ?? fallbackPinName)
+    : fallbackPinName
 
   const additionalPinLabels: string[] = []
 
@@ -46,6 +62,7 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (isGenericPinName(port_hint, port.pin_number)) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
@@ -55,5 +72,6 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const uniqueAdditionalPinLabels = Array.from(new Set(additionalPinLabels))
+  return `${component.name} ${mainPinName}${uniqueAdditionalPinLabels.length > 0 ? ` (${uniqueAdditionalPinLabels.join(",")})` : ""}${displayValue}`
 }
