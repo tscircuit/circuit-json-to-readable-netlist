@@ -1,8 +1,9 @@
 import { expect, it } from "bun:test"
+import type { AnyCircuitElement } from "circuit-json"
 import { getReadableNameForPin } from "lib/getReadableNameForPin"
 
 it("includes useful labels for generic pin names", () => {
-  const circuitJson = [
+  const circuitJson: AnyCircuitElement[] = [
     {
       type: "source_component",
       source_component_id: "source_component_0",
