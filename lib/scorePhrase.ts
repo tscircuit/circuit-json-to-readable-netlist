@@ -39,8 +39,9 @@ export const scorePhrase = (phrase: string) => {
   if (phrase.match(/\d+/)) {
     return 0.5
   }
+  const normalizedPhrase = phrase.toLowerCase()
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word.toLowerCase())) {
       return score
     }
   }
