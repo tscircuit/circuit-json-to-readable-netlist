@@ -43,6 +43,9 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = `${component.display_capacitance}${
         footprint ? ` ${footprint}` : ""
       } capacitor`
+    } else if (component.ftype === "simple_diode") {
+      const value = component.display_value
+      componentDescription = `${value ? `${value} ` : ""}${footprint ? `${footprint} ` : ""}diode`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -148,6 +151,10 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_diode") {
+        const value = component.display_value
+        const details = [value, footprint].filter(Boolean).join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
