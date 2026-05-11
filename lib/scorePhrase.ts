@@ -35,7 +35,29 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const oneWirePinAliases = new Set([
+  "1W",
+  "1WDQ",
+  "1WIO",
+  "1WIRE",
+  "1WIREDQ",
+  "1WIREIO",
+  "ONEWIRE",
+  "ONEWIREDQ",
+  "ONEWIREIO",
+  "OW",
+  "OWDQ",
+  "OWIO",
+  "DQ",
+])
+
+const getNormalizedPinAlias = (phrase: string) =>
+  phrase.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+
 export const scorePhrase = (phrase: string) => {
+  if (oneWirePinAliases.has(getNormalizedPinAlias(phrase))) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
