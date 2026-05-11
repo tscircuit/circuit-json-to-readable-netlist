@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const simCardSignalPattern =
+  /(^|[_-])(SIM|USIM|UICC|ISO7816)([_-]?(IO|CLK|RST|RESET|VCC|DET|PRES|PRESENT|DATA))?($|[_-])/i
+
 export const scorePhrase = (phrase: string) => {
+  if (simCardSignalPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
