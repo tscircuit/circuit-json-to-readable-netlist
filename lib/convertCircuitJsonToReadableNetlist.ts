@@ -124,14 +124,16 @@ export const convertCircuitJsonToReadableNetlist = (
   for (const [netId, connectedIds] of Object.entries(netMap)) {
     const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
     if (portIds.length === 0) continue
-    const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
-    let netName = net?.name
-    if (!netName) {
-      netName = generateNetName({ circuitJson, connectedIds })
-    }
+    const netNames = source_nets
+      .filter((n) => connectedIds.includes(n.source_net_id) && n.name)
+      .map((n) => n.name)
+    const uniqueNetNames =
+      netNames.length > 0
+        ? Array.from(new Set(netNames))
+        : [generateNetName({ circuitJson, connectedIds })]
     for (const portId of portIds) {
       if (!portIdToNetNames[portId]) portIdToNetNames[portId] = []
-      portIdToNetNames[portId].push(netName)
+      portIdToNetNames[portId].push(...uniqueNetNames)
     }
   }
 
