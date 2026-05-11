@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const qspiFlashSignalPatterns = [
+  /^(?:Q?SPI_)?(?:IO|SIO)[0-3]$/,
+  /^QSPI_D[0-3]$/,
+  /^Q?SPI_(?:CS|CS_N|CSN|CLK|SCLK)$/,
+  /^(?:Q?SPI_)?(?:WP|HOLD|RESET)_N$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.trim().toUpperCase()
+  if (
+    qspiFlashSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
