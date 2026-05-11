@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pcieSignalPatterns = [
+  /^PCIE_(?:TX|RX)[PN]\d+$/,
+  /^PE(?:T|R)[PN]\d+$/,
+  /^(?:PCIE_)?(?:PERST|CLKREQ)(?:_N)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.trim().toUpperCase()
+  if (pcieSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
