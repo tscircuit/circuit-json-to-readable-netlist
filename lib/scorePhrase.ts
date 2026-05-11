@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const motorOrFanControlAliasPattern =
+  /^(?:(?:FAN|MOTOR)[_-])?(?:PWM\d*|HALL(?:\d+|[_-]?[ABCUVW])?|PHASE[_-]?[UVWABC]|TACH\d*|FG\d*|FAULT\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (motorOrFanControlAliasPattern.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
