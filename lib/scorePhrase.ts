@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const analogAudioAliasPattern =
+  /(^|[_-])(?:HP\d*_[LR]|HPOUT\d*_[LR]|SPK\d*_[PNLR]|MICBIAS\d*|MIC\d*_(?:P|N|BIAS)|LINE(?:IN|OUT)\d*_[LR]|AUDIO_JD|JACK_DETECT)($|[_-])/
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (analogAudioAliasPattern.test(normalizedPhrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
