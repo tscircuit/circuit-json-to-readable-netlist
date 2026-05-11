@@ -15,6 +15,7 @@ it("renders simple pin header descriptions", () => {
       source_component_id: "source_component_j1",
       ftype: "simple_pin_header",
       name: "J1",
+      manufacturer_part_number: "HDR-4",
       pin_count: 4,
       gender: "female",
       display_value: "I2C expansion",
