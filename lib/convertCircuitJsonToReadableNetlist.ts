@@ -9,6 +9,39 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const joinDescriptionParts = (
+  parts: Array<string | number | null | undefined>,
+) =>
+  parts
+    .filter((part) => part !== undefined && part !== null && part !== "")
+    .join(" ")
+
+const formatPassiveDescription = ({
+  displayValue,
+  footprint,
+  kind,
+}: {
+  displayValue?: string | number | null
+  footprint?: string | null
+  kind: "resistor" | "capacitor"
+}) => {
+  const details = joinDescriptionParts([displayValue, footprint])
+  return details ? `${details} ${kind}` : kind
+}
+
+const formatPassiveHeader = ({
+  name,
+  displayValue,
+  footprint,
+}: {
+  name: string
+  displayValue?: string | number | null
+  footprint?: string | null
+}) => {
+  const details = joinDescriptionParts([displayValue, footprint])
+  return details ? `${name} (${details})` : name
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -36,13 +69,17 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      componentDescription = formatPassiveDescription({
+        displayValue: component.display_resistance,
+        footprint,
+        kind: "resistor",
+      })
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      componentDescription = formatPassiveDescription({
+        displayValue: component.display_capacitance,
+        footprint,
+        kind: "capacitor",
+      })
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -145,9 +182,17 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = formatPassiveHeader({
+          name: component.name,
+          displayValue: component.display_resistance,
+          footprint,
+        })
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = formatPassiveHeader({
+          name: component.name,
+          displayValue: component.display_capacitance,
+          footprint,
+        })
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
