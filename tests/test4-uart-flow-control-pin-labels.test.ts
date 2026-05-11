@@ -1,4 +1,5 @@
 import { expect, it } from "bun:test"
+import type { AnyCircuitElement } from "circuit-json"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 
 declare module "bun:test" {
@@ -8,7 +9,7 @@ declare module "bun:test" {
 }
 
 it("shows UART flow-control aliases for generic chip pin labels", () => {
-  const circuitJson = [
+  const circuitJson: AnyCircuitElement[] = [
     {
       type: "source_component",
       ftype: "simple_chip",
@@ -48,7 +49,7 @@ it("shows UART flow-control aliases for generic chip pin labels", () => {
   ]
 
   expect(
-    convertCircuitJsonToReadableNetlist(circuitJson as any),
+    convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
      - U1: UART-MCU
