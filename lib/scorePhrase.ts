@@ -35,7 +35,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const getNormalizedPinAlias = (phrase: string) =>
+  phrase.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+
+const highSpeedConverterAliasPattern =
+  /^(?:JESD(?:204)?[A-Z]*(?:TX|RX)\d+[PN]|SYSREF[PN]?|SYNC(?:IN|OUT)?[PNB]|LMFC)$/
+
 export const scorePhrase = (phrase: string) => {
+  if (highSpeedConverterAliasPattern.test(getNormalizedPinAlias(phrase))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
