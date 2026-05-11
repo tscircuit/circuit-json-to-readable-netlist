@@ -34,6 +34,12 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
+  const componentName =
+    component.name ??
+    ("manufacturer_part_number" in component
+      ? component.manufacturer_part_number
+      : undefined) ??
+    component.source_component_id
   const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
@@ -47,7 +53,7 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score >= 1) {
       additionalPinLabels.push(port_hint)
     }
   }
@@ -55,5 +61,5 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${componentName} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
