@@ -9,6 +9,25 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const getSemiconductorDescription = (component: {
+  ftype?: string
+  transistor_type?: string
+  channel_type?: string
+  mosfet_mode?: string
+}) => {
+  if (component.ftype === "simple_transistor" && component.transistor_type) {
+    return `${component.transistor_type.toUpperCase()} transistor`
+  }
+
+  if (component.ftype === "simple_mosfet" && component.channel_type) {
+    const channel = component.channel_type === "n" ? "n-channel" : "p-channel"
+    const mode = component.mosfet_mode ? ` ${component.mosfet_mode}` : ""
+    return `${channel}${mode} MOSFET`
+  }
+
+  return ""
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -34,6 +53,7 @@ export const convertCircuitJsonToReadableNetlist = (
     })
 
     const footprint = cadComponent?.footprinter_string
+    const semiconductorDescription = getSemiconductorDescription(component)
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance}${
@@ -46,6 +66,13 @@ export const convertCircuitJsonToReadableNetlist = (
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
+        .filter(Boolean)
+        .join(", ")
+    } else if (semiconductorDescription) {
+      componentDescription = [
+        component.manufacturer_part_number,
+        semiconductorDescription,
+      ]
         .filter(Boolean)
         .join(", ")
     } else {
@@ -150,6 +177,10 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      }
+      const semiconductorDescription = getSemiconductorDescription(component)
+      if (semiconductorDescription && !component.manufacturer_part_number) {
+        header = `${component.name} (${semiconductorDescription})`
       }
       netlist.push(header)
       const ports = source_ports
