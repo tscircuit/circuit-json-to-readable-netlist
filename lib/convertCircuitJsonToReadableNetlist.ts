@@ -13,6 +13,11 @@ type ComponentWithSupplierPartNumbers = {
   supplier_part_numbers?: Partial<Record<string, string[]>>
 }
 
+const getNonEmptyString = (value: string | undefined) => {
+  const trimmedValue = value?.trim()
+  return trimmedValue ? trimmedValue : undefined
+}
+
 const getFirstSupplierPartNumber = (
   component: ComponentWithSupplierPartNumbers,
 ) => {
@@ -64,7 +69,9 @@ export const convertCircuitJsonToReadableNetlist = (
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
+      const manufacturerPartNumber = getNonEmptyString(
+        component.manufacturer_part_number,
+      )
       const supplierPartNumber = getFirstSupplierPartNumber(component)
       componentDescription = [
         manufacturerPartNumber ?? supplierPartNumber,
@@ -167,13 +174,16 @@ export const convertCircuitJsonToReadableNetlist = (
         source_component_id: component.source_component_id,
       })
       const footprint = cadComponent?.footprinter_string
+      const manufacturerPartNumber = getNonEmptyString(
+        component.manufacturer_part_number,
+      )
       let header = component.name
       if (component.ftype === "simple_resistor") {
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
-      } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (manufacturerPartNumber) {
+        header = `${component.name} (${manufacturerPartNumber})`
       } else if (component.ftype === "simple_chip") {
         const supplierPartNumber = getFirstSupplierPartNumber(component)
         if (supplierPartNumber) {
