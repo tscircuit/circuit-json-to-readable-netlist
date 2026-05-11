@@ -27,14 +27,18 @@ it("uses connected pin labels when a source net has no name", () => {
     </board>,
   )
 
-  for (const element of circuitJson) {
+  const circuitJsonWithUnnamedSourceNet = circuitJson.map((element) => ({
+    ...element,
+  }))
+  for (const element of circuitJsonWithUnnamedSourceNet) {
     if (element.type === "source_net" && element.name === "GND") {
-      element.name = undefined
+      const unnamedSourceNet = element as Partial<typeof element>
+      unnamedSourceNet.name = undefined
     }
   }
 
   expect(
-    convertCircuitJsonToReadableNetlist(circuitJson),
+    convertCircuitJsonToReadableNetlist(circuitJsonWithUnnamedSourceNet),
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
      - U1: ATMEGA328P, soic8
