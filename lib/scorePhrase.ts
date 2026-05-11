@@ -35,21 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
-const i2sAudioBusAliases = [
-  "I2S_BCLK",
-  "I2S_LRCLK",
-  "I2S_MCLK",
-  "I2S_SDIN",
-  "I2S_SDOUT",
-  "BCLK",
-  "LRCLK",
-  "MCLK",
-  "SDIN",
-  "SDOUT",
+const contactlessReaderAliases = [
+  "NFC_IRQ",
+  "NFC_FIELD",
+  "NFC_CLK",
+  "NFC_TX",
+  "NFC_RX",
+  "RFID_IRQ",
+  "RFID_FIELD",
+  "RFID_CLK",
+  "RFID_TX",
+  "RFID_RX",
+  "ISO14443",
 ]
 
 export const scorePhrase = (phrase: string) => {
-  if (i2sAudioBusAliases.some((alias) => phrase.includes(alias))) {
+  if (contactlessReaderAliases.some((alias) => phrase.includes(alias))) {
     return 1.2
   }
   if (phrase.match(/\d+/)) {
