@@ -172,8 +172,6 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
-      } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
       } else if (component.ftype === "simple_pin_header") {
         const pinHeaderDescription = formatPinHeaderDescription({
           pinCount: component.pin_count,
@@ -182,6 +180,8 @@ export const convertCircuitJsonToReadableNetlist = (
           footprint,
         })
         header = `${component.name} (${pinHeaderDescription})`
+      } else if (component.manufacturer_part_number) {
+        header = `${component.name} (${component.manufacturer_part_number})`
       }
       netlist.push(header)
       const ports = source_ports
