@@ -9,6 +9,20 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const formatPowerSourceDescription = (component: {
+  ftype?: string
+  voltage?: unknown
+}) => {
+  if (component.ftype !== "simple_power_source") return ""
+  if (typeof component.voltage === "number") {
+    return `${component.voltage}V power source`
+  }
+  if (typeof component.voltage === "string" && component.voltage.trim()) {
+    return `${component.voltage.trim()} power source`
+  }
+  return "power source"
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -48,6 +62,8 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+    } else if (component.ftype === "simple_power_source") {
+      componentDescription = formatPowerSourceDescription(component)
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -150,6 +166,8 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (component.ftype === "simple_power_source") {
+        header = `${component.name} (${formatPowerSourceDescription(component)})`
       }
       netlist.push(header)
       const ports = source_ports
