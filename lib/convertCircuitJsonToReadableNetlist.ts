@@ -1,13 +1,13 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+
+const formatSourceComponentType = (ftype?: string) => {
+  if (!ftype) return undefined
+  return ftype.replace(/^simple_/, "").replaceAll("_", " ")
+}
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -23,36 +23,48 @@ export const convertCircuitJsonToReadableNetlist = (
   // Build readable netlist
   const netlist: string[] = []
 
+  const getComponentDescription = (
+    component: (typeof source_components)[number],
+    footprint?: string,
+  ) => {
+    if (component.ftype === "simple_resistor") {
+      return `${component.display_resistance}${
+        footprint ? ` ${footprint}` : ""
+      } resistor`
+    }
+    if (component.ftype === "simple_capacitor") {
+      return `${component.display_capacitance}${
+        footprint ? ` ${footprint}` : ""
+      } capacitor`
+    }
+    if (component.ftype === "simple_chip") {
+      const manufacturerPartNumber = component.manufacturer_part_number
+      return [manufacturerPartNumber, footprint].filter(Boolean).join(", ")
+    }
+
+    const readableComponentType = formatSourceComponentType(component.ftype)
+    const componentDescription = [
+      component.manufacturer_part_number,
+      component.display_value,
+      footprint,
+      readableComponentType,
+    ]
+      .filter(Boolean)
+      .join(" ")
+
+    return componentDescription || component.name
+  }
+
   // Add COMPONENTS section
   netlist.push("COMPONENTS:")
   for (const component of source_components) {
-    let componentDescription = ""
-
     // Get the cad_component associated with the source_component
     const cadComponent = su(circuitJson).cad_component.getWhere({
       source_component_id: component.source_component_id,
     })
 
     const footprint = cadComponent?.footprinter_string
-
-    if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
-    } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
-    } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [manufacturerPartNumber, footprint]
-        .filter(Boolean)
-        .join(", ")
-    } else {
-      componentDescription = [component.name, component.type]
-        .filter(Boolean)
-        .join(", ")
-    }
+    const componentDescription = getComponentDescription(component, footprint)
 
     netlist.push(` - ${component.name}: ${componentDescription}`)
   }
