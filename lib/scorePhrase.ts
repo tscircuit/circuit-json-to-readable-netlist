@@ -7,6 +7,10 @@
  *
  * These unique port names are usually the best indicator of what the net is for
  */
+const exactWordQualityScore = {
+  EN: 1.1,
+}
+
 const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
@@ -16,6 +20,12 @@ const wordQualityScore = {
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
+  PGOOD: 1.15,
+  PWR_OK: 1.15,
+  POWER_GOOD: 1.15,
+  ENABLE: 1.1,
+  SHDN: 1.1,
+  WAKE: 1.1,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -35,7 +45,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const exactWordQualityScoreEntries = Object.entries(exactWordQualityScore).sort(
+  (a, b) => b[1] - a[1],
+)
+
 export const scorePhrase = (phrase: string) => {
+  const exactWords = phrase.split(/[^A-Za-z0-9]+/).filter(Boolean)
+  for (const [word, score] of exactWordQualityScoreEntries) {
+    if (exactWords.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
