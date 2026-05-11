@@ -54,3 +54,43 @@ it("keeps custom descriptive pin hints while filtering low quality labels", () =
 
   expect(readablePinName).toBe("U1 pin14 (RESET,BOOT)")
 })
+
+it("keeps USB differential pin hints on generic physical pins", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      source_component_id: "source_component_1",
+      name: "U1",
+      ftype: "simple_chip",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_1",
+      source_component_id: "source_component_1",
+      name: "pin14",
+      pin_number: 14,
+      port_hints: ["pin14", "D+"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_2",
+      source_component_id: "source_component_1",
+      name: "pin15",
+      pin_number: 15,
+      port_hints: ["pin15", "D-"],
+    },
+  ]
+
+  expect(
+    getReadableNameForPin({
+      circuitJson,
+      source_port_id: "source_port_1",
+    }),
+  ).toBe("U1 pin14 (D+)")
+  expect(
+    getReadableNameForPin({
+      circuitJson,
+      source_port_id: "source_port_2",
+    }),
+  ).toBe("U1 pin15 (D-)")
+})
