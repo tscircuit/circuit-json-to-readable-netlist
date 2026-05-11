@@ -35,25 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
-const technicalPinAliases = new Set([
-  "I3CSCL0",
-  "I3CSCL1",
-  "I3CSDA0",
-  "I3CSDA1",
-  "PMBALERT",
-  "PMBUSALERT",
-  "SCL0",
-  "SCL1",
-  "SDA0",
-  "SDA1",
-  "SMBALERT",
-])
-
 const getNormalizedTechnicalAlias = (phrase: string) =>
   phrase.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
 
+const preferredTechnicalPinAliasPattern =
+  /^(?:I3C(?:SCL|SDA)\d*|I3CIBI|I3CHDR(?:DDR|TS)|PMBUS(?:ALERT|CLK|DAT|DATA|PEC))$/
+
+const technicalPinAliasPattern =
+  /^(?:(?:SCL|SDA)\d+|IBI|HDR(?:DDR|TS)|SMB(?:ALERT|CLK|DAT|DATA)|SMBUS(?:ALERT|CLK|DAT|DATA)|PMBALERT|PMBUS(?:ALERT|CLK|DAT|DATA|PEC)|PEC)$/
+
 export const scorePhrase = (phrase: string) => {
-  if (technicalPinAliases.has(getNormalizedTechnicalAlias(phrase))) {
+  const normalizedAlias = getNormalizedTechnicalAlias(phrase)
+  if (preferredTechnicalPinAliasPattern.test(normalizedAlias)) {
+    return 1.19
+  }
+  if (technicalPinAliasPattern.test(normalizedAlias)) {
     return 1.18
   }
   if (phrase.match(/\d+/)) {
