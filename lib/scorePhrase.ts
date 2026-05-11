@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const keypadMatrixSignalPattern =
+  /(^|[^A-Za-z0-9])(?:KEY[_-]?)?(?:ROW|COL)\d*(?=$|[^A-Za-z0-9])|(^|[^A-Za-z0-9])KS[IO]\d*(?=$|[^A-Za-z0-9])/i
+
 export const scorePhrase = (phrase: string) => {
+  if (keypadMatrixSignalPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
