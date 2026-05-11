@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const fieldbusPinAliasPatterns = [/RS[-_]?485/i, /DMX/i, /DALI/i, /MODBUS/i]
+
 export const scorePhrase = (phrase: string) => {
+  // These protocol labels often contain digits, so score them before the
+  // generic digit fallback.
+  if (fieldbusPinAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
