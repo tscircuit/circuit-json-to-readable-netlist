@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitalMicrophoneSignalPattern =
+  /(^|[^A-Za-z0-9])(?:PDM|DMIC)\d*(?:[_-]?(?:CLK|CLOCK|DATA|DAT|DIN|DOUT|IN|OUT))?(?=$|[^A-Za-z0-9])/i
+
 export const scorePhrase = (phrase: string) => {
+  if (digitalMicrophoneSignalPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
