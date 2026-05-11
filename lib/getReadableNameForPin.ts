@@ -5,6 +5,7 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import { getUniqueReadableLabels } from "./getUniqueReadableLabels"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -55,5 +56,6 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const readablePinLabels = getUniqueReadableLabels(additionalPinLabels)
+  return `${component.name} ${mainPinName}${readablePinLabels.length > 0 ? ` (${readablePinLabels.join(", ")})` : ""}${displayValue}`
 }
