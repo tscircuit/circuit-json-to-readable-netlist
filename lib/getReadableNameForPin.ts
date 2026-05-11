@@ -7,6 +7,16 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const formatDisplayValue = (displayValue?: string | number | null): string => {
+  const normalizedValue =
+    typeof displayValue === "string" ? displayValue.trim() : displayValue
+  return normalizedValue !== undefined &&
+    normalizedValue !== null &&
+    normalizedValue !== ""
+    ? ` (${normalizedValue})`
+    : ""
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -52,8 +62,6 @@ export const getReadableNameForPin = ({
     }
   }
 
-  const displayValue = component.display_value
-    ? ` (${component.display_value})`
-    : ""
+  const displayValue = formatDisplayValue(component.display_value)
   return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
