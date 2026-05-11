@@ -27,10 +27,10 @@ export const getReadableNameForPin = ({
 
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
-    ["anode", "pos", "positive"].includes(hint.toLowerCase()),
+    ["+", "anode", "plus", "pos", "positive"].includes(hint.toLowerCase()),
   )
   const isNegative = port.port_hints?.some((hint) =>
-    ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
+    ["-", "cathode", "minus", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
   // Format pin description
