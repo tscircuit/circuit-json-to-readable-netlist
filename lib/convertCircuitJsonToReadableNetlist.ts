@@ -9,6 +9,14 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const getSourceNetNameFromMetadata = (net: SourceNet | undefined) => {
+  const name = net?.name?.trim()
+  if (name) return name
+  if (net?.is_ground) return "GND"
+  if (net?.is_power) return "POWER"
+  return undefined
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -63,7 +71,7 @@ export const convertCircuitJsonToReadableNetlist = (
     // Get net name
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
 
-    let netName = net?.name
+    let netName = getSourceNetNameFromMetadata(net)
 
     if (!netName) {
       // Generate a net name from the connected port names
@@ -125,7 +133,7 @@ export const convertCircuitJsonToReadableNetlist = (
     const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
     if (portIds.length === 0) continue
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
-    let netName = net?.name
+    let netName = getSourceNetNameFromMetadata(net)
     if (!netName) {
       netName = generateNetName({ circuitJson, connectedIds })
     }
