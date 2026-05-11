@@ -9,6 +9,15 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const getPotentiometerValue = (component: {
+  display_value?: string
+  max_resistance?: number
+}) =>
+  component.display_value ??
+  (component.max_resistance !== undefined
+    ? `${component.max_resistance}Ω`
+    : undefined)
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -43,6 +52,14 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = `${component.display_capacitance}${
         footprint ? ` ${footprint}` : ""
       } capacitor`
+    } else if (component.ftype === "simple_potentiometer") {
+      componentDescription = [
+        getPotentiometerValue(component),
+        footprint,
+        "potentiometer",
+      ]
+        .filter(Boolean)
+        .join(" ")
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -148,6 +165,14 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_potentiometer") {
+        header = `${component.name} (${[
+          getPotentiometerValue(component),
+          footprint,
+          "potentiometer",
+        ]
+          .filter(Boolean)
+          .join(" ")})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
