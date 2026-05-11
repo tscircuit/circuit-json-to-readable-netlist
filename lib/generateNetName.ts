@@ -1,6 +1,7 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import { getReadablePortHints } from "./getReadablePortHints"
 import { scorePhrase } from "./scorePhrase"
 
 // Order components by how much better they are as a reference (chips are
@@ -57,7 +58,10 @@ export const generateNetName = ({
   const possibleNames = ports
     .flatMap((p) =>
       Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
+        new Set([
+          ...(p.name ? [p.name] : []),
+          ...getReadablePortHints(p.port_hints),
+        ]),
       ),
     )
     .concat(nets.map((n) => n.name))
