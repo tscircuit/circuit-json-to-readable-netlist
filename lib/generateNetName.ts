@@ -54,13 +54,19 @@ export const generateNetName = ({
     connectedIds.includes(t.source_trace_id),
   )
 
-  const possibleNames = ports
-    .flatMap((p) =>
-      Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
+  const traceDisplayNames = traces
+    .map((t) => t.display_name)
+    .filter((name): name is string => Boolean(name))
+
+  const possibleNames = traceDisplayNames
+    .concat(nets.map((n) => n.name))
+    .concat(
+      ports.flatMap((p) =>
+        Array.from(
+          new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
+        ),
       ),
     )
-    .concat(nets.map((n) => n.name))
 
   const phrases = possibleNames.map((name) => ({
     name,
@@ -77,5 +83,7 @@ export const generateNetName = ({
   const componentWithBestPort = all_source_components.find(
     (c) => c.source_component_id === bestPort?.source_component_id,
   )
+  if (!componentWithBestPort) return bestPortName
+
   return [componentWithBestPort?.name, bestPortName].filter(Boolean).join("_")
 }
