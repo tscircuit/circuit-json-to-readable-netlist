@@ -16,6 +16,13 @@ const wordQualityScore = {
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
+  HAPTIC: 1.18,
+  VIB: 1.18,
+  VIBE: 1.18,
+  VIBRATOR: 1.18,
+  LRA: 1.18,
+  ERM: 1.18,
+  DRV: 1.12,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -36,6 +43,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (phrase.match(/(?:HAPTIC|VIBRATOR|VIBE|VIB|LRA|ERM|DRV)/)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
