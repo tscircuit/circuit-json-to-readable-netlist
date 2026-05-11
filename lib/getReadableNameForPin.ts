@@ -7,6 +7,8 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (name: string) => /^pin\d+$/i.test(name)
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -46,8 +48,13 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    const isMeaningfulChipAlias =
+      component.ftype === "simple_chip" &&
+      isGenericPinName(mainPinName) &&
+      !isGenericPinName(port_hint) &&
+      port_hint !== String(port.pin_number)
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (isMeaningfulChipAlias || score > 1) {
       additionalPinLabels.push(port_hint)
     }
   }
