@@ -8,6 +8,7 @@ import type {
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import { getSchematicDisplayPinLabel } from "./getSourcePortLabelCandidates"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -160,6 +161,17 @@ export const convertCircuitJsonToReadableNetlist = (
           port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
+        const schematicDisplayPinLabel = getSchematicDisplayPinLabel({
+          circuitJson,
+          source_port_id: port.source_port_id,
+        })
+        if (
+          schematicDisplayPinLabel &&
+          schematicDisplayPinLabel !== mainPin &&
+          schematicDisplayPinLabel !== port.name
+        ) {
+          aliases.push(schematicDisplayPinLabel)
+        }
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)

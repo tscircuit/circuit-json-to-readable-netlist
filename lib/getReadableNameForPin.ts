@@ -1,10 +1,6 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
+import { getSchematicDisplayPinLabel } from "./getSourcePortLabelCandidates"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -37,18 +33,31 @@ export const getReadableNameForPin = ({
   const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
+  const addAdditionalPinLabel = (label: string) => {
+    if (label !== mainPinName && !additionalPinLabels.includes(label)) {
+      additionalPinLabels.push(label)
+    }
+  }
 
   if (isPositive && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("+")
+    addAdditionalPinLabel("+")
   } else if (isNegative && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("-")
+    addAdditionalPinLabel("-")
+  }
+
+  const schematicDisplayPinLabel = getSchematicDisplayPinLabel({
+    circuitJson,
+    source_port_id,
+  })
+  if (schematicDisplayPinLabel) {
+    addAdditionalPinLabel(schematicDisplayPinLabel)
   }
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
-      additionalPinLabels.push(port_hint)
+      addAdditionalPinLabel(port_hint)
     }
   }
 
