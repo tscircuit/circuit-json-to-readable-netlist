@@ -45,10 +45,11 @@ export const getReadableNameForPin = ({
   }
 
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
+    const readableHint = port_hint.trim()
+    if (!readableHint || readableHint === mainPinName) continue
+    const score = scorePhrase(readableHint)
+    if (score >= 1 && !additionalPinLabels.includes(readableHint)) {
+      additionalPinLabels.push(readableHint)
     }
   }
 
