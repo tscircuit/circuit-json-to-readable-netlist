@@ -1,6 +1,6 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import { cleanLabel, getReadablePinLabel } from "./pin-labels"
 import { scorePhrase } from "./scorePhrase"
 
 // Order components by how much better they are as a reference (chips are
@@ -42,32 +42,41 @@ export const generateNetName = ({
     )
 
   const all_source_nets = su(circuitJson).source_net.list()
-  const all_source_traces = su(circuitJson).source_trace.list()
-
   const ports = all_source_ports.filter((p) =>
     connectedIds.includes(p.source_port_id),
   )
   const nets = all_source_nets.filter((n) =>
     connectedIds.includes(n.source_net_id),
   )
-  const traces = all_source_traces.filter((t) =>
-    connectedIds.includes(t.source_trace_id),
-  )
 
   const possibleNames = ports
     .flatMap((p) =>
       Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
+        new Set([
+          getReadablePinLabel(p),
+          ...(p.name ? [p.name] : []),
+          ...(p.port_hints ?? []),
+        ]),
       ),
     )
     .concat(nets.map((n) => n.name))
+    .map(cleanLabel)
+    .filter((name): name is string => Boolean(name))
 
   const phrases = possibleNames.map((name) => ({
     name,
     score: scorePhrase(name),
   }))
 
-  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0].name
+  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0]?.name
+  if (!bestPortName) {
+    const firstComponent = all_source_components.find((component) =>
+      ports.some(
+        (port) => port.source_component_id === component.source_component_id,
+      ),
+    )
+    return [firstComponent?.name, "net"].filter(Boolean).join("_")
+  }
 
   // Find the component that has the best port name
   const bestPort = ports.find(

@@ -1,11 +1,10 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
-import { scorePhrase } from "./scorePhrase"
+import type { AnyCircuitElement } from "circuit-json"
+import {
+  getReadablePinAliases,
+  getReadablePinLabel,
+  isLowInformationPinLabel,
+} from "./pin-labels"
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -25,7 +24,6 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
-  // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
   )
@@ -33,27 +31,29 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const preferDescriptiveHints =
+    component.ftype !== "simple_resistor" &&
+    component.ftype !== "simple_capacitor"
+  const mainPinName = getReadablePinLabel(port, { preferDescriptiveHints })
 
   const additionalPinLabels: string[] = []
-
   if (isPositive && component.ftype !== "simple_resistor") {
     additionalPinLabels.push("+")
   } else if (isNegative && component.ftype !== "simple_resistor") {
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
-  }
+  additionalPinLabels.push(
+    ...getReadablePinAliases(port, mainPinName, {
+      includeAllDescriptiveHints:
+        preferDescriptiveHints &&
+        Boolean(port.name && isLowInformationPinLabel(port.name, port)),
+    }),
+  )
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const pinLabels = Array.from(new Set(additionalPinLabels))
+  return `${component.name} ${mainPinName}${pinLabels.length > 0 ? ` (${pinLabels.join(",")})` : ""}${displayValue}`
 }
