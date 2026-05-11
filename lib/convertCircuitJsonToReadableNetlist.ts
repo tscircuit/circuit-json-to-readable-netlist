@@ -9,6 +9,31 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const getPinHeaderDescription = ({
+  pinCount,
+  gender,
+  displayValue,
+  manufacturerPartNumber,
+  footprint,
+}: {
+  pinCount?: number
+  gender?: string
+  displayValue?: string
+  manufacturerPartNumber?: string
+  footprint?: string
+}) => {
+  const pinHeaderText = [
+    pinCount !== undefined ? `${pinCount}-pin` : undefined,
+    gender,
+    displayValue,
+    footprint,
+    "pin header",
+  ]
+    .filter(Boolean)
+    .join(" ")
+  return [manufacturerPartNumber, pinHeaderText].filter(Boolean).join(", ")
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -48,6 +73,14 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+    } else if (component.ftype === "simple_pin_header") {
+      componentDescription = getPinHeaderDescription({
+        pinCount: component.pin_count,
+        gender: component.gender,
+        displayValue: component.display_value,
+        manufacturerPartNumber: component.manufacturer_part_number,
+        footprint,
+      })
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -148,6 +181,14 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_pin_header") {
+        header = `${component.name} (${getPinHeaderDescription({
+          pinCount: component.pin_count,
+          gender: component.gender,
+          displayValue: component.display_value,
+          manufacturerPartNumber: component.manufacturer_part_number,
+          footprint,
+        })})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
