@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const i2sAudioBusAliases = [
+  "I2S_BCLK",
+  "I2S_LRCLK",
+  "I2S_MCLK",
+  "I2S_SDIN",
+  "I2S_SDOUT",
+  "BCLK",
+  "LRCLK",
+  "MCLK",
+  "SDIN",
+  "SDOUT",
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (i2sAudioBusAliases.some((alias) => phrase.includes(alias))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
