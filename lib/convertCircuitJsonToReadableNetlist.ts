@@ -1,13 +1,32 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+
+const formatSourceComponentType = (ftype?: string) =>
+  ftype?.replace(/^simple_/, "").replaceAll("_", " ")
+
+type ComponentPinHeaderSource = {
+  display_value?: string
+  ftype?: string
+  name: string
+}
+
+const getGenericComponentPinHeader = (
+  component: ComponentPinHeaderSource,
+  footprint?: string,
+) => {
+  const description = [
+    component.display_value,
+    footprint,
+    formatSourceComponentType(component.ftype),
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  return description ? `${component.name} (${description})` : component.name
+}
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -150,6 +169,8 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (component.ftype !== "simple_chip") {
+        header = getGenericComponentPinHeader(component, footprint)
       }
       netlist.push(header)
       const ports = source_ports
