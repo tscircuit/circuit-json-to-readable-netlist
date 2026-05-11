@@ -145,9 +145,9 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${component.name} (${[component.display_resistance, footprint].filter(Boolean).join(" ")})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${component.name} (${[component.display_capacitance, footprint].filter(Boolean).join(" ")})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,10 +156,12 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+        const pinNumberName =
+          port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+        const mainPin = port.name || pinNumberName || port.source_port_id
         const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
+        if (pinNumberName && pinNumberName !== mainPin)
+          aliases.push(pinNumberName)
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)

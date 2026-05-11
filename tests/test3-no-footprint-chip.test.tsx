@@ -26,3 +26,16 @@ it("chip without footprint doesn't output undefined", () => {
     "
   `)
 })
+
+it("passives without footprints don't output undefined in component pins", () => {
+  const circuitJson = renderCircuit(
+    <board width="10mm" height="10mm" routingDisabled>
+      <resistor resistance="1k" name="R1" />
+      <capacitor capacitance="1nF" name="C1" />
+    </board>,
+  )
+  const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
+  expect(netlist).not.toContain("undefined")
+  expect(netlist).toContain("R1 (1k")
+  expect(netlist).toContain("C1 (1nF)")
+})
