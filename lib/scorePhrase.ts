@@ -35,7 +35,18 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isMipiCsiDsiLaneLabel = (phrase: string) => {
+  const normalized = phrase.toUpperCase()
+  return (
+    /(?:^|_)(?:CSI|DSI)\d*(?:_|$)/.test(normalized) &&
+    /(?:D\d+_?[PN]|CLK_?[PN])/.test(normalized)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isMipiCsiDsiLaneLabel(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
