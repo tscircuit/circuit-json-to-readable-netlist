@@ -9,17 +9,61 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const addInternalPortConnections = (
+  netMap: Record<string, string[]>,
+  sourceComponents: AnyCircuitElement[],
+) => {
+  let internalNetIndex = 0
+
+  for (const component of sourceComponents) {
+    if (!("internally_connected_source_port_ids" in component)) continue
+
+    for (const portGroup of component.internally_connected_source_port_ids ??
+      []) {
+      if (portGroup.length <= 1) continue
+
+      const matchingNetIds = Object.entries(netMap)
+        .filter(([, connectedIds]) =>
+          portGroup.some((portId) => connectedIds.includes(portId)),
+        )
+        .map(([netId]) => netId)
+
+      const targetNetId =
+        matchingNetIds[0] ??
+        `internal_${component.source_component_id}_${internalNetIndex++}`
+
+      if (!netMap[targetNetId]) netMap[targetNetId] = []
+
+      for (const portId of portGroup) {
+        if (!netMap[targetNetId].includes(portId)) {
+          netMap[targetNetId].push(portId)
+        }
+      }
+
+      for (const netId of matchingNetIds.slice(1)) {
+        for (const connectedId of netMap[netId]) {
+          if (!netMap[targetNetId].includes(connectedId)) {
+            netMap[targetNetId].push(connectedId)
+          }
+        }
+        delete netMap[netId]
+      }
+    }
+  }
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(
     circuitJson.filter((e) => e.type.startsWith("source_")),
   )
-  const netMap = connectivityMap.netMap
+  const netMap = { ...connectivityMap.netMap }
   const source_ports = su(circuitJson).source_port.list()
   const source_components = su(circuitJson).source_component.list()
   const source_nets = su(circuitJson).source_net.list()
   const source_traces = su(circuitJson).source_trace.list()
+  addInternalPortConnections(netMap, source_components)
   // Build readable netlist
   const netlist: string[] = []
 
