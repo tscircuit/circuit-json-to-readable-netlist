@@ -13,8 +13,14 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  SOUNDWIRE: 1.2,
+  SLIMBUS: 1.2,
+  MCASP: 1.2,
   RX: 1.15,
   TX: 1.15,
+  SAI: 1.15,
+  TDM: 1.15,
+  AC97: 1.15,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
@@ -35,7 +41,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) =>
+    ["SOUNDWIRE", "SLIMBUS", "MCASP", "SAI", "TDM", "AC97"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
