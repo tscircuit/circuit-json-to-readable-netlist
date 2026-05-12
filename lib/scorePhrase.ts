@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const barcodeScannerPattern =
+  /(^|[_-])(BARCODE|QRCODE|QR|SCAN_GOOD|SCANGOOD|LASER_EN|LASEREN)(\d+|[_-]|$)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (barcodeScannerPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
