@@ -8,11 +8,16 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  I2C: 1.2,
+  SPI: 1.2,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  ADC: 1.2,
+  DAC: 1.2,
+  PWM: 1.2,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -36,11 +41,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
+  const normalizedPhrase = phrase.trim().toUpperCase()
+  if (normalizedPhrase.match(/^(PIN)?\d+$/)) {
     return 0.5
   }
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word)) {
       return score
     }
   }
