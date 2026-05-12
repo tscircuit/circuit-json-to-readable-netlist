@@ -25,7 +25,7 @@ it("uses full pin labels when the primary pin name is generic", () => {
       source_component_id: "source_component_0",
       name: "pin14",
       pin_number: 14,
-      port_hints: ["GPIO14", "SCL"],
+      port_hints: ["pin14", "GPIO14", "SCL"],
     },
   ] as AnyCircuitElement[]
 

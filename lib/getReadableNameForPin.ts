@@ -3,6 +3,7 @@ import type { AnyCircuitElement } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
 const hasSignalNameWithNumber = (phrase: string) => /[A-Za-z_]+\d+/.test(phrase)
+const isGenericPinHint = (phrase: string) => /^pin\d+$/i.test(phrase)
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -48,6 +49,7 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName || port_hint === String(port.pin_number))
       continue
+    if (isGenericPinHint(port_hint)) continue
     if (scorePhrase(port_hint) > 1 || hasSignalNameWithNumber(port_hint)) {
       additionalPinLabels.push(port_hint)
     }
