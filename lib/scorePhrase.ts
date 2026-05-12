@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pllClockGeneratorLabelPattern =
+  /^(PLL(?:[_-]?(?:LOCK|LOCKED|UNLOCK|UNLOCKED|STATUS|STAT|REF|FB|EN|PWRDN))?\d*|(?:CLKGEN|CLK_GEN|CLOCKGEN|CLOCK_GEN)[_-]?(?:OUT|CLKOUT|CLK|LOCK|EN|SEL)?\d*|FREQ[_-]?SEL\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (pllClockGeneratorLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
