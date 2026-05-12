@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreAudioInterfacePhrase = (phrase: string) => {
+  // Avoid the generic digit penalty for common audio interface pin aliases.
+  // Examples: I2S_BCLK, I2S_LRCLK, I2S_WS, I2S_SDOUT, PDM_CLK, PDM_DAT.
+  if (/(^|[_-])I2S([_-]|$)/.test(phrase)) return 1.2
+  if (/(^|[_-])(BCLK|LRCLK|WS|MCLK)([_-]|$)/.test(phrase)) return 1.15
+  if (/(^|[_-])(SDIN|SDOUT|DIN|DOUT|DATA)([_-]|$)/.test(phrase)) return 1.1
+  if (/(^|[_-])PDM([_-]|$)/.test(phrase)) return 1.2
+  if (/(^|[_-])(PDM_CLK|PDM_DAT)([_-]|$)/.test(phrase)) return 1.15
+}
+
 export const scorePhrase = (phrase: string) => {
+  const audioScore = scoreAudioInterfacePhrase(phrase)
+  if (audioScore) return audioScore
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
