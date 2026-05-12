@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const automotiveBusLabelPattern =
+  /^(CANH|CANL|CAN[_-]?(TX|RX|TXD|RXD)|LIN|LIN[_-]?BUS|LIN[_-]?(TX|RX|TXD|RXD))\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (automotiveBusLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
