@@ -35,7 +35,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isDigitalIsolatorLabel = (phrase: string) => {
+  const normalized = phrase.toUpperCase()
+  return /^(?:ISO|ISOLATED|ADUM)_(?:IN|OUT|TX|RX)\d*$/.test(normalized)
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isDigitalIsolatorLabel(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
