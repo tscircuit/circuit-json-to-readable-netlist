@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const chargePumpLabelPattern =
+  /^((CHARGE[_-]?PUMP|CPUMP)[_-]?(OUT|NEG|POS|IN|SW)\d*|CFLY\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (chargePumpLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
