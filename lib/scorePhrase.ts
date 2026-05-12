@@ -35,7 +35,32 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isolatedGateDriverSignalPatterns = [
+  /^(GATE|GATE_DRV|GATE_DRIVE|GATE_HI|GATE_LO|HIGH_GATE|LOW_GATE)$/,
+  /^GATE\d+(_[HL])?$/,
+  /^(GH|GL|HO|LO|HIN|DESAT|DESAT_N|FLT|FLT_N|FAULT_N)$/,
+  /^(GH|GL|HO|LO|HIN|DESAT|FLT)\d+(_N)?$/,
+  /^ISO[_-]?(IN|OUT|EN|FAULT|FLT)\d*(_N)?$/,
+  /^OPTO[_-]?(IN|OUT)\d*$/,
+]
+
+const scoreIsolatedGateDriverPhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    isolatedGateDriverSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.18
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const isolatedGateDriverScore = scoreIsolatedGateDriverPhrase(phrase)
+  if (isolatedGateDriverScore !== undefined) {
+    return isolatedGateDriverScore
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
