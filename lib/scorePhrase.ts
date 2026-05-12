@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const rs232Rs422LabelPattern =
+  /^(RS[_-]?232[_-]?(TX|RX|RTS|CTS|DTR|DSR|DCD|RI)\d*|RS[_-]?422[_-]?(A|B|Y|Z|TX|RX|TXP|TXN|RXP|RXN)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (rs232Rs422LabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
