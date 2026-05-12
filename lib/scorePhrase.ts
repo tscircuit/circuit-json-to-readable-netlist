@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isOpticalTransceiverManagementAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase().replace(/[^A-Z0-9]+/g, "_")
+
+  return [
+    /^MOD_ABS\d*$/,
+    /^MODSEL(L)?\d*$/,
+    /^RATE_SELECT\d*$/,
+    /^RS[01]$/,
+    /^TX_FAULT\d*$/,
+    /^TX_DISABLE\d*$/,
+    /^RX_LOS\d*$/,
+  ].some((pattern) => pattern.test(normalizedPhrase))
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isOpticalTransceiverManagementAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
