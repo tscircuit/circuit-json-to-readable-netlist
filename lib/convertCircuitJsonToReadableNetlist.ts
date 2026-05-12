@@ -12,6 +12,12 @@ import { getReadableNameForPin } from "./getReadableNameForPin"
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
+  const cleanText = (value: unknown) => {
+    if (typeof value !== "string") return value
+    const trimmed = value.trim()
+    return trimmed.length > 0 ? trimmed : undefined
+  }
+
   const connectivityMap = getFullConnectivityMapFromCircuitJson(
     circuitJson.filter((e) => e.type.startsWith("source_")),
   )
@@ -33,7 +39,7 @@ export const convertCircuitJsonToReadableNetlist = (
       source_component_id: component.source_component_id,
     })
 
-    const footprint = cadComponent?.footprinter_string
+    const footprint = cleanText(cadComponent?.footprinter_string)
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance}${
@@ -44,7 +50,9 @@ export const convertCircuitJsonToReadableNetlist = (
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
+      const manufacturerPartNumber = cleanText(
+        component.manufacturer_part_number,
+      )
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
@@ -142,14 +150,14 @@ export const convertCircuitJsonToReadableNetlist = (
       const cadComponent = su(circuitJson).cad_component.getWhere({
         source_component_id: component.source_component_id,
       })
-      const footprint = cadComponent?.footprinter_string
+      const footprint = cleanText(cadComponent?.footprinter_string)
       let header = component.name
       if (component.ftype === "simple_resistor") {
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
-      } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (cleanText(component.manufacturer_part_number)) {
+        header = `${component.name} (${cleanText(component.manufacturer_part_number)})`
       }
       netlist.push(header)
       const ports = source_ports
