@@ -8,6 +8,10 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  ULTRASONIC: 1.2,
+  SONAR: 1.2,
+  ECHO: 1.15,
+  TRIG: 1.15,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -36,13 +40,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
