@@ -36,6 +36,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (/(ACCEL|GYRO|MAG|IMU)(_|$)/.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
