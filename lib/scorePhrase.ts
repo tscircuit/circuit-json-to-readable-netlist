@@ -11,6 +11,12 @@ const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
+  I2S: 1.2,
+  BCLK: 1.2,
+  LRCLK: 1.2,
+  MCLK: 1.2,
+  SDIN: 1.15,
+  SDOUT: 1.15,
   SDA: 1.2,
   SCL: 1.2,
   RX: 1.15,
@@ -36,13 +42,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const normalizedPhrase = phrase.trim().toUpperCase()
+
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word.toUpperCase())) {
       return score
     }
+  }
+  if (normalizedPhrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
