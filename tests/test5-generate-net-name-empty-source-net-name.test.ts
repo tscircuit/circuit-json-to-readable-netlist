@@ -1,7 +1,7 @@
 import { expect, it } from "bun:test"
 import { generateNetName } from "lib/generateNetName"
 
-it("ignores empty source-net names and keeps semantic port hints", () => {
+it("ignores empty source-net names when generating fallback names", () => {
   const circuitJson = [
     {
       type: "source_component",
@@ -29,5 +29,6 @@ it("ignores empty source-net names and keeps semantic port hints", () => {
     connectedIds: ["source_port_0", "source_net_0"],
   })
 
-  expect(netName).toBe("U1_GPIO1")
+  expect(netName).toBe("U1_pin14")
+  expect(netName).not.toContain(" ")
 })

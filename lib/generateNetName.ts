@@ -66,7 +66,9 @@ export const generateNetName = ({
 
   if (possibleNames.length === 0) {
     const fallbackComponent = all_source_components.find((component) =>
-      ports.some((port) => port.source_component_id === component.source_component_id),
+      ports.some(
+        (port) => port.source_component_id === component.source_component_id,
+      ),
     )
     return [fallbackComponent?.name, "UNNAMED_NET"].filter(Boolean).join("_")
   }
