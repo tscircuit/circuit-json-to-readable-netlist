@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const flybackSupplyLabelPattern =
+  /^((FLYBACK|AUX[_-]?WINDING|DEMAG|DEMAGNETIZATION)[_-]?(SW|FB|SENSE|AUX|OUT|IN)?\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (flybackSupplyLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
