@@ -1,11 +1,33 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
+
+const isGenericPinLabel = (label: string | undefined, pinNumber?: number) => {
+  if (!label) return false
+  const normalized = label.toLowerCase()
+  return (
+    normalized === "pin" ||
+    normalized === `pin${pinNumber}` ||
+    normalized === String(pinNumber) ||
+    /^pin\d+$/i.test(label)
+  )
+}
+
+const getBestDescriptivePinName = ({
+  name,
+  portHints,
+  pinNumber,
+}: {
+  name?: string
+  portHints?: string[]
+  pinNumber?: number
+}) => {
+  if (name && !isGenericPinLabel(name, pinNumber)) return name
+
+  return [...new Set(portHints ?? [])].find(
+    (hint) => !isGenericPinLabel(hint, pinNumber),
+  )
+}
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -34,9 +56,25 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const fallbackPinName =
+    port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+  const mainPinName =
+    getBestDescriptivePinName({
+      name: port.name,
+      portHints: port.port_hints,
+      pinNumber: port.pin_number,
+    }) ??
+    fallbackPinName ??
+    "pin"
 
   const additionalPinLabels: string[] = []
+
+  if (
+    isGenericPinLabel(port.name, port.pin_number) &&
+    port.name !== mainPinName
+  ) {
+    additionalPinLabels.push(port.name)
+  }
 
   if (isPositive && component.ftype !== "simple_resistor") {
     additionalPinLabels.push("+")
@@ -46,6 +84,8 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (port_hint === port.name) continue
+    if (port_hint === String(port.pin_number)) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
@@ -55,5 +95,6 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const uniqueAdditionalPinLabels = Array.from(new Set(additionalPinLabels))
+  return `${component.name} ${mainPinName}${uniqueAdditionalPinLabels.length > 0 ? ` (${uniqueAdditionalPinLabels.join(",")})` : ""}${displayValue}`
 }
