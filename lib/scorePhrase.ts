@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const industrialIoAliasPattern =
+  /^(PLC_(DI|DO|AI|AO)\d*|OPTO_(IN|OUT)\d*|SINK(_OUT)?\d*|SOURCE(_OUT)?\d*)$/
+
 export const scorePhrase = (phrase: string) => {
+  if (industrialIoAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
