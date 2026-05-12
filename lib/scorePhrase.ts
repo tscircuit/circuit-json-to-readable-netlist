@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const mipiInterfacePattern = /(^|[_-])(MIPI|CSI2?|DSI|D-?PHY|C-?PHY)([_-]|$)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (mipiInterfacePattern.test(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
