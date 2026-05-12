@@ -15,6 +15,11 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  PRESS: 1.15,
+  HUM: 1.15,
+  VOC: 1.15,
+  CO2: 1.15,
+  PM25: 1.15,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
@@ -35,7 +40,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingEnvironmentalAliases = new Set(["CO2", "PM25"])
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of wordQualityScoreEntries) {
+    if (digitBearingEnvironmentalAliases.has(word) && phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
