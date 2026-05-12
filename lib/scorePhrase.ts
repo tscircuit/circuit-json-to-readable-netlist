@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const discreteTransistorLabelPattern =
+  /^((N|P)MOS(FET)?[_-]?(GATE|DRAIN|SOURCE|G|D|S)\d*|BJT[_-]?(BASE|COLLECTOR|EMITTER|B|C|E)\d*|TRANSISTOR[_-]?(BASE|COLLECTOR|EMITTER|GATE|DRAIN|SOURCE)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (discreteTransistorLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
