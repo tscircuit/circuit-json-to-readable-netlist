@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const armTraceAliasPattern =
+  /(^|[_-])(TRACE(?:CLK|CK|_?D\d+|_?DATA\d+)|TRACED\d+|ETM\d*|TPIU(?:_TRACE)?|SWV)([_-]|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (armTraceAliasPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
