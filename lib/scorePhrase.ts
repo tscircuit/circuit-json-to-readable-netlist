@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cryptoSecurityAliasPattern =
+  /(^|[^A-Z0-9])(TRNG|RNG|AES|SHA|SHA256|SHA512|HMAC|PUF|CRYPTO|SECURE_BOOT|SECBOOT|OTP|KEYSTORE)(\d+)?($|[^A-Z0-9])/
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (cryptoSecurityAliasPattern.test(normalizedPhrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
