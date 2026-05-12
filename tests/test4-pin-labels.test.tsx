@@ -38,7 +38,7 @@ it("test4 chip with rich pin labels uses labels, not pinN, in COMPONENT_PINS", (
 
   // 2. The COMPONENT_PINS section must show the real label (GP14) not pinN
   expect(netlist).toContain("GP14")
-  expect(netlist).not.toMatch(/^- pin19(/m)
+  expect(netlist).not.toMatch(/^- pin19\(/m)
 
   // 3. The pin we wired up must be listed by its label in the NET section
   expect(netlist).toMatch(/U1 GP14/)
