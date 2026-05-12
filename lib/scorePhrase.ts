@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreDdrMemoryPhrase = (phrase: string) => {
+  // Preserve meaningful DDR/LPDDR pin aliases that commonly include digits.
+  // Examples: DDR_DQ0, DDR_DQS1P, LPDDR4_CA3, DDR_A14, DDR_BA0.
+  if (/(^|[_-])(LPDDR\d*|DDR\d*)([_-]|$)/.test(phrase)) return 1.2
+  if (/(^|[_-])(DQ|DQS|DM|CA|A|BA)\d+([_-]|$)/.test(phrase)) return 1.15
+  if (
+    /(^|[_-])(CK[PN]?|CS\d*|ODT\d*|CKE\d*|RESETN|WE|RAS|CAS)([_-]|$)/.test(
+      phrase,
+    )
+  ) {
+    return 1.1
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const ddrScore = scoreDdrMemoryPhrase(phrase)
+  if (ddrScore) return ddrScore
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
