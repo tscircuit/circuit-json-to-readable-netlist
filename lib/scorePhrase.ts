@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const analogSwitchAliasPatterns = [
+  /(?:^|_)(?:MUX|DEMUX)(?:_|$)/i,
+  /^(?:MUXA|MUXS)\d+$/i,
+  /^(?:SEL|COM)\d*$/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (analogSwitchAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
