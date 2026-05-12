@@ -13,6 +13,9 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  SUPERCAP: 1.2,
+  ULTRACAP: 1.2,
+  BACKUP_CAP: 1.2,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +38,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["SUPERCAP", "ULTRACAP", "BACKUP_CAP"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
