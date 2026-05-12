@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const reedMagneticSwitchLabelPattern =
+  /^((REED|REED[_-]?SW|MAG[_-]?SWITCH|MAGNETIC[_-]?SWITCH|LID[_-]?MAG|LID[_-]?SW)[_-]?(IN|OUT|DET|SENSE|SW)?\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (reedMagneticSwitchLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
