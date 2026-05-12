@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const buzzerAliasPattern =
+  /^(?:BUZZER\d*|BZ\d+|PIEZO|BEEP(?:ER)?)(?:[_-]?(?:PWM|OUT|EN|DRIVE))?$/
+
 export const scorePhrase = (phrase: string) => {
+  if (buzzerAliasPattern.test(phrase.toUpperCase())) {
+    return 1.16
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
