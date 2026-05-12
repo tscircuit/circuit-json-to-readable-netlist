@@ -17,12 +17,15 @@ const getBestDescriptivePinName = ({
   name,
   portHints,
   pinNumber,
+  preferDescriptiveHints,
 }: {
   name?: string
   portHints?: string[]
   pinNumber?: number
+  preferDescriptiveHints: boolean
 }) => {
   if (name && !isGenericPinLabel(name, pinNumber)) return name
+  if (!preferDescriptiveHints) return undefined
 
   return [...new Set(portHints ?? [])].find(
     (hint) => !isGenericPinLabel(hint, pinNumber),
@@ -63,6 +66,7 @@ export const getReadableNameForPin = ({
       name: port.name,
       portHints: port.port_hints,
       pinNumber: port.pin_number,
+      preferDescriptiveHints: component.ftype === "simple_chip",
     }) ??
     fallbackPinName ??
     "pin"
