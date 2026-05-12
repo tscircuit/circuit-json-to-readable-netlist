@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const buildingAutomationBusLabelPattern =
+  /^(KNX|EIB)([_-]?(TP1|A|B|P|N|BUS|DATA))?\d*$|^(BACNET[_-]?MSTP|BACNET|MSTP)[_-]?(A|B|P|N|TX|RX)?\d*$|^(M[_-]?BUS|MBUS)[_-]?(A|B|P|N|TX|RX|DATA)?\d*$|^(LONWORKS|LON)([_-]?(NET[_-]?(A|B|P|N)|A|B|P|N|NET))?\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (buildingAutomationBusLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
