@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const ulpiPhyLabelPattern =
+  /^ULPI[_-]?(D\d+|DATA\d+|STP|NXT|DIR|CLK|REFCLK|RESET)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (ulpiPhyLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
