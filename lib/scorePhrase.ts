@@ -13,6 +13,12 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  PWMA: 1.2,
+  PWMB: 1.2,
+  AIN: 1.2,
+  BIN: 1.2,
+  STBY: 1.2,
+  FAULT: 1.2,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +41,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hbridgeMotorWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["PWMA", "PWMB", "AIN", "BIN", "STBY", "FAULT"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of hbridgeMotorWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
