@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const stepperDriverSignalPatterns = [
+  /(?:^|[_-])STEP(?:\d+|[_-]|$)/,
+  /(?:^|[_-])DIR(?:\d+|[_-]|$)/,
+  /(?:^|[_-])MS[123](?:[_-]|$)/,
+  /(?:^|[_-])MICROSTEP(?:[_-]|$)/,
+  /(?:^|[_-])DECAY(?:\d+|[_-]|$)/,
+  /(?:^|[_-])N?SLEEP(?:\d+|[_-]|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  if (
+    stepperDriverSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
