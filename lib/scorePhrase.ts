@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const leakMoistureWords = [
+  "LEAK",
+  "MOISTURE",
+  "WATER_DETECT",
+  "LIQUID_DETECT",
+  "LEVEL_SENSE",
+  "FLOAT_SW",
+  "SOIL_MOIST",
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (leakMoistureWords.some((word) => phrase.includes(word))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
