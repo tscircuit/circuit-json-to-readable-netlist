@@ -20,6 +20,9 @@ export const convertCircuitJsonToReadableNetlist = (
   const source_components = su(circuitJson).source_component.list()
   const source_nets = su(circuitJson).source_net.list()
   const source_traces = su(circuitJson).source_trace.list()
+  const sourcePortIdSet = new Set(source_ports.map((p) => p.source_port_id))
+  const isSourcePortId = (id: string) =>
+    sourcePortIdSet.has(id) || id.startsWith("source_port")
   // Build readable netlist
   const netlist: string[] = []
 
@@ -71,7 +74,7 @@ export const convertCircuitJsonToReadableNetlist = (
     }
 
     const connectedPortCount = connectedIds.filter((id) =>
-      id.startsWith("source_port"),
+      isSourcePortId(id),
     ).length
 
     if (connectedPortCount <= 1) continue
@@ -98,7 +101,7 @@ export const convertCircuitJsonToReadableNetlist = (
   let hasEmptyNets = false
   for (const [netId, connectedIds] of Object.entries(netMap)) {
     const connectedPortCount = connectedIds.filter((id) =>
-      id.startsWith("source_port"),
+      isSourcePortId(id),
     ).length
     if (connectedPortCount === 1) {
       if (!hasEmptyNets) {
@@ -107,7 +110,7 @@ export const convertCircuitJsonToReadableNetlist = (
         hasEmptyNets = true
       }
       const source_port_id = netMap[netId].find((id) =>
-        id.startsWith("source_port"),
+        isSourcePortId(id),
       )!
       const pinName = getReadableNameForPin({
         circuitJson,
@@ -122,7 +125,7 @@ export const convertCircuitJsonToReadableNetlist = (
   // build map of port ids to the nets they connect to
   const portIdToNetNames: Record<string, string[]> = {}
   for (const [netId, connectedIds] of Object.entries(netMap)) {
-    const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
+    const portIds = connectedIds.filter((id) => isSourcePortId(id))
     if (portIds.length === 0) continue
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
     let netName = net?.name
