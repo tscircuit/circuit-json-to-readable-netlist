@@ -13,6 +13,10 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  HALL: 1.2,
+  BLDC: 1.2,
+  TACH: 1.2,
+  FG: 1.15,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +39,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hallBldcWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["HALL", "BLDC", "TACH", "FG"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of hallBldcWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
