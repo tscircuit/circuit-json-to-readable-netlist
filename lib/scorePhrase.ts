@@ -36,6 +36,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (phrase.match(/NMEA(?:0183|2000)?|SEATALK/i)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
