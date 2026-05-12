@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const resolverPositionLabelPattern =
+  /^(?:(?:RESOLVER|SYNCHRO|RDC)(?:[_-]?(?:SIN|COS|SINE|COSINE|EXC|EXCITE|REF|SENSE|IN|OUT|S1|S2|S3|S4))?|LVDT(?:[_-]?(?:PRI|PRIMARY|SEC|SECONDARY|EXC|EXCITE|SENSE|IN|OUT|A|B))?)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (resolverPositionLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
