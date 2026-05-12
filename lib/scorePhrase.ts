@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const gpioExpanderLabelPattern =
+  /^(?:(?:IOEXP|IO_EXP|GPIOEXP|GPIO_EXP)_?(?:INT|RESET|RST|GPIO|PORT)\d*|(?:PCA95\d*|TCA95\d*|MCP23\d*|PCF857\d*)_?(?:INT|RESET|RST|GPIO|PORT|GPA|GPB|P)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (gpioExpanderLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
