@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const thermalManagementAliasPattern =
+  /(?:^|[_-])(?:TEMP|THERM|THERMAL|NTC|PTAT|CTAT|TSENSE)(?:$|[_\d-])/
+
 export const scorePhrase = (phrase: string) => {
+  if (thermalManagementAliasPattern.test(phrase.toUpperCase())) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
