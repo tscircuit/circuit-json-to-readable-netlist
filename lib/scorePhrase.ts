@@ -15,6 +15,7 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  CAN: 1.15,
   CANH: 1.15,
   CANL: 1.15,
   LIN: 1.15,
@@ -39,13 +40,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
