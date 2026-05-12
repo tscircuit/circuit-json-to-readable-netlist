@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const nonvolatileMemorySignalPattern =
+  /(^|[_-])(EEPROM|FRAM|NVM|NVRAM|NVSRAM|EDID|SPD)([_-]|$|\d)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (nonvolatileMemorySignalPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
