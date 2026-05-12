@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const flowMeterLabelPattern =
+  /^(?:(?:FLOW|WATERFLOW|WATER_FLOW|FLOWMETER|FLOW_METER|TURBINE)(?:[_-]?(?:PULSE|SIG|SIGNAL|OUT|SENSE|COUNT|CNT))?|(?:METER|WHEEL)[_-]?(?:PULSE|OUT|SIG|SIGNAL|COUNT|CNT))\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (flowMeterLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
