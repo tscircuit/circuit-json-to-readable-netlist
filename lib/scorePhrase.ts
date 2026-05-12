@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreWirelessChargingPhrase = (phrase: string) => {
+  if (
+    /^(QI|WPC|WLC)(?:_|$)/.test(phrase) ||
+    /^(RECT|RECTIFIER)(?:_|$)/.test(phrase)
+  ) {
+    return 1.15
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const wirelessChargingScore = scoreWirelessChargingPhrase(phrase)
+  if (wirelessChargingScore) {
+    return wirelessChargingScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
