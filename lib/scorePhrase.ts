@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const efuseHotSwapSignalPattern =
+  /(^|[_-])(EFUSE|HOTSWAP|ILIM|OCP|OVP|UVLO)([_-]|$|\d)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (efuseHotSwapSignalPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
