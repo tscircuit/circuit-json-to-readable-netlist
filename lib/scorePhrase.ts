@@ -15,6 +15,8 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  SENT: 1.15,
+  PSI5: 1.15,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
@@ -35,7 +37,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["SENT", "PSI5"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
