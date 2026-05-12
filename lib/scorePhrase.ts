@@ -13,6 +13,13 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  QSPI: 1.2,
+  PSRAM: 1.2,
+  FLASH: 1.2,
+  DQ: 1.2,
+  IO: 1.15,
+  HOLD: 1.15,
+  WP: 1.15,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +42,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const qspiMemoryWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) =>
+    ["QSPI", "PSRAM", "FLASH", "DQ", "IO", "HOLD", "WP"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of qspiMemoryWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
