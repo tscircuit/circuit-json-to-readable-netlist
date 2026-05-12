@@ -71,6 +71,22 @@ it("keeps data-line hints for generic chip pin labels", () => {
       port_hints: ["CS0"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_8",
+      source_component_id: "source_component_2",
+      name: "pin8",
+      pin_number: 8,
+      port_hints: ["DQ1"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_9",
+      source_component_id: "source_component_2",
+      name: "pin9",
+      pin_number: 9,
+      port_hints: ["DAT3"],
+    },
+    {
       type: "source_component",
       ftype: "simple_chip",
       source_component_id: "source_component_3",
@@ -102,6 +118,22 @@ it("keeps data-line hints for generic chip pin labels", () => {
       port_hints: ["CS0"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_10",
+      source_component_id: "source_component_3",
+      name: "pin4",
+      pin_number: 4,
+      port_hints: ["DQ1"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_11",
+      source_component_id: "source_component_3",
+      name: "pin5",
+      pin_number: 5,
+      port_hints: ["DAT3"],
+    },
+    {
       type: "source_trace",
       source_trace_id: "source_trace_0",
       connected_source_port_ids: ["source_port_0", "source_port_1"],
@@ -123,6 +155,18 @@ it("keeps data-line hints for generic chip pin labels", () => {
       type: "source_trace",
       source_trace_id: "source_trace_3",
       connected_source_port_ids: ["source_port_4", "source_port_7"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_4",
+      connected_source_port_ids: ["source_port_8", "source_port_10"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_5",
+      connected_source_port_ids: ["source_port_9", "source_port_11"],
       connected_source_net_ids: [],
     },
   ] as any
@@ -152,6 +196,14 @@ it("keeps data-line hints for generic chip pin labels", () => {
       - U3 pin7 (CS0)
       - J1 pin3 (CS0)
 
+    NET: U3_DQ1
+      - U3 pin8 (DQ1)
+      - J1 pin4 (DQ1)
+
+    NET: U3_DAT3
+      - U3 pin9 (DAT3)
+      - J1 pin5 (DAT3)
+
 
     COMPONENT_PINS:
     U1 (WS2812B)
@@ -164,11 +216,15 @@ it("keeps data-line hints for generic chip pin labels", () => {
     - pin5(DATA0): NETS(U3_DATA0)
     - pin6(CLK0): NETS(U3_CLK0)
     - pin7(CS0): NETS(U3_CS0)
+    - pin8(DQ1): NETS(U3_DQ1)
+    - pin9(DAT3): NETS(U3_DAT3)
 
     J1 (GENERIC_HEADER)
     - pin1(DATA0): NETS(U3_DATA0)
     - pin2(CLK0): NETS(U3_CLK0)
     - pin3(CS0): NETS(U3_CS0)
+    - pin4(DQ1): NETS(U3_DQ1)
+    - pin5(DAT3): NETS(U3_DAT3)
     "
   `)
 })
