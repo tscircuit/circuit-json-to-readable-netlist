@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hdmiAliasPatterns = [
+  /^(?:HDMI_)?TMDS_(?:CLK|D[0-2])_[PN]\d*$/,
+  /^(?:HDMI_)?(?:HPD|CEC)\d*$/,
+  /^(?:HDMI_)?DDC_(?:SCL|SDA)\d*$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (hdmiAliasPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.21
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
