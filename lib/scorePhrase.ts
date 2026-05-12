@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const presenceDetectorAliasPattern =
+  /(^|[_-])(PIR\d*|MOTION|OCC|OCCUPANCY|PRESENCE|MMWAVE)([_-]|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (presenceDetectorAliasPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
