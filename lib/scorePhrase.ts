@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const highValueAliasPatterns = [
+  /^LVDS(?:_?(?:CLK|DCLK|TX|RX))?\d*[_-]?[PN]$/i,
+  /^E?DP(?:_?(?:AUX|HPD|HOTPLUG|LANE|ML|TX|RX|CLK))?\d*[_-]?[PN]?$/i,
+]
+
+const scoreHighValueAlias = (phrase: string) => {
+  if (highValueAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const highValueAliasScore = scoreHighValueAlias(phrase)
+  if (highValueAliasScore !== undefined) {
+    return highValueAliasScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
