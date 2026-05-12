@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const servoRcAliasPatterns = [
+  /(?:^|_)SERVO(?:_|$)/i,
+  /(?:^|_)RC(?:_|$|\d)/i,
+  /(?:^|_)SBUS(?:_|$|\d)/i,
+  /(?:^|_)IBUS(?:_|$|\d)/i,
+  /(?:^|_)CRSF(?:_|$|\d)/i,
+  /(?:^|_)PPM(?:_|$|\d)/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (servoRcAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
