@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const bridgeSensorWords = [
+  "LOADCELL",
+  "LOAD_CELL",
+  "STRAIN",
+  "BRIDGE",
+  "WHEATSTONE",
+  "EXC_P",
+  "EXC_N",
+  "SENSE_P",
+  "SENSE_N",
+  "SIGP",
+  "SIGN",
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (bridgeSensorWords.some((word) => phrase.includes(word))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
