@@ -34,7 +34,10 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const normalizedPortName = port.name?.trim()
+  const mainPinName =
+    normalizedPortName ??
+    (port.pin_number !== undefined ? `Pin${port.pin_number}` : "Pin")
 
   const additionalPinLabels: string[] = []
 
@@ -44,7 +47,9 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
+  for (const port_hint_raw of port.port_hints ?? []) {
+    const port_hint = port_hint_raw.trim()
+    if (!port_hint) continue
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
