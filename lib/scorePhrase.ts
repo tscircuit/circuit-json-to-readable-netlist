@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const industrialEthernetAliasPattern =
+  /^(?:ETHERCAT(?:_|[0-9])|PROFINET(?:_|[0-9])|POWERLINK(?:_|[0-9])|SERCOS(?:_|[0-9])|CC_LINK(?:_|[0-9])|CCLINK(?:_|[0-9]))/
+
 export const scorePhrase = (phrase: string) => {
+  if (industrialEthernetAliasPattern.test(phrase.toUpperCase())) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
