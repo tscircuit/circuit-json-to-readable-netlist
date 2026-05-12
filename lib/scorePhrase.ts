@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const wirelessControlAliasPattern =
+  /(?:^|[_-])(?:WLAN|WIFI|WL|BT|BLE|COEX|HOST_WAKE|DEV_WAKE|REG_ON)(?:[_-]|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (wirelessControlAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
