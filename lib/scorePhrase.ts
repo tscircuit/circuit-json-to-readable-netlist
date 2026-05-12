@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const avionicsBusSignalPatterns = [
+  /(?:^|[_-])ARINC(?:429)?(?:[_-]?(?:TX|RX|A|B)\d*|[_-]|$)/,
+  /(?:^|[_-])MIL(?:STD)?1553(?:[_-]?(?:A|B|TX|RX)\d*|[_-]|$)/,
+  /(?:^|[_-])1553(?:[_-]?(?:A|B|TX|RX)\d*|[_-]|$)/,
+  /(?:^|[_-])SPACEWIRE(?:[_-]|$)/,
+  /(?:^|[_-])SPW(?:[_-]?(?:DIN|DOUT|SIN|SOUT|STROBE|CLK|P|N)\d*|[_-]|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  if (
+    avionicsBusSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
