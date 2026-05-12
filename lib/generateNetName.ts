@@ -60,7 +60,16 @@ export const generateNetName = ({
         new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
       ),
     )
-    .concat(nets.map((n) => n.name))
+    .concat(nets.map((n) => n.name).filter(Boolean))
+    .map((name) => name?.trim())
+    .filter(Boolean) as string[]
+
+  if (possibleNames.length === 0) {
+    const fallbackComponent = all_source_components.find((component) =>
+      ports.some((port) => port.source_component_id === component.source_component_id),
+    )
+    return [fallbackComponent?.name, "UNNAMED_NET"].filter(Boolean).join("_")
+  }
 
   const phrases = possibleNames.map((name) => ({
     name,
