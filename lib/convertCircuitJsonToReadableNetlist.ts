@@ -1,13 +1,50 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type {
   AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
+  AnySourceComponent,
   SourcePort,
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+
+const getPhysicalPinName = (port: SourcePort) =>
+  port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+
+const isGenericPinLabel = (label: string) =>
+  /^pin\d+$/i.test(label) || /^\d+$/.test(label)
+
+const getComponentPinLabelParts = ({
+  component,
+  port,
+}: {
+  component: AnySourceComponent
+  port: SourcePort
+}) => {
+  const physicalPinName = getPhysicalPinName(port)
+  const labels = [port.name, ...(port.port_hints ?? [])].filter(
+    (label): label is string => Boolean(label),
+  )
+
+  let mainPin = physicalPinName ?? port.source_port_id
+  if ("ftype" in component && component.ftype === "simple_chip") {
+    const readableLabel = labels.find((label) => !isGenericPinLabel(label))
+    if (readableLabel) mainPin = readableLabel
+  }
+
+  const aliases = [
+    physicalPinName,
+    ...labels.filter((label) => label !== mainPin),
+  ].filter(
+    (label): label is string =>
+      Boolean(label) && label !== mainPin && !/^\d+$/.test(label),
+  )
+
+  return {
+    mainPin,
+    aliases: Array.from(new Set(aliases)),
+  }
+}
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -156,18 +193,11 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
-        }
-        const aliasPart =
-          aliases.length > 0
-            ? `(${Array.from(new Set(aliases)).join(", ")})`
-            : ""
+        const { mainPin, aliases } = getComponentPinLabelParts({
+          component,
+          port,
+        })
+        const aliasPart = aliases.length > 0 ? `(${aliases.join(", ")})` : ""
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =
           nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
