@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const fuseProtectionWords = [
+  "POLYFUSE",
+  "RESETTABLE_FUSE",
+  "PTC_FUSE",
+  "FUSE",
+  "OCP",
+  "OC_FAULT",
+  "CURRENT_LIMIT",
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (fuseProtectionWords.some((word) => phrase.includes(word))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
