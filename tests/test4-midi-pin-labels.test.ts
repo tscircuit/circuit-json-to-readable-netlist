@@ -1,5 +1,6 @@
 import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { scorePhrase } from "lib/scorePhrase"
 
 it("preserves MIDI aliases on generic chip pins", () => {
   const circuitJson = [
@@ -62,4 +63,10 @@ it("preserves MIDI aliases on generic chip pins", () => {
   expect(netlist).toContain("NET: U1_MIDI_CH1")
   expect(netlist).toContain("  - U1 pin14 (MIDI_CH1)")
   expect(netlist).toContain("- pin14(MIDI_CH1): NETS(U1_MIDI_CH1)")
+})
+
+it("preserves stronger signal scores for MIDI aliases", () => {
+  expect(scorePhrase("MIDI_CH1")).toBe(1.15)
+  expect(scorePhrase("MIDI_SCLK")).toBe(1.2)
+  expect(scorePhrase("MIDI_MISO")).toBe(1.2)
 })
