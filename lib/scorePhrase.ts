@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sdCardSignalPattern =
+  /^(?:SDIO|SDMMC|MMC|MICROSD|SDCARD)[_-]?(?:D[0-7]|DAT[0-7]|CMD|CLK|CK|CD|WP)$/
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase().replace(/\s+/g, "_")
+  if (
+    sdCardSignalPattern.test(normalizedPhrase) ||
+    normalizedPhrase.match(/^DAT[0-7]$/)
+  ) {
+    return 1.16
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
