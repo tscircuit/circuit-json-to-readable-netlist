@@ -13,12 +13,16 @@ it("preserves radar frontend aliases in readable netlists", () => {
           pin14: ["pin14", "RADAR_TX1"],
           pin15: ["pin15", "IF_OUT1"],
           pin16: ["pin16", "MIXER_LO1"],
+          pin17: ["pin17", "RADAR_TX1_P"],
+          pin18: ["pin18", "RADAR_TX1N"],
         }}
       />
       <resistor name="R1" resistance="50" footprint="0402" />
       <capacitor name="C1" capacitance="100nF" footprint="0402" />
       <trace from=".U1 .RADAR_TX1" to=".R1 .pin1" />
       <trace from=".U1 .IF_OUT1" to=".C1 .pin1" />
+      <trace from=".U1 .RADAR_TX1_P" to=".R1 .pin2" />
+      <trace from=".U1 .RADAR_TX1N" to=".C1 .pin2" />
     </board>,
   )
 
@@ -28,5 +32,9 @@ it("preserves radar frontend aliases in readable netlists", () => {
   expect(netlist).toContain("  - U1 pin14 (RADAR_TX1)")
   expect(netlist).toContain("NET: U1_IF_OUT1")
   expect(netlist).toContain("  - U1 pin15 (IF_OUT1)")
+  expect(netlist).toContain("NET: U1_RADAR_TX1_P")
+  expect(netlist).toContain("  - U1 pin17 (RADAR_TX1_P)")
+  expect(netlist).toContain("NET: U1_RADAR_TX1N")
+  expect(netlist).toContain("  - U1 pin18 (RADAR_TX1N)")
   expect(netlist).toContain("- pin16(MIXER_LO1): NOT_CONNECTED")
 })
