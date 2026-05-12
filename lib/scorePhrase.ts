@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isLoadCellAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /^(HX711|LOADCELL|LOAD_CELL|STRAIN_GAUGE)[_-]?[A-Z0-9_+-]*$/.test(
+      normalizedPhrase,
+    ) ||
+    /^(WHEATSTONE|BRIDGE)[_-]?(EXC|SIG|SENSE)?[_-]?[PN+-]?$/.test(
+      normalizedPhrase,
+    )
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isLoadCellAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
