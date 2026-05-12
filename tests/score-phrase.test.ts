@@ -9,6 +9,9 @@ it("scores technical aliases that contain pin numbers", () => {
   expect(scorePhrase("I2C1_SCL")).toBe(1.2)
   expect(scorePhrase("ADC0")).toBe(1.2)
   expect(scorePhrase("PWM1")).toBe(1.2)
+  expect(scorePhrase("anode")).toBe(0.5)
+  expect(scorePhrase("pos")).toBe(0.9)
+  expect(scorePhrase("left")).toBe(0.3)
 })
 
 it("includes digit-bearing technical aliases in readable pin names", () => {

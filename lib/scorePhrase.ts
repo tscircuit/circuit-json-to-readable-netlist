@@ -46,7 +46,7 @@ export const scorePhrase = (phrase: string) => {
     return 0.5
   }
   for (const [word, score] of wordQualityScoreEntries) {
-    if (normalizedPhrase.includes(word)) {
+    if (normalizedPhrase.includes(word.toUpperCase())) {
       return score
     }
   }
