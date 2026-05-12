@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isMachineLimitAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /^[XYZ][_-]?(MIN|MAX|HOME|LIMIT|ENDSTOP)\d*$/.test(normalizedPhrase) ||
+    /^(MIN|MAX|HOME)[_-]?[XYZ]\d*$/.test(normalizedPhrase) ||
+    /^(LIMIT|ENDSTOP)[_-]?(SW|X|Y|Z)?\d*$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isMachineLimitAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
