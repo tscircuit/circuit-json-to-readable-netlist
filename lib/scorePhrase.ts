@@ -31,11 +31,29 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const digitBearingWordQualityScore = {
+  NFC: 1.15,
+  RFID: 1.15,
+  PN532: 1.15,
+  IRQ: 1.15,
+  FIELD: 1.1,
+  ANT: 1.1,
+}
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
