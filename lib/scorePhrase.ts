@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const relaySolenoidScoreEntries = [
+  ["SOLENOID", 1.2],
+  ["RELAY", 1.2],
+  ["VALVE", 1.2],
+  ["COIL", 1.15],
+] as const
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of relaySolenoidScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
