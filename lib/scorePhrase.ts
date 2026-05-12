@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const radiationSensorLabelPattern =
+  /^(?:(?:GEIGER|RADIATION|RAD|DOSIMETER|DOSE)(?:[_-]?(?:PULSE|COUNT|CNT|IRQ|INT|ALERT|SIG|SIGNAL|OUT|READY|TUBE|HV|BIAS))?|GM[_-]?(?:TUBE|PULSE|COUNT|CNT|SIG|SIGNAL|OUT))\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (radiationSensorLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
