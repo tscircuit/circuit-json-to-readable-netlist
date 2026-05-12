@@ -36,7 +36,7 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 const qspiFlashSignalPatterns = [
-  /^(?:Q?SPI_)?(?:IO|SIO)[0-3]$/,
+  /^Q?SPI_(?:IO|SIO)[0-3]$/,
   /^QSPI_D[0-3]$/,
   /^Q?SPI_(?:CS|CS_N|CSN|CLK|SCLK)$/,
   /^(?:Q?SPI_)?(?:WP|HOLD|RESET)_N$/,

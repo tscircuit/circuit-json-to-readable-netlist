@@ -1,5 +1,6 @@
 import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { scorePhrase } from "lib/scorePhrase"
 
 it("keeps QSPI flash aliases above generic pin labels", () => {
   const circuitJson = [
@@ -111,12 +112,12 @@ it("keeps QSPI flash aliases above generic pin labels", () => {
 
   expect(netlist).toContain("NET: U1_QSPI_IO0")
   expect(netlist).toContain("  - U1 pin14 (QSPI_IO0)")
-  expect(netlist).toContain("  - U2 pin5 (IO0)")
+  expect(netlist).toContain("  - U2 pin5")
   expect(netlist).toContain("- pin14(QSPI_IO0): NETS(U1_QSPI_IO0)")
 
   expect(netlist).toContain("NET: U1_QSPI_IO1")
   expect(netlist).toContain("  - U1 pin15 (QSPI_IO1)")
-  expect(netlist).toContain("  - U2 pin2 (IO1)")
+  expect(netlist).toContain("  - U2 pin2")
 
   expect(netlist).toContain("NET: U1_QSPI_WP_N")
   expect(netlist).toContain("  - U1 pin16 (QSPI_WP_N)")
@@ -125,4 +126,11 @@ it("keeps QSPI flash aliases above generic pin labels", () => {
   expect(netlist).toContain("NET: U1_QSPI_HOLD_N")
   expect(netlist).toContain("  - U1 pin17 (QSPI_HOLD_N)")
   expect(netlist).toContain("  - U2 pin7 (HOLD_N)")
+})
+
+it("does not score bare IO labels as QSPI flash aliases", () => {
+  expect(scorePhrase("IO0")).toBeLessThan(scorePhrase("BOOT"))
+  expect(scorePhrase("SIO0")).toBeLessThan(scorePhrase("BOOT"))
+  expect(scorePhrase("QSPI_IO0")).toBeGreaterThan(scorePhrase("BOOT"))
+  expect(scorePhrase("SPI_SIO0")).toBeGreaterThan(scorePhrase("BOOT"))
 })
