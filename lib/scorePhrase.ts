@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const legacyDisplayLabelPattern =
+  /^(VGA[_-]?(R|G|B|RED|GREEN|BLUE|HSYNC|VSYNC|DDC[_-]?(SCL|SDA))|RGB[_-]?(R|G|B|RED|GREEN|BLUE|DE|PCLK|CLK|HSYNC|VSYNC)|TFT[_-]?(DE|PCLK|CLK|HSYNC|VSYNC))\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (legacyDisplayLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
