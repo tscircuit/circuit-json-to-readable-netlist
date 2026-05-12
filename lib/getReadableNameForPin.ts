@@ -25,6 +25,19 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
+  const isNumberedPinName = (name: string) =>
+    port.pin_number !== undefined &&
+    (name.toLowerCase() === `pin${port.pin_number}` ||
+      name === String(port.pin_number))
+
+  const fallbackPinName =
+    port.name || (port.pin_number !== undefined ? `Pin${port.pin_number}` : "")
+
+  const bestHint = (port.port_hints ?? [])
+    .filter((hint) => hint !== fallbackPinName && !isNumberedPinName(hint))
+    .map((hint) => ({ hint, score: scorePhrase(hint) }))
+    .find(({ score }) => score > 1)?.hint
+
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
@@ -34,7 +47,8 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    isNumberedPinName(fallbackPinName) && bestHint ? bestHint : fallbackPinName
 
   const additionalPinLabels: string[] = []
 
