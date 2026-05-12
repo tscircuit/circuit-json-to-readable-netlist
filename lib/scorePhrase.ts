@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const rangefinderPattern =
+  /(^|[_-])(ULTRASONIC|SONAR|LIDAR|TOF|TIME_OF_FLIGHT|HC_SR04)(\d+|[_-]|$)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (rangefinderPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
