@@ -53,17 +53,17 @@ it("test2 chip", () => {
       - C1 pin1 (+)
 
     NET: GND
-      - U1 GPIO1 (SCL)
+      - U1 GPIO1 (SCL,pin3)
       - U1 AGND
       - U1 GND
 
     NET: U1_SDA
-      - U1 GPIO2 (SDA)
+      - U1 GPIO2 (SDA,pin4)
       - R1 pin2
 
 
     EMPTY NET PINS:
-      - U1 GPIO3
+      - U1 GPIO3 (pin5)
       - U1 VDD
 
     COMPONENT_PINS:
