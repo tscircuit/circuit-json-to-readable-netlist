@@ -36,7 +36,7 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 const isMipiCsiDsiLaneLabel = (phrase: string) => {
-  const normalized = phrase.toUpperCase()
+  const normalized = phrase.toUpperCase().replaceAll("-", "_")
   return (
     /(?:^|_)(?:CSI|DSI)\d*(?:_|$)/.test(normalized) &&
     /(?:D\d+_?[PN]|CLK_?[PN])/.test(normalized)

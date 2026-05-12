@@ -65,6 +65,22 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       port_hints: ["MIPI_DSI0_CLK_N"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_12",
+      source_component_id: "source_component_0",
+      name: "pin20",
+      pin_number: 20,
+      port_hints: ["MIPI-CSI1-D2-P"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_13",
+      source_component_id: "source_component_0",
+      name: "pin21",
+      pin_number: 21,
+      port_hints: ["MIPI-DSI1-CLK-P"],
+    },
+    {
       type: "source_component",
       ftype: "simple_chip",
       source_component_id: "source_component_4",
@@ -120,6 +136,22 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       port_hints: ["MIPI_DSI0_CLK_N"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_14",
+      source_component_id: "source_component_4",
+      name: "pin7",
+      pin_number: 7,
+      port_hints: ["MIPI-CSI1-D2-P"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_15",
+      source_component_id: "source_component_4",
+      name: "pin8",
+      pin_number: 8,
+      port_hints: ["MIPI-DSI1-CLK-P"],
+    },
+    {
       type: "source_trace",
       source_trace_id: "source_trace_0",
       connected_source_port_ids: ["source_port_0", "source_port_4"],
@@ -155,6 +187,18 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       connected_source_port_ids: ["source_port_9", "source_port_11"],
       connected_source_net_ids: [],
     },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_6",
+      connected_source_port_ids: ["source_port_12", "source_port_14"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_7",
+      connected_source_port_ids: ["source_port_13", "source_port_15"],
+      connected_source_net_ids: [],
+    },
   ] as any
 
   expect(
@@ -188,6 +232,14 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       - U1 pin19 (MIPI_DSI0_CLK_N)
       - J1 pin6 (MIPI_DSI0_CLK_N)
 
+    NET: U1_MIPI-CSI1-D2-P
+      - U1 pin20 (MIPI-CSI1-D2-P)
+      - J1 pin7 (MIPI-CSI1-D2-P)
+
+    NET: U1_MIPI-DSI1-CLK-P
+      - U1 pin21 (MIPI-DSI1-CLK-P)
+      - J1 pin8 (MIPI-DSI1-CLK-P)
+
 
     COMPONENT_PINS:
     U1 (CAM_IFACE)
@@ -197,6 +249,8 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
     - pin17(DSI_CLKN): NETS(U1_DSI_CLKN)
     - pin18(MIPI_CSI0_D0_P): NETS(U1_MIPI_CSI0_D0_P)
     - pin19(MIPI_DSI0_CLK_N): NETS(U1_MIPI_DSI0_CLK_N)
+    - pin20(MIPI-CSI1-D2-P): NETS(U1_MIPI-CSI1-D2-P)
+    - pin21(MIPI-DSI1-CLK-P): NETS(U1_MIPI-DSI1-CLK-P)
 
     J1 (FPC_CAMERA_DISPLAY)
     - pin1(CSI_D0P): NETS(U1_CSI_D0P)
@@ -205,6 +259,8 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
     - pin4(DSI_CLKN): NETS(U1_DSI_CLKN)
     - pin5(MIPI_CSI0_D0_P): NETS(U1_MIPI_CSI0_D0_P)
     - pin6(MIPI_DSI0_CLK_N): NETS(U1_MIPI_DSI0_CLK_N)
+    - pin7(MIPI-CSI1-D2-P): NETS(U1_MIPI-CSI1-D2-P)
+    - pin8(MIPI-DSI1-CLK-P): NETS(U1_MIPI-DSI1-CLK-P)
     "
   `)
 })
