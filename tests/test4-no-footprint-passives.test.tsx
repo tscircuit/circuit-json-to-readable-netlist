@@ -12,8 +12,8 @@ it("passives without footprints do not render undefined", () => {
 
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
   expect(netlist).not.toContain("undefined")
-  expect(netlist).toContain(" - R1: 10k resistor")
+  expect(netlist).toContain(" - R1: 10kΩ resistor")
   expect(netlist).toContain(" - C1: 100nF capacitor")
-  expect(netlist).toContain("R1 (10k)")
+  expect(netlist).toContain("R1 (10kΩ)")
   expect(netlist).toContain("C1 (100nF)")
 })
