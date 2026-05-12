@@ -13,6 +13,12 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  CTP: 1.2,
+  TOUCH: 1.2,
+  TCH: 1.2,
+  RESET: 1.2,
+  WAKE: 1.2,
+  INT: 1.15,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +41,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const touchControllerWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["CTP", "TOUCH", "TCH", "RESET", "WAKE", "INT"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of touchControllerWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
