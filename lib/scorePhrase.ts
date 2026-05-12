@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const regulatorTopologyLabelPattern =
+  /^(BUCK[_-]?(SW|LX|PH|FB|COMP|BOOT|BST|PG|PGOOD|VOUT)\d*|BOOST[_-]?(SW|LX|PH|FB|COMP|BOOT|BST|PG|PGOOD|VOUT)\d*|LDO[_-]?(IN|OUT|FB|BYP|NR|PG|PGOOD)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (regulatorTopologyLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
