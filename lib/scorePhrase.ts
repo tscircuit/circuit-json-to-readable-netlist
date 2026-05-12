@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const ufsStorageAliasPattern = /(?:^|[_-])(?:UFS|UNIPRO|M_PHY|MPHY)(?:[_-]|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (ufsStorageAliasPattern.test(phrase.toUpperCase())) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
