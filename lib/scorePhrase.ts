@@ -8,6 +8,10 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  I3C: 1.2,
+  IBI: 1.2,
+  ENTDAA: 1.2,
+  HDR: 1.15,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -31,18 +35,20 @@ const wordQualityScore = {
   right: 0.3,
 }
 
-const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
-  (a, b) => b[1] - a[1],
-)
+const wordQualityScoreEntries = Object.entries(wordQualityScore)
+  .sort((a, b) => b[1] - a[1])
+  .map(([word, score]): [string, number] => [word.toUpperCase(), score])
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const normalizedPhrase = phrase.toUpperCase()
+
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word)) {
       return score
     }
+  }
+  if (normalizedPhrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
