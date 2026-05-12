@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const biomedicalSignalWords = ["ECG", "EEG", "EMG", "PPG", "BIOZ", "RESP"]
+const biomedicalSignalScore = 1.2
+
 export const scorePhrase = (phrase: string) => {
+  const uppercasePhrase = phrase.toUpperCase()
+  if (biomedicalSignalWords.some((word) => uppercasePhrase.includes(word))) {
+    return biomedicalSignalScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
