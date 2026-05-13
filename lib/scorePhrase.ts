@@ -15,6 +15,7 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  GP: 1.1,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
