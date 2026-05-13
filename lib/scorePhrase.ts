@@ -16,6 +16,16 @@ const wordQualityScore = {
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
+  CELL_BAL: 1.2,
+  BAL_SNS: 1.2,
+  JEITA: 1.15,
+  NTC_BAT: 1.15,
+  SHIP_MODE: 1.15,
+  BATT_PROT: 1.15,
+  PACK_SNS: 1.15,
+  BATFET: 1.15,
+  DSG: 1.15,
+  CHG_FET: 1.15,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -36,13 +46,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
