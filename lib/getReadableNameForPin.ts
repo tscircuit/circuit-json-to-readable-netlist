@@ -7,6 +7,20 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (pinName?: string) => /^pin\d+$/i.test(pinName ?? "")
+
+const getMainPinName = (port: SourcePort) => {
+  if (!isGenericPinName(port.name)) return port.name ?? `Pin${port.pin_number}`
+
+  const bestHint = (port.port_hints ?? [])
+    .filter((hint) => !isGenericPinName(hint))
+    .map((hint) => ({ hint, score: scorePhrase(hint) }))
+    .filter(({ score }) => score >= 1)
+    .at(0)?.hint
+
+  return bestHint ?? port.name ?? `Pin${port.pin_number}`
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +48,7 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName = getMainPinName(port)
 
   const additionalPinLabels: string[] = []
 
@@ -46,6 +60,7 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (isGenericPinName(port_hint)) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
