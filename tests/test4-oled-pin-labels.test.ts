@@ -70,7 +70,7 @@ it("keeps OLED module control and bias pin aliases readable", () => {
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
 
   expect(netlist).toContain("NET: OLED1_OLED_DC")
-  expect(netlist).toContain("  - OLED1 pin4 (DC,OLED_DC)")
+  expect(netlist).toContain("  - OLED1 pin4 (OLED_DC)")
   expect(netlist).toContain("NET: OLED1_VCOMH")
   expect(netlist).toContain("  - OLED1 pin10 (VCOMH)")
   expect(netlist).not.toContain("undefined")
