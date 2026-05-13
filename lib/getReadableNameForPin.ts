@@ -1,11 +1,28 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
-import { scorePhrase } from "./scorePhrase"
+import type { AnyCircuitElement, SourcePort } from "circuit-json"
+
+export const getReadablePinLabel = (port: SourcePort): string => {
+  const mainPinName =
+    port.pin_number !== undefined
+      ? `pin${port.pin_number}`
+      : (port.name ?? "pin")
+
+  const aliases: string[] = []
+  if (port.name && port.name !== mainPinName) aliases.push(port.name)
+
+  for (const portHint of port.port_hints ?? []) {
+    if (portHint === String(port.pin_number)) continue
+    if (portHint !== mainPinName && portHint !== port.name) {
+      aliases.push(portHint)
+    }
+  }
+
+  const uniqueAliases = Array.from(new Set(aliases))
+  const aliasPart =
+    uniqueAliases.length > 0 ? `(${uniqueAliases.join(", ")})` : ""
+
+  return `${mainPinName}${aliasPart}`
+}
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -25,35 +42,23 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
-  // Determine pin polarity from hints
-  const isPositive = port.port_hints?.some((hint) =>
-    ["anode", "pos", "positive"].includes(hint.toLowerCase()),
-  )
-  const isNegative = port.port_hints?.some((hint) =>
-    ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
-  )
-
-  // Format pin description
   const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  let pinLabel = getReadablePinLabel(port)
 
-  const additionalPinLabels: string[] = []
-
-  if (isPositive && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("+")
-  } else if (isNegative && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("-")
-  }
-
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
+  if (component.ftype === "simple_resistor") {
+    pinLabel = mainPinName
+  } else if (component.ftype === "simple_capacitor") {
+    const isPositive = port.port_hints?.some((hint) =>
+      ["anode", "pos", "positive"].includes(hint.toLowerCase()),
+    )
+    const isNegative = port.port_hints?.some((hint) =>
+      ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
+    )
+    pinLabel = `${mainPinName}${isPositive ? " (+)" : isNegative ? " (-)" : ""}`
   }
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${component.name} ${pinLabel}${displayValue}`
 }

@@ -53,18 +53,18 @@ it("test2 chip", () => {
       - C1 pin1 (+)
 
     NET: GND
-      - U1 GPIO1 (SCL)
-      - U1 AGND
-      - U1 GND
+      - U1 pin3(GPIO1, SCL)
+      - U1 pin2(AGND)
+      - U1 pin1(GND)
 
     NET: U1_SDA
-      - U1 GPIO2 (SDA)
+      - U1 pin4(GPIO2, SDA)
       - R1 pin2
 
 
     EMPTY NET PINS:
-      - U1 GPIO3
-      - U1 VDD
+      - U1 pin5(GPIO3)
+      - U1 pin8(VDD)
 
     COMPONENT_PINS:
     U1 (ATMEGA328P)
