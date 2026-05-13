@@ -36,6 +36,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (
+    /^(USB_?)?PWRON\d*$/i.test(phrase) ||
+    /^(USB_?)?PORT_?PWR_?EN\d*$/i.test(phrase) ||
+    /^(USB_?)?(OC|OVERCURRENT)\d*$/i.test(phrase) ||
+    /^HUB_(RESET|PWRON|OC|OVERCURRENT)\d*$/i.test(phrase)
+  ) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
