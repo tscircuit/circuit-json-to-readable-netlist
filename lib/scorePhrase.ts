@@ -36,6 +36,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase().replace(/[-\s]+/g, "_")
+
+  if (
+    normalizedPhrase.includes("WIEGAND") ||
+    /^WG_?(?:D|DATA)?[01]$/.test(normalizedPhrase)
+  ) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
