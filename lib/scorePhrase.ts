@@ -42,7 +42,7 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 
 const isDataLineLabel = (phrase: string) => {
   const normalized = phrase.toUpperCase()
-  return /^(?:DATA|DAT|DQ|DIN|DOUT|CLK|CS)\d*$/.test(normalized)
+  return /^(?:DATA|DAT|DQ|DIN|DOUT|CLK|CS)_?\d*$/.test(normalized)
 }
 
 export const scorePhrase = (phrase: string) => {
