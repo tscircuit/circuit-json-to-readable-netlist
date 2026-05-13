@@ -35,7 +35,25 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const motorControlAliases = [
+  "PHASE_U",
+  "PHASE_V",
+  "PHASE_W",
+  "BEMF_U",
+  "BEMF_V",
+  "BEMF_W",
+  "HALL_A",
+  "HALL_B",
+  "HALL_C",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const alias of motorControlAliases) {
+    if (normalizedPhrase.includes(alias)) {
+      return 1.2
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
