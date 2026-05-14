@@ -1,5 +1,6 @@
 import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { scorePhrase } from "lib/scorePhrase"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
@@ -319,4 +320,10 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
     - pin10(MIPI_DSI2_CK_N): NETS(U1_MIPI_DSI2_CK_N)
     "
   `)
+})
+
+it("scores MIPI lane aliases without broadening generic numbered pins", () => {
+  expect(scorePhrase("MIPI-CSI1-D2-P")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("MIPI_DSI2_CK_N")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("pin14")).toBe(0.5)
 })
