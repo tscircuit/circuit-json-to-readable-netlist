@@ -120,7 +120,7 @@ export const scorePhrase = (phrase: string) => {
   }
 
   const [singleToken] = descriptiveTokens
-  if (singleToken && singleToken.length >= 4) {
+  if (singleToken && singleToken.length >= 3) {
     return Math.max(bestTokenScore, 1.12)
   }
 

@@ -196,6 +196,7 @@ it("scores descriptive signal aliases without substring false positives", () => 
   expect(scorePhrase("VBUS_SENSE")).toBeLessThan(
     scorePhrase("USB_POWER_DELIVERY"),
   )
+  expect(scorePhrase("IBI")).toBeGreaterThan(1)
   expect(scorePhrase("positive")).toBeLessThanOrEqual(1)
   expect(scorePhrase("DC")).toBe(1)
 })
