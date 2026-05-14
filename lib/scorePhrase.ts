@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const motionNetworkAliasPatterns = [
+  /\bSERCOS_?(?:III|TX|RX|DATA|P|N|CLK|SYNC)?\d?\b/i,
+  /\bMECHATROLINK_?(?:I|II|III|TX|RX|DATA|P|N|SYNC)?\d?\b/i,
+  /\bPOWERLINK_?(?:TX|RX|DATA|P|N|SYNC|MN|CN)?\d?\b/i,
+  /\bETHERNET_POWERLINK_?(?:TX|RX|DATA|P|N|SYNC)?\d?\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (motionNetworkAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
