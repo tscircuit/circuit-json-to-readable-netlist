@@ -61,6 +61,7 @@ export const generateNetName = ({
       ),
     )
     .concat(nets.map((n) => n.name))
+    .filter((name): name is string => typeof name === "string")
 
   const phrases = possibleNames.map((name) => ({
     name,
