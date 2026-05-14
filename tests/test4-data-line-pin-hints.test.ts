@@ -1,5 +1,6 @@
 import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { scorePhrase } from "lib/scorePhrase"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
@@ -283,4 +284,10 @@ it("keeps data-line hints for generic chip pin labels", () => {
     - pin7(DQ_2): NETS(U3_DQ_2)
     "
   `)
+})
+
+it("scores data-line aliases without broadening generic numbered pins", () => {
+  expect(scorePhrase("DATA_1")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("DQ_2")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("pin14")).toBe(0.5)
 })
