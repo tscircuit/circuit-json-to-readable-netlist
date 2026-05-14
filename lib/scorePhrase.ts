@@ -8,6 +8,16 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  DESAT: 1.25,
+  MILLER_CLAMP: 1.25,
+  GATE_HS: 1.25,
+  GATE_LS: 1.25,
+  VBOOT: 1.2,
+  BOOTSTRAP: 1.2,
+  IGBT: 1.2,
+  MOSFET: 1.2,
+  SIC: 1.2,
+  GAN: 1.2,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -36,13 +46,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
