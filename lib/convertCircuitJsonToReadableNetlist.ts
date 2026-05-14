@@ -6,6 +6,7 @@ import type {
   SourcePort,
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
+import { scorePhrase } from "./scorePhrase"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
@@ -143,35 +144,57 @@ export const convertCircuitJsonToReadableNetlist = (
         source_component_id: component.source_component_id,
       })
       const footprint = cadComponent?.footprinter_string
-      let header = component.name
+      let header = component.name ?? "unnamed"
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${component.name ?? "unnamed"} (${component.display_resistance} ${footprint ?? ""})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${component.name ?? "unnamed"} (${component.display_capacitance} ${footprint ?? ""})`
       } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+        header = `${component.name ?? "unnamed"} (${component.manufacturer_part_number})`
       }
       netlist.push(header)
       const ports = source_ports
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
+        const pinLabels = Array.from(
+          new Set(
+            [port.name, ...(port.port_hints ?? [])]
+              .filter(Boolean)
+              .map((p) => String(p)),
+          ),
+        ).sort((a, b) => scorePhrase(b) - scorePhrase(a))
+
+        const bestLabel = pinLabels[0]
         const mainPin =
           port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
+
+        let label = mainPin
+        if (bestLabel && bestLabel !== mainPin && scorePhrase(bestLabel) > 1) {
+          label = `${bestLabel} (${mainPin})`
         }
+
+        const aliases: string[] = []
+        for (const labelCandidate of pinLabels) {
+          if (
+            labelCandidate !== bestLabel &&
+            labelCandidate !== mainPin &&
+            labelCandidate !== port.name &&
+            !label.includes(labelCandidate)
+          ) {
+            aliases.push(labelCandidate)
+          }
+        }
+
         const aliasPart =
           aliases.length > 0
-            ? `(${Array.from(new Set(aliases)).join(", ")})`
+            ? ` (${Array.from(new Set(aliases)).join(", ")})`
             : ""
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =
           nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
-        netlist.push(`- ${mainPin}${aliasPart}: ${netsPart}`)
+
+        netlist.push(`- ${label}${aliasPart}: ${netsPart}`)
       }
       netlist.push("")
     }
