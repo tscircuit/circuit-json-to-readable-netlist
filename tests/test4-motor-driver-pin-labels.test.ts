@@ -36,19 +36,35 @@ it("keeps motor-driver pin aliases readable", () => {
     },
     {
       type: "source_port",
-      source_port_id: "source_port_motor_fault",
+      source_port_id: "source_port_phase_v",
       source_component_id: "source_component_motor_driver",
       name: "pin6",
       pin_number: 6,
-      port_hints: ["6", "pin6", "MOTOR_FAULT", "SLEEP_MODE"],
+      port_hints: ["6", "pin6", "MOTOR_PHASE", "PHASE_V"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_mcu_phase_v",
+      source_component_id: "source_component_mcu",
+      name: "pin14",
+      pin_number: 14,
+      port_hints: ["14", "pin14", "GPIO_MOTOR"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_motor_fault",
+      source_component_id: "source_component_motor_driver",
+      name: "pin7",
+      pin_number: 7,
+      port_hints: ["7", "pin7", "MOTOR_FAULT", "SLEEP_MODE"],
     },
     {
       type: "source_port",
       source_port_id: "source_port_mcu_fault",
       source_component_id: "source_component_mcu",
-      name: "pin14",
-      pin_number: 14,
-      port_hints: ["14", "pin14", "GPIO_INT"],
+      name: "pin15",
+      pin_number: 15,
+      port_hints: ["15", "pin15", "GPIO_INT"],
     },
     {
       type: "source_trace",
@@ -56,6 +72,15 @@ it("keeps motor-driver pin aliases readable", () => {
       connected_source_port_ids: [
         "source_port_phase_u",
         "source_port_mcu_phase_u",
+      ],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_phase_v",
+      connected_source_port_ids: [
+        "source_port_phase_v",
+        "source_port_mcu_phase_v",
       ],
       connected_source_net_ids: [],
     },
@@ -72,9 +97,12 @@ it("keeps motor-driver pin aliases readable", () => {
 
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
 
-  expect(netlist).toContain("NET: U1_MOTOR_PHASE")
+  expect(netlist).toContain("NET: U1_PHASE_U")
   expect(netlist).toContain("  - U1 pin5 (MOTOR_PHASE,PHASE_U)")
+  expect(netlist).toContain("NET: U1_PHASE_V")
+  expect(netlist).toContain("  - U1 pin6 (MOTOR_PHASE,PHASE_V)")
+  expect(netlist).not.toContain("NET: U1_MOTOR_PHASE")
   expect(netlist).toContain("NET: U1_MOTOR_FAULT")
-  expect(netlist).toContain("  - U1 pin6 (MOTOR_FAULT,SLEEP_MODE)")
+  expect(netlist).toContain("  - U1 pin7 (MOTOR_FAULT,SLEEP_MODE)")
   expect(netlist).not.toContain("undefined")
 })
