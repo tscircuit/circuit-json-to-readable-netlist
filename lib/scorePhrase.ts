@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isMagstripeReaderAlias = (phrase: string) => {
+  const normalized = phrase.toUpperCase()
+  return /(^|[_-])(MAGSTRIPE|MAG_STRIPE|MSR|MAGTEK|TRACK[123]|TK[123]|F2F|SWIPE)([_-]|$)/.test(
+    normalized,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isMagstripeReaderAlias(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
