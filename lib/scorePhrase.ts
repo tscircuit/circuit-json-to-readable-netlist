@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hvacThermostatAliasPatterns = [
+  /\bOPEN_?THERM(?:_?(?:BUS|TX|RX|IN|OUT|P|N|PLUS|MINUS))?\d?\b/i,
+  /\bOT_?(?:BUS|TX|RX|IN|OUT|P|N|PLUS|MINUS)\d?\b/i,
+  /\bTHERMOSTAT_?(?:W\d?|Y\d?|G\d?|C|R|RC|RH|O|B|AUX|E|FAN|HEAT|COOL)\b/i,
+  /\bHVAC_?(?:HEAT|COOL|FAN|AUX|EMHEAT|CALL)\d?\b/i,
+  /\b(?:HEAT|COOL|FAN|AUX|EM)_CALL\d?\b/i,
+  /\bBOILER_?(?:CALL|ENABLE|FIRE|TX|RX|BUS)\d?\b/i,
+  /\bFURNACE_?(?:W\d?|CALL|FAN|HEAT|FAULT)\b/i,
+  /\bHEATPUMP_?(?:O|B|REV|AUX|DEFROST|Y\d?)\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (hvacThermostatAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
