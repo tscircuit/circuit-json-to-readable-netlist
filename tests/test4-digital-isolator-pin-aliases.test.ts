@@ -185,4 +185,5 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
 it("scores digital isolator channel aliases above passive labels", () => {
   expect(scorePhrase("SI86_CH1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("ISO_CH1")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("pin14")).toBe(0.5)
 })
