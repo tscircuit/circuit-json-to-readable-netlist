@@ -7,7 +7,7 @@
  *
  * These unique port names are usually the best indicator of what the net is for
  */
-const wordQualityScore = {
+const exactPhraseQualityScore: Record<string, number> = {
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -18,35 +18,111 @@ const wordQualityScore = {
   GPIO: 1.1,
   GP: 1.1,
   SCK: 1.1,
-  cathode: 0.5,
-  anode: 0.5,
   GND: 1.1,
   VDD: 1.1,
   AGND: 1.1,
+  VBAT: 1.1,
+  VCOMH: 1.1,
   V5: 1.1,
   V3: 1.1,
   V1: 1.1,
-  neg: 0.9,
-  pos: 0.9,
-  pin: 0.5,
-  left: 0.3,
-  right: 0.3,
 }
 
-const wordQualityScoreEntries = Object.entries(wordQualityScore)
-  .map(([word, score]): [string, number] => [word.toUpperCase(), score])
-  .sort((a, b) => b[1] - a[1])
+const tokenQualityScore: Record<string, number> = {
+  ...exactPhraseQualityScore,
+  CATHODE: 0.5,
+  ANODE: 0.5,
+  NEG: 0.9,
+  NEGATIVE: 0.9,
+  POS: 0.9,
+  POSITIVE: 0.9,
+  PIN: 0.5,
+  NC: 0.4,
+  LEFT: 0.3,
+  RIGHT: 0.3,
+  TOP: 0.3,
+  BOTTOM: 0.3,
+}
+
+const genericSignalPrefixes = [
+  "GPIO",
+  "GP",
+  "SPI",
+  "I2C",
+  "UART",
+  "USART",
+  "ADC",
+  "DAC",
+  "PWM",
+]
+
+const specificSuffixTokens = new Set([
+  "IN",
+  "OUT",
+  "HIGH",
+  "LOW",
+  "PLUS",
+  "MINUS",
+  "U",
+  "V",
+  "W",
+  "TX",
+  "RX",
+  "DATA",
+  "CLOCK",
+])
+
+const getTokens = (phrase: string) => phrase.match(/[A-Z]+|\d+/g) ?? []
+
+const getTokenScore = (token: string) =>
+  /^\d+$/.test(token) ? 0.5 : (tokenQualityScore[token] ?? 1)
+
+const startsWithGenericPrefix = (phrase: string) =>
+  genericSignalPrefixes.some(
+    (prefix) => phrase === prefix || phrase.startsWith(prefix),
+  )
+
+const isLowValueToken = (token: string) => getTokenScore(token) < 1
 
 export const scorePhrase = (phrase: string) => {
-  const normalizedPhrase = phrase.toUpperCase()
+  const normalizedPhrase = phrase.trim().toUpperCase()
+  if (!normalizedPhrase) return 0
 
-  for (const [word, score] of wordQualityScoreEntries) {
-    if (normalizedPhrase.includes(word)) {
-      return score
-    }
+  const exactScore = exactPhraseQualityScore[normalizedPhrase]
+  if (exactScore) {
+    return exactScore
   }
-  if (normalizedPhrase.match(/\d+/)) {
+
+  const tokens = getTokens(normalizedPhrase)
+  if (tokens.length > 0 && tokens.every((token) => /^\d+$/.test(token))) {
     return 0.5
   }
-  return 1
+
+  const bestTokenScore = tokens.reduce(
+    (bestScore, token) => Math.max(bestScore, getTokenScore(token)),
+    0,
+  )
+
+  if (bestTokenScore < 1 || startsWithGenericPrefix(normalizedPhrase)) {
+    return bestTokenScore
+  }
+
+  const descriptiveTokens = tokens.filter((token) => !isLowValueToken(token))
+  if (descriptiveTokens.length >= 2) {
+    const specificityScore = 1.12 + Math.min(descriptiveTokens.length, 3) * 0.02
+    const suffixBonus = specificSuffixTokens.has(
+      descriptiveTokens[descriptiveTokens.length - 1],
+    )
+      ? 0.02
+      : 0
+
+    return Math.max(bestTokenScore, specificityScore + suffixBonus)
+  }
+
+  const [singleToken] = descriptiveTokens
+  if (singleToken && singleToken.length >= 4) {
+    return Math.max(bestTokenScore, 1.12)
+  }
+
+  return bestTokenScore
 }
