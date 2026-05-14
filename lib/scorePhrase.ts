@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const platformManagementAliasPatterns = [
+  /\bLPC_?(?:AD|LAD)\d\b/i,
+  /\bLAD\d\b/i,
+  /\bLPC_?(?:CLK|FRAME|RESET|RST|DRQ\d?|PD)\b/i,
+  /\bLFRAME(?:_N)?\b/i,
+  /\b(?:SERIRQ|CLKRUN)\b/i,
+  /\bESPI_?(?:CLK|CS\d?|IO\d|RESET|RST|ALERT|OOB|SAFS|VWIRE)\b/i,
+  /\bTPM_?(?:CS\d?|CLK|RST|RESET|IRQ|PIRQ|PP|GPIO\d?|LAD\d|AD\d)\b/i,
+  /\b(?:PLTRST|RSMRST|SLP_S[345]|PCH_PWROK|SUSCLK|SUS_STAT)\b/i,
+  /\bEC_(?:SCI|SMI)\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (platformManagementAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
