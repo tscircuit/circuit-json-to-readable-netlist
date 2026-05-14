@@ -35,7 +35,33 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const gateDriverAliasPatterns = [
+  /^DESAT(?:_|$|\d)/,
+  /^MILLER_CLAMP(?:_|$|\d)/,
+  /^MILLER(?:_|$|\d)/,
+  /^GATE_HS(?:_|$|\d)/,
+  /^GATE_LS(?:_|$|\d)/,
+  /^GATE_HI(?:_|$|\d)/,
+  /^GATE_LO(?:_|$|\d)/,
+  /^GH(?:_|$|\d)/,
+  /^GL(?:_|$|\d)/,
+  /^HO(?:_|$|\d)/,
+  /^LO(?:_|$|\d)/,
+  /^VBST(?:_|$|\d)/,
+  /^VBOOT(?:_|$|\d)/,
+  /^BOOTSTRAP(?:_|$|\d)/,
+  /^SIC_GATE(?:_|$|\d)/,
+  /^GAN_GATE(?:_|$|\d)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    gateDriverAliasPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
