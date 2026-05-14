@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cameraInterfaceAliasPattern =
+  /(^|[_-])(?:MIPI|CSI(?:2)?|CAM(?:ERA)?|MCLK|XCLK|PCLK|VSYNC|HSYNC|PWDN|STROBE)(?:[_-]|$)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (cameraInterfaceAliasPattern.test(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
