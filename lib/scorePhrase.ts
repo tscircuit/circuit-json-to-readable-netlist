@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const telecomLineAliasPatterns = [
+  /^SLIC(?:_|$|\d)/,
+  /^FXS(?:_|$|\d)/,
+  /^FXO(?:_|$|\d)/,
+  /^POTS(?:_|$|\d)/,
+  /^TIP(?:_|$|\d)/,
+  /^RING(?:_|$|\d)/,
+  /^HOOKSW(?:_|$|\d)/,
+  /^OFFHOOK(?:_|$|\d)/,
+  /^ONHOOK(?:_|$|\d)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    telecomLineAliasPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
