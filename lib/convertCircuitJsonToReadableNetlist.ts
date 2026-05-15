@@ -161,7 +161,10 @@ export const convertCircuitJsonToReadableNetlist = (
       for (const port of ports) {
         const fallbackPin =
           port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const mainPin = getReadableMainPinName(port) ?? fallbackPin
+        const mainPin =
+          getReadableMainPinName(port, {
+            preferPortHints: component.ftype === "simple_chip",
+          }) ?? fallbackPin
         const aliases: string[] = []
         if (fallbackPin && fallbackPin !== mainPin) aliases.push(fallbackPin)
         if (port.name && port.name !== mainPin) aliases.push(port.name)
