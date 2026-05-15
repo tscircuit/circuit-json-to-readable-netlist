@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const thermalImagerAliasPattern =
+  /(?:^|_)(?:BOL|MICROBOLOMETER|NUC|SHUTTER|FRAME_VALID|FRAME_SYNC|THERMAL|FLIR)(?:_|$|\d)/
+
 export const scorePhrase = (phrase: string) => {
+  if (thermalImagerAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
