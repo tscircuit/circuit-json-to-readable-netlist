@@ -34,7 +34,16 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Prefer port.name, then check port_hints for meaningful names,
+  // then fallback to "Pin{N}" format
+  let mainPinName = port.name
+  if (!mainPinName) {
+    // Check if port_hints has a usable name (e.g. "GPIO14" vs "pin14")
+    const usableHint = (port.port_hints ?? []).find(
+      (h) => h && !h.toLowerCase().startsWith("pin") && !/^left$/i.test(h) && !/^right$/i.test(h),
+    )
+    mainPinName = usableHint ?? `Pin${port.pin_number}`
+  }
 
   const additionalPinLabels: string[] = []
 
