@@ -36,13 +36,17 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      // Filter out undefined fields so a resistor without a stated resistance
+      // doesn't render as "undefined 0402 resistor" (see issue #4).
+      const parts = [component.display_resistance, footprint].filter(Boolean)
+      componentDescription = parts.length
+        ? `${parts.join(" ")} resistor`
+        : "resistor"
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      const parts = [component.display_capacitance, footprint].filter(Boolean)
+      componentDescription = parts.length
+        ? `${parts.join(" ")} capacitor`
+        : "capacitor"
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -144,10 +148,18 @@ export const convertCircuitJsonToReadableNetlist = (
       })
       const footprint = cadComponent?.footprinter_string
       let header = component.name
+      // Build the parenthetical descriptor from non-empty fields so a resistor
+      // or capacitor without a value doesn't render "R1 (undefined 0402)".
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const parts = [component.display_resistance, footprint].filter(Boolean)
+        header = parts.length
+          ? `${component.name} (${parts.join(" ")})`
+          : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const parts = [component.display_capacitance, footprint].filter(Boolean)
+        header = parts.length
+          ? `${component.name} (${parts.join(" ")})`
+          : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
