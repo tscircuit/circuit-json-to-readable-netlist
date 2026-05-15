@@ -7,6 +7,48 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (name?: string) => /^pin\d+$/i.test(name ?? "")
+
+const isPinNumberHint = (hint: string, port: SourcePort) =>
+  port.pin_number !== undefined && hint === String(port.pin_number)
+
+const uniqueLabels = (labels: string[]) => Array.from(new Set(labels))
+
+export const getBestReadablePinLabel = (port: SourcePort): string => {
+  const fallback =
+    port.name || (port.pin_number !== undefined ? `pin${port.pin_number}` : "")
+
+  if (port.name && !isGenericPinName(port.name)) return port.name
+
+  const bestHint = (port.port_hints ?? []).find(
+    (hint) =>
+      !isGenericPinName(hint) &&
+      !isPinNumberHint(hint, port) &&
+      scorePhrase(hint) >= 1,
+  )
+
+  return bestHint ?? fallback
+}
+
+export const getReadablePinAliases = (port: SourcePort, mainPin: string) => {
+  const aliases: string[] = []
+  const numberedPin =
+    port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+  const addAlias = (label?: string) => {
+    if (!label || label === mainPin) return
+    aliases.push(label)
+  }
+
+  addAlias(numberedPin)
+  addAlias(port.name)
+  for (const hint of port.port_hints ?? []) {
+    if (isPinNumberHint(hint, port)) continue
+    addAlias(hint)
+  }
+
+  return uniqueLabels(aliases)
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +76,7 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName = getBestReadablePinLabel(port)
 
   const additionalPinLabels: string[] = []
 
@@ -44,10 +86,15 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
+  if (port.name && isGenericPinName(port.name) && port.name !== mainPinName) {
+    additionalPinLabels.push(port.name)
+  }
+
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (isPinNumberHint(port_hint, port)) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score >= 1) {
       additionalPinLabels.push(port_hint)
     }
   }
