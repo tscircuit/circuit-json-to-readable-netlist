@@ -71,7 +71,8 @@ it("renders useful digit-containing chip pin hints in readable netlists", () => 
     },
   ]
 
-  expect(convertCircuitJsonToReadableNetlist(circuitJson)).toContain(
-    "U1 pin14 (GP10_SPI1SCK_I2C1SDA)",
-  )
+  const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
+
+  expect(netlist).toContain("U1 pin14 (GP10_SPI1SCK_I2C1SDA)")
+  expect(netlist).not.toContain("undefined")
 })
