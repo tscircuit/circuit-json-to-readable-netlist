@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const focusedTechnicalLabelScores: Array<[RegExp, number]> = [
+  [
+    /(^|_)(PTT|SQUELCH|SQL|CW|MORSE|APRS|RIG|TXEN|RXEN|KEYER|KEY)(?=\d|_|$)/i,
+    1.18,
+  ],
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const [pattern, score] of focusedTechnicalLabelScores) {
+    if (pattern.test(phrase)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
