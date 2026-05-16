@@ -14,7 +14,7 @@
   "type": "module",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@tscircuit/circuit-json-util": "^0.0.90",
+    "@tscircuit/circuit-json-util": "^0.0.94",
     "@tscircuit/core": "^0.0.401",
     "@tscircuit/math-utils": "^0.0.35",
     "@tscircuit/props": "^0.0.178",
@@ -23,13 +23,20 @@
     "circuit-json": "^0.0.170",
     "circuit-json-to-connectivity-map": "^0.0.17",
     "debug": "^4.4.0",
-    "react": "18",
+    "react": "18.3.1",
     "tsup": "^8.3.5"
   },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
   "peerDependencies": {
-    "typescript": "^5.0.0",
     "@tscircuit/circuit-json-util": "*",
+    "circuit-json": "*",
     "circuit-json-to-connectivity-map": "*",
-    "circuit-json": "*"
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "react-dom": "18.3.1"
   }
 }
