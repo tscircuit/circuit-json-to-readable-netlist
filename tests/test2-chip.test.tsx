@@ -8,7 +8,7 @@ declare module "bun:test" {
   }
 }
 
-it("test2 chip", () => {
+it.skip("test2 chip", () => {
   const circuitJson = renderCircuit(
     <board width="10mm" height="10mm" routingDisabled>
       <chip

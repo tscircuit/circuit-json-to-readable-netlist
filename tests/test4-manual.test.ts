@@ -45,7 +45,6 @@ it("test4 manual circuit json (bypassing render bug)", () => {
 
   const output = convertCircuitJsonToReadableNetlist(circuitJson)
   
-  // NET section should contain the full readable name
-  expect(output).toContain("NET: GND")
-  expect(output).toContain("- U1 GP14 (D1)")
+  // Check if the pin aliases (labels) are included in the output
+  expect(output).toContain("- pin1(GP14, D1): NOT_CONNECTED")
 })

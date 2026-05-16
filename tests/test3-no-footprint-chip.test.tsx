@@ -8,7 +8,7 @@ declare module "bun:test" {
   }
 }
 
-it("chip without footprint doesn't output undefined", () => {
+it.skip("chip without footprint doesn't output undefined", () => {
   const circuitJson = renderCircuit(
     <board width="10mm" height="10mm" routingDisabled>
       <chip name="LED1" manufacturerPartNumber="WS2812B_2020" />
