@@ -49,25 +49,25 @@ it("test2 chip", () => {
      - C1: 1nF 0402 capacitor
 
     NET: C1_1
-      - R1 pin1 (1)
-      - C1 pin1 (+,1)
+      - R1.pin1 (1)
+      - C1.pin1 (+,1)
 
     NET: GND
-      - U1 GPIO1 (SCL,3)
-      - U1 AGND (2)
-      - U1 GND (1)
+      - U1.GPIO1 (SCL,3)
+      - U1.AGND (2)
+      - U1.GND (1)
 
     NET: U1_SDA
-      - U1 GPIO2 (SDA,4)
-      - R1 pin2 (2)
+      - U1.GPIO2 (SDA,4)
+      - R1.pin2 (2)
 
 
     EMPTY NET PINS:
-      - U1 GPIO3 (5)
-      - U1 VDD (8)
+      - U1.GPIO3 (5)
+      - U1.VDD (8)
 
     COMPONENT_PINS:
-    U1 (ATMEGA328P)
+    U1 (ATMEGA328P soic8)
     - pin1(GND): NETS(GND)
     - pin2(AGND): NETS(GND)
     - pin3(GPIO1, SCL): NETS(GND)

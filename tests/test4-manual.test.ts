@@ -40,12 +40,12 @@ it("test4 manual circuit json (bypassing render bug)", () => {
       source_trace_id: "t1",
       connected_source_port_ids: ["u1_p1", "u2_p1"],
       connected_source_net_ids: ["net1"],
-    }
+    },
   ]
 
   const output = convertCircuitJsonToReadableNetlist(circuitJson)
   console.log(output)
-  
+
   // Check if the pin aliases (labels) are included in the output
   expect(output).toContain("- pin1(GP14, D1): NOT_CONNECTED")
 })

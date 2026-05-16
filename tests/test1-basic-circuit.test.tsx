@@ -32,8 +32,8 @@ it("test1 should render a basic circuit", () => {
      - C1: 1nF 0402 capacitor
 
     NET: C1_1
-      - R1 pin1 (1)
-      - C1 pin1 (+,1)
+      - R1.pin1 (1)
+      - C1.pin1 (+,1)
 
 
     COMPONENT_PINS:
