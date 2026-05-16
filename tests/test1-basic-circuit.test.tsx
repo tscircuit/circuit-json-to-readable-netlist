@@ -8,7 +8,7 @@ declare module "bun:test" {
   }
 }
 
-it.skip("test1 should render a basic circuit", () => {
+it("test1 should render a basic circuit", () => {
   const circuitJson = renderCircuit(
     <board width="10mm" height="10mm" routingDisabled>
       <resistor resistance="1k" footprint="0402" name="R1" schX={3} pcbX={3} />
@@ -31,18 +31,18 @@ it.skip("test1 should render a basic circuit", () => {
      - R1: 1kΩ 0402 resistor
      - C1: 1nF 0402 capacitor
 
-    NET: C1_pos
-      - R1 pin1
-      - C1 pin1 (+)
+    NET: C1_1
+      - R1 pin1 (1)
+      - C1 pin1 (+,1)
 
 
     COMPONENT_PINS:
     R1 (1kΩ 0402)
-    - pin1(anode, pos, left): NETS(C1_pos)
+    - pin1(anode, pos, left): NETS(C1_1)
     - pin2(cathode, neg, right): NOT_CONNECTED
 
     C1 (1nF 0402)
-    - pin1(pos, anode, left): NETS(C1_pos)
+    - pin1(pos, anode, left): NETS(C1_1)
     - pin2(neg, cathode, right): NOT_CONNECTED
     "
   `)
