@@ -40,7 +40,10 @@ const isDigitalIsolatorLabel = (phrase: string) => {
   return (
     /^(?:(?:ISO|ISOLATED|ADUM)_?(?:IN|OUT|TX|RX|CH)[A-Z]?\d*|SI86_?CH[A-Z]?\d*)$/.test(
       normalized,
-    ) || /^(?:VDD|GND|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
+    ) ||
+    /^V[IO][A-H]\d+$/.test(normalized) ||
+    /^(?:VE|N?EN|N?OE|DISABLE)_?(?:[12AB]|\d+)$/.test(normalized) ||
+    /^(?:VDD|GND|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
   )
 }
 

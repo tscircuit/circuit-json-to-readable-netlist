@@ -74,6 +74,22 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
       port_hints: ["EN1"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_14",
+      source_component_id: "source_component_0",
+      name: "pin21",
+      pin_number: 21,
+      port_hints: ["VIA1"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_16",
+      source_component_id: "source_component_0",
+      name: "pin22",
+      pin_number: 22,
+      port_hints: ["VE1"],
+    },
+    {
       type: "source_component",
       ftype: "simple_chip",
       source_component_id: "source_component_1",
@@ -137,6 +153,22 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
       port_hints: ["EN2"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_15",
+      source_component_id: "source_component_1",
+      name: "pin8",
+      pin_number: 8,
+      port_hints: ["VOB2"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_17",
+      source_component_id: "source_component_1",
+      name: "pin9",
+      pin_number: 9,
+      port_hints: ["nEN2"],
+    },
+    {
       type: "source_trace",
       source_trace_id: "source_trace_0",
       connected_source_port_ids: ["source_port_0", "source_port_2"],
@@ -178,6 +210,18 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
       connected_source_port_ids: ["source_port_12", "source_port_13"],
       connected_source_net_ids: [],
     },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_7",
+      connected_source_port_ids: ["source_port_14", "source_port_15"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_8",
+      connected_source_port_ids: ["source_port_16", "source_port_17"],
+      connected_source_net_ids: [],
+    },
   ] as any
 
   expect(
@@ -215,6 +259,14 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
       - U1 pin20 (EN1)
       - U2 pin7 (EN2)
 
+    NET: U1_VIA1
+      - U1 pin21 (VIA1)
+      - U2 pin8 (VOB2)
+
+    NET: U1_VE1
+      - U1 pin22 (VE1)
+      - U2 pin9 (nEN2)
+
 
     COMPONENT_PINS:
     U1 (ADUM_DIGITAL_ISOLATOR)
@@ -225,6 +277,8 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
     - pin18(SI86_CH1): NETS(U1_SI86_CH1)
     - pin19(VDD1): NETS(U1_VDD1)
     - pin20(EN1): NETS(U1_EN1)
+    - pin21(VIA1): NETS(U1_VIA1)
+    - pin22(VE1): NETS(U1_VE1)
 
     U2 (MCU_HEADER)
     - pin1(ISO_OUT1): NETS(U1_ISO_IN1)
@@ -234,6 +288,8 @@ it("keeps digital isolator aliases for generic chip pin labels", () => {
     - pin5(ISO_CH1): NETS(U1_SI86_CH1)
     - pin6(VISO2): NETS(U1_VDD1)
     - pin7(EN2): NETS(U1_EN1)
+    - pin8(VOB2): NETS(U1_VIA1)
+    - pin9(nEN2): NETS(U1_VE1)
     "
   `)
 })
@@ -244,5 +300,9 @@ it("scores digital isolator channel aliases above passive labels", () => {
   expect(scorePhrase("VDD1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("VISO2")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("EN1")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("VIA1")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("VOB2")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("VE1")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("nEN2")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("pin14")).toBe(0.5)
 })
