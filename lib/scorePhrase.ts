@@ -37,8 +37,10 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 
 const isDigitalIsolatorLabel = (phrase: string) => {
   const normalized = phrase.toUpperCase()
-  return /^(?:(?:ISO|ISOLATED|ADUM)_?(?:IN|OUT|TX|RX|CH)[A-Z]?\d*|SI86_?CH[A-Z]?\d*)$/.test(
-    normalized,
+  return (
+    /^(?:(?:ISO|ISOLATED|ADUM)_?(?:IN|OUT|TX|RX|CH)[A-Z]?\d*|SI86_?CH[A-Z]?\d*)$/.test(
+      normalized,
+    ) || /^(?:VDD|GND|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
   )
 }
 
