@@ -104,6 +104,22 @@ it("keeps data-line hints for generic chip pin labels", () => {
       port_hints: ["DQ_2"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_16",
+      source_component_id: "source_component_2",
+      name: "pin12",
+      pin_number: 12,
+      port_hints: ["SIO0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_18",
+      source_component_id: "source_component_2",
+      name: "pin13",
+      pin_number: 13,
+      port_hints: ["DQS0_P"],
+    },
+    {
       type: "source_component",
       ftype: "simple_chip",
       source_component_id: "source_component_3",
@@ -167,6 +183,22 @@ it("keeps data-line hints for generic chip pin labels", () => {
       port_hints: ["DQ_2"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_17",
+      source_component_id: "source_component_3",
+      name: "pin8",
+      pin_number: 8,
+      port_hints: ["SIO0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_19",
+      source_component_id: "source_component_3",
+      name: "pin9",
+      pin_number: 9,
+      port_hints: ["DQS0_P"],
+    },
+    {
       type: "source_trace",
       source_trace_id: "source_trace_0",
       connected_source_port_ids: ["source_port_0", "source_port_1"],
@@ -214,6 +246,18 @@ it("keeps data-line hints for generic chip pin labels", () => {
       connected_source_port_ids: ["source_port_13", "source_port_15"],
       connected_source_net_ids: [],
     },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_8",
+      connected_source_port_ids: ["source_port_16", "source_port_17"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_9",
+      connected_source_port_ids: ["source_port_18", "source_port_19"],
+      connected_source_net_ids: [],
+    },
   ] as any
 
   expect(
@@ -257,6 +301,14 @@ it("keeps data-line hints for generic chip pin labels", () => {
       - U3 pin11 (DQ_2)
       - J1 pin7 (DQ_2)
 
+    NET: U3_SIO0
+      - U3 pin12 (SIO0)
+      - J1 pin8 (SIO0)
+
+    NET: U3_DQS0_P
+      - U3 pin13 (DQS0_P)
+      - J1 pin9 (DQS0_P)
+
 
     COMPONENT_PINS:
     U1 (WS2812B)
@@ -273,6 +325,8 @@ it("keeps data-line hints for generic chip pin labels", () => {
     - pin9(DAT3): NETS(U3_DAT3)
     - pin10(DATA_1): NETS(U3_DATA_1)
     - pin11(DQ_2): NETS(U3_DQ_2)
+    - pin12(SIO0): NETS(U3_SIO0)
+    - pin13(DQS0_P): NETS(U3_DQS0_P)
 
     J1 (GENERIC_HEADER)
     - pin1(DATA0): NETS(U3_DATA0)
@@ -282,6 +336,8 @@ it("keeps data-line hints for generic chip pin labels", () => {
     - pin5(DAT3): NETS(U3_DAT3)
     - pin6(DATA_1): NETS(U3_DATA_1)
     - pin7(DQ_2): NETS(U3_DQ_2)
+    - pin8(SIO0): NETS(U3_SIO0)
+    - pin9(DQS0_P): NETS(U3_DQS0_P)
     "
   `)
 })
@@ -289,5 +345,7 @@ it("keeps data-line hints for generic chip pin labels", () => {
 it("scores data-line aliases without broadening generic numbered pins", () => {
   expect(scorePhrase("DATA_1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("DQ_2")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("SIO0")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("DQS0_P")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("pin14")).toBe(0.5)
 })
