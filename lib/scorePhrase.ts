@@ -37,10 +37,11 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 
 const isMipiCsiDsiLaneLabel = (phrase: string) => {
   const normalized = phrase.toUpperCase().replaceAll("-", "_")
-  return (
-    /(?:^|_)(?:CSI|DSI)\d*(?:_|$)/.test(normalized) &&
-    /(?:D\d+_?[PN]|(?:CLK|CK)_?[PN])/.test(normalized)
-  )
+  const hasMipiLaneFamily =
+    /(?:^|_)(?:CSI|DSI)\d*(?:_|$)/.test(normalized) ||
+    /(?:^|_)DPHY(?:_|$)/.test(normalized) ||
+    normalized.startsWith("MIPI_")
+  return hasMipiLaneFamily && /(?:D\d+_?[PN]|(?:CLK|CK)_?[PN])/.test(normalized)
 }
 
 export const scorePhrase = (phrase: string) => {
