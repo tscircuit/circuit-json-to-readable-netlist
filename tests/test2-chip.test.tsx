@@ -131,7 +131,7 @@ it("prioritizes MCU debug aliases over pin numbers", () => {
   }
 
   for (const alias of Object.keys(debugAliasByPin)) {
-    expect(netlist).toContain(`NET: ${alias}`)
+    expect(netlist).toContain(`NET: U1_${alias}`)
     expect(netlist).toMatch(new RegExp(`^  - U1 .*\\b${alias}\\b`, "m"))
   }
 
