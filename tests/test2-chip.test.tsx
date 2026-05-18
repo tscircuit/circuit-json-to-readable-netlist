@@ -87,3 +87,55 @@ it("test2 chip", () => {
     "
   `)
 })
+
+it("prioritizes MCU debug aliases over pin numbers", () => {
+  const circuitJson = renderCircuit(
+    <board width="10mm" height="10mm" routingDisabled>
+      <chip
+        name="U1"
+        footprint="soic8"
+        manufacturerPartNumber="STM32G030F4P"
+        pinLabels={{
+          pin1: ["SWDIO"],
+          pin2: ["SWCLK"],
+          pin3: ["TMS"],
+          pin4: ["TCK"],
+          pin5: ["TDI"],
+          pin6: ["TDO"],
+        }}
+      />
+      <resistor name="R1" resistance="1k" footprint="0402" />
+      <resistor name="R2" resistance="1k" footprint="0402" />
+      <resistor name="R3" resistance="1k" footprint="0402" />
+      <resistor name="R4" resistance="1k" footprint="0402" />
+      <resistor name="R5" resistance="1k" footprint="0402" />
+      <resistor name="R6" resistance="1k" footprint="0402" />
+
+      <trace from=".U1 .SWDIO" to=".R1 .pin1" />
+      <trace from=".U1 .SWCLK" to=".R2 .pin1" />
+      <trace from=".U1 .TMS" to=".R3 .pin1" />
+      <trace from=".U1 .TCK" to=".R4 .pin1" />
+      <trace from=".U1 .TDI" to=".R5 .pin1" />
+      <trace from=".U1 .TDO" to=".R6 .pin1" />
+    </board>,
+  )
+  const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
+
+  const debugAliasByPin = {
+    SWDIO: 1,
+    SWCLK: 2,
+    TMS: 3,
+    TCK: 4,
+    TDI: 5,
+    TDO: 6,
+  }
+
+  for (const alias of Object.keys(debugAliasByPin)) {
+    expect(netlist).toContain(`NET: ${alias}`)
+    expect(netlist).toMatch(new RegExp(`^  - U1 .*\\b${alias}\\b`, "m"))
+  }
+
+  for (const pin of Object.values(debugAliasByPin)) {
+    expect(netlist).not.toContain(`U1_pin${pin}`)
+  }
+})
