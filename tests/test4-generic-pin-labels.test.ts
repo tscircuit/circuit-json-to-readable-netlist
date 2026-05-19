@@ -32,6 +32,7 @@ it("includes meaningful labels for generic pin names and omits missing footprint
       source_component_id: "source_component_1",
       ftype: "simple_resistor",
       name: "R1",
+      resistance: 1000,
       display_resistance: "1kΩ",
     },
     {
