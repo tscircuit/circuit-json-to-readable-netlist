@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const agricultureSensorWordQualityScore = {
+  SOIL_MOIST: 1.2,
+  TENSIOMETER: 1.2,
+  WATERMARK: 1.2,
+  IRRIG: 1.15,
+  VWC: 1.15,
+}
+
+const agricultureSensorWordQualityScoreEntries = Object.entries(
+  agricultureSensorWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of agricultureSensorWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
