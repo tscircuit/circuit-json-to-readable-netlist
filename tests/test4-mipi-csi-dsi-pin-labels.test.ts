@@ -114,6 +114,22 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       port_hints: ["MIPI_D0_P"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_24",
+      source_component_id: "source_component_0",
+      name: "pin26",
+      pin_number: 26,
+      port_hints: ["MIPI_CSI_DP0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_25",
+      source_component_id: "source_component_0",
+      name: "pin27",
+      pin_number: 27,
+      port_hints: ["MIPI_DSI_DN1"],
+    },
+    {
       type: "source_component",
       ftype: "simple_chip",
       source_component_id: "source_component_4",
@@ -217,6 +233,22 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       port_hints: ["MIPI_D0_P"],
     },
     {
+      type: "source_port",
+      source_port_id: "source_port_26",
+      source_component_id: "source_component_4",
+      name: "pin13",
+      pin_number: 13,
+      port_hints: ["MIPI_CSI_DP0"],
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_27",
+      source_component_id: "source_component_4",
+      name: "pin14",
+      pin_number: 14,
+      port_hints: ["MIPI_DSI_DN1"],
+    },
+    {
       type: "source_trace",
       source_trace_id: "source_trace_0",
       connected_source_port_ids: ["source_port_0", "source_port_4"],
@@ -288,6 +320,18 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       connected_source_port_ids: ["source_port_22", "source_port_23"],
       connected_source_net_ids: [],
     },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_12",
+      connected_source_port_ids: ["source_port_24", "source_port_26"],
+      connected_source_net_ids: [],
+    },
+    {
+      type: "source_trace",
+      source_trace_id: "source_trace_13",
+      connected_source_port_ids: ["source_port_25", "source_port_27"],
+      connected_source_net_ids: [],
+    },
   ] as any
 
   expect(
@@ -345,6 +389,14 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
       - U1 pin25 (MIPI_D0_P)
       - J1 pin12 (MIPI_D0_P)
 
+    NET: U1_MIPI_CSI_DP0
+      - U1 pin26 (MIPI_CSI_DP0)
+      - J1 pin13 (MIPI_CSI_DP0)
+
+    NET: U1_MIPI_DSI_DN1
+      - U1 pin27 (MIPI_DSI_DN1)
+      - J1 pin14 (MIPI_DSI_DN1)
+
 
     COMPONENT_PINS:
     U1 (CAM_IFACE)
@@ -360,6 +412,8 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
     - pin23(MIPI_DSI2_CK_N): NETS(U1_MIPI_DSI2_CK_N)
     - pin24(MIPI_DPHY_D3_N): NETS(U1_MIPI_DPHY_D3_N)
     - pin25(MIPI_D0_P): NETS(U1_MIPI_D0_P)
+    - pin26(MIPI_CSI_DP0): NETS(U1_MIPI_CSI_DP0)
+    - pin27(MIPI_DSI_DN1): NETS(U1_MIPI_DSI_DN1)
 
     J1 (FPC_CAMERA_DISPLAY)
     - pin1(CSI_D0P): NETS(U1_CSI_D0P)
@@ -374,6 +428,8 @@ it("keeps MIPI CSI and DSI lane hints for generic chip pin labels", () => {
     - pin10(MIPI_DSI2_CK_N): NETS(U1_MIPI_DSI2_CK_N)
     - pin11(MIPI_DPHY_D3_N): NETS(U1_MIPI_DPHY_D3_N)
     - pin12(MIPI_D0_P): NETS(U1_MIPI_D0_P)
+    - pin13(MIPI_CSI_DP0): NETS(U1_MIPI_CSI_DP0)
+    - pin14(MIPI_DSI_DN1): NETS(U1_MIPI_DSI_DN1)
     "
   `)
 })
@@ -383,5 +439,7 @@ it("scores MIPI lane aliases without broadening generic numbered pins", () => {
   expect(scorePhrase("MIPI_DSI2_CK_N")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("MIPI_DPHY_D3_N")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("MIPI_D0_P")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("MIPI_CSI_DP0")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("MIPI_DSI_DN1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("pin14")).toBe(0.5)
 })

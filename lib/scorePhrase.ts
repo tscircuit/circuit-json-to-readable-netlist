@@ -41,7 +41,10 @@ const isMipiCsiDsiLaneLabel = (phrase: string) => {
     /(?:^|_)(?:CSI|DSI)\d*(?:_|$)/.test(normalized) ||
     /(?:^|_)DPHY(?:_|$)/.test(normalized) ||
     normalized.startsWith("MIPI_")
-  return hasMipiLaneFamily && /(?:D\d+_?[PN]|(?:CLK|CK)_?[PN])/.test(normalized)
+  return (
+    hasMipiLaneFamily &&
+    /(?:D\d+_?[PN]|D[PN]_?\d+|(?:CLK|CK)_?[PN])/.test(normalized)
+  )
 }
 
 export const scorePhrase = (phrase: string) => {
