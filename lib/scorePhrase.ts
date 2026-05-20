@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const industrialCanAutomationAliasPatterns = [
+  /\bCANOPEN_?(?:SYNC|EMCY|NMT|PDO|TPDO|RPDO|SDO|HEARTBEAT|HB|TX|RX|CANH|CANL|H|L|DATA)?\d?\b/i,
+  /\bDEVICE_?NET_?(?:CANH|CANL|V\+|V-|SHIELD|DATA|TX|RX|H|L|P|N)?\d?\b/i,
+  /\bDEVICENET_?(?:CANH|CANL|V\+|V-|SHIELD|DATA|TX|RX|H|L|P|N)?\d?\b/i,
+  /\bCONTROL_?NET_?(?:A|B|TX|RX|DATA|SYNC|COAX|TRUNK)?\d?\b/i,
+  /\bCONTROLNET_?(?:A|B|TX|RX|DATA|SYNC|COAX|TRUNK)?\d?\b/i,
+  /\bCIP_?(?:SYNC|MOTION|SAFETY|DATA|TX|RX)\d?\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (
+    industrialCanAutomationAliasPatterns.some((pattern) => pattern.test(phrase))
+  ) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
