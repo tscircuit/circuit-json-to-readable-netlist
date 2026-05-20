@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isoSpiBatteryStackSignalPatterns = [
+  /^ISOSPI(?:_|-|\d|$)/,
+  /^LTC68\d{2}(?:_|-|\d|$)/,
+  /^SD[IO][ABCD](?:_|-|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    isoSpiBatteryStackSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
