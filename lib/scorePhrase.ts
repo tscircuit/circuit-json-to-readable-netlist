@@ -35,7 +35,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const opticalAccessAliasPatterns = [
+  /(?:^|[_-])(?:GPON|EPON|XGPON|XGSPON|XGS_PON|NGPON|NG_PON)(?=$|[_\d-])/,
+  /(?:^|[_-])PON(?=$|[_\d-])/,
+  /(?:^|[_-])(?:ONU|OLT|BOSA|BURST)(?=$|[_\d-])/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (opticalAccessAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
