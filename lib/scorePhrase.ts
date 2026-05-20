@@ -35,7 +35,25 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const segmentLcdSignalPatterns = [
+  /^LCD[_-]?SEG\d*(?:[_-].*)?$/,
+  /^LCD[_-]?COM\d*(?:[_-].*)?$/,
+  /^SEGMENT[_-]?LCD(?:[_-].*)?$/,
+  /^GLASS[_-]?LCD(?:[_-].*)?$/,
+  /^HT1621(?:[_-].*)?$/,
+  /^VLCD\d*(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Segment LCD aliases often include numeric segment/common indexes.
+  if (
+    segmentLcdSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
