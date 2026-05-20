@@ -1,4 +1,4 @@
-import { expect, it } from "bun:test"
+﻿import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import { renderCircuit } from "tests/fixtures/render-circuit"
 
@@ -45,12 +45,12 @@ it("test2 chip", () => {
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
      - U1: ATMEGA328P, soic8
-     - R1: 1kΩ 0402 resistor
+     - R1: 1kÎ© 0402 resistor
      - C1: 1nF 0402 capacitor
 
     NET: C1_pos
-      - R1 pin1
-      - C1 pin1 (+)
+      - R1 anode
+      - C1 pos (+)
 
     NET: GND
       - U1 GPIO1 (SCL)
@@ -59,7 +59,7 @@ it("test2 chip", () => {
 
     NET: U1_SDA
       - U1 GPIO2 (SDA)
-      - R1 pin2
+      - R1 cathode
 
 
     EMPTY NET PINS:
@@ -77,7 +77,7 @@ it("test2 chip", () => {
     - pin7(GPIO5, UART_RX): NOT_CONNECTED
     - pin8(VDD): NETS(V5)
 
-    R1 (1kΩ 0402)
+    R1 (1kÎ© 0402)
     - pin1(anode, pos, left): NETS(C1_pos)
     - pin2(cathode, neg, right): NETS(U1_SDA)
 
@@ -87,3 +87,4 @@ it("test2 chip", () => {
     "
   `)
 })
+
