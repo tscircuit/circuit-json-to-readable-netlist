@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isSmartcardPinLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /(^|[_-])(SIM|USIM|ESIM|UICC|ISO7816|SMARTCARD|SMART_CARD)([_-]|\d|$)/.test(
+      normalizedPhrase,
+    ) ||
+    /^(SIM|USIM|ESIM|UICC)(IO|CLK|RST|VCC|DET|PRES)\d*$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isSmartcardPinLabel(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
