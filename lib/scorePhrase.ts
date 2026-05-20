@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hasGnssGpsAlias = (phrase: string) =>
+  /(?:^|_)(?:GNSS|GPS)(?:$|_|\d)/.test(phrase.toUpperCase())
+
 export const scorePhrase = (phrase: string) => {
+  if (hasGnssGpsAlias(phrase)) {
+    return 1.23
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
