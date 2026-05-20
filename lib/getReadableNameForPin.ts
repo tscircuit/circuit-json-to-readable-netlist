@@ -8,7 +8,9 @@ import type {
 import { scorePhrase } from "./scorePhrase"
 
 const isBarePinNumber = (hint: string, pinNumber?: number | null) =>
-  pinNumber !== undefined && pinNumber !== null && hint === String(pinNumber)
+  pinNumber !== undefined &&
+  pinNumber !== null &&
+  (hint === String(pinNumber) || hint.toLowerCase() === `pin${pinNumber}`)
 
 const isUsefulPinLabel = (hint: string) =>
   /[a-zA-Z]/.test(hint) && /\d/.test(hint)
