@@ -36,6 +36,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    /(^|[^A-Z0-9])(ELVDD[0-9]*|ELVSS[0-9]*|VCOM[0-9]*|VGH[0-9]*|VGL[0-9]*|AVDD[0-9]*|VCI[0-9]*|IREF[0-9]*|VSP[0-9]*|VSN[0-9]*)([^A-Z0-9]|$)/.test(
+      normalizedPhrase,
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
