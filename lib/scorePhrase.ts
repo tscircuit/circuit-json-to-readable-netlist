@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scsiBusSignalPatterns = [
+  /^SCSI(?:[_-].*)?$/,
+  /^FAST[-_]?SCSI(?:[_-].*)?$/,
+  /^ULTRA(?:160|320)(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Parallel SCSI labels often include control or data line indexes.
+  if (scsiBusSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
