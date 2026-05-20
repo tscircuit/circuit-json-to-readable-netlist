@@ -7,6 +7,32 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const getPinNumberLabel = (port: SourcePort): string | undefined =>
+  port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+
+const isGenericPinLabel = (
+  label: string | undefined,
+  port: SourcePort,
+): boolean => {
+  if (!label) return false
+
+  const normalizedLabel = label.toLowerCase()
+  return (
+    normalizedLabel === getPinNumberLabel(port)?.toLowerCase() ||
+    normalizedLabel === String(port.pin_number)
+  )
+}
+
+export const getReadableChipPinName = (port: SourcePort): string => {
+  const readableLabel = [port.name, ...(port.port_hints ?? [])].find(
+    (label) => label && !isGenericPinLabel(label, port),
+  )
+
+  return (
+    readableLabel ?? getPinNumberLabel(port) ?? port.name ?? port.source_port_id
+  )
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +60,12 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    component.ftype === "simple_chip"
+      ? getReadableChipPinName(port)
+      : port.name
+        ? port.name
+        : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 

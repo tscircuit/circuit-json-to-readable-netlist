@@ -7,7 +7,10 @@ import type {
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  getReadableChipPinName,
+  getReadableNameForPin,
+} from "./getReadableNameForPin"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -145,9 +148,15 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = `${component.name} (${details})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = `${component.name} (${details})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,10 +165,19 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
+        const pinNumberLabel =
+          port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          component.ftype === "simple_chip"
+            ? getReadableChipPinName(port)
+            : (port.name ?? pinNumberLabel ?? port.source_port_id)
         const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
+        if (pinNumberLabel && pinNumberLabel !== mainPin) {
+          aliases.push(pinNumberLabel)
+        }
+        if (port.name && port.name !== mainPin) {
+          aliases.push(port.name)
+        }
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
