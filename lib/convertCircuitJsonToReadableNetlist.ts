@@ -20,6 +20,9 @@ export const convertCircuitJsonToReadableNetlist = (
   const source_components = su(circuitJson).source_component.list()
   const source_nets = su(circuitJson).source_net.list()
   const source_traces = su(circuitJson).source_trace.list()
+  const sourcePortIds = new Set(source_ports.map((p) => p.source_port_id))
+  const getConnectedSourcePortIds = (connectedIds: string[]) =>
+    connectedIds.filter((id) => sourcePortIds.has(id))
   // Build readable netlist
   const netlist: string[] = []
 
@@ -70,9 +73,7 @@ export const convertCircuitJsonToReadableNetlist = (
       netName = generateNetName({ circuitJson, connectedIds })
     }
 
-    const connectedPortCount = connectedIds.filter((id) =>
-      id.startsWith("source_port"),
-    ).length
+    const connectedPortCount = getConnectedSourcePortIds(connectedIds).length
 
     if (connectedPortCount <= 1) continue
 
@@ -97,18 +98,15 @@ export const convertCircuitJsonToReadableNetlist = (
   // Process nets with only one connection
   let hasEmptyNets = false
   for (const [netId, connectedIds] of Object.entries(netMap)) {
-    const connectedPortCount = connectedIds.filter((id) =>
-      id.startsWith("source_port"),
-    ).length
+    const connectedSourcePortIds = getConnectedSourcePortIds(connectedIds)
+    const connectedPortCount = connectedSourcePortIds.length
     if (connectedPortCount === 1) {
       if (!hasEmptyNets) {
         netlist.push("")
         netlist.push("EMPTY NET PINS:")
         hasEmptyNets = true
       }
-      const source_port_id = netMap[netId].find((id) =>
-        id.startsWith("source_port"),
-      )!
+      const source_port_id = connectedSourcePortIds[0]
       const pinName = getReadableNameForPin({
         circuitJson,
         source_port_id,
@@ -122,7 +120,7 @@ export const convertCircuitJsonToReadableNetlist = (
   // build map of port ids to the nets they connect to
   const portIdToNetNames: Record<string, string[]> = {}
   for (const [netId, connectedIds] of Object.entries(netMap)) {
-    const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
+    const portIds = getConnectedSourcePortIds(connectedIds)
     if (portIds.length === 0) continue
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
     let netName = net?.name
