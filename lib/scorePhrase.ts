@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const storageFabricLinkPattern =
+  /\b(?:FC_(?:RX|TX)\d*|FIBRE_CHANNEL(?:[_-]?(?:RX|TX|LOS|LOCK)\d*)?|FIBER_CHANNEL(?:[_-]?(?:RX|TX|LOS|LOCK)\d*)?|IB_LANE\d*|INFINIBAND(?:[_-]?(?:RX|TX|LANE|LINK|LOCK)\d*)?)\b/i
+
 export const scorePhrase = (phrase: string) => {
+  if (storageFabricLinkPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
