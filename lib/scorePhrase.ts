@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isHapticPinLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return /(^|[_-])(HAPTIC|VIB|VIBE|VIBRATOR|LRA|ERM|DRV2605|DRV2604|PIEZO|BUZZER)([_-]|\d|$)/.test(
+    normalizedPhrase,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isHapticPinLabel(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
