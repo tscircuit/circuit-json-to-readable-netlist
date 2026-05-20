@@ -7,6 +7,9 @@ import { scorePhrase } from "lib/scorePhrase"
 it("scores useful GPIO-style numbered labels without promoting generic coordinates", () => {
   expect(scorePhrase("14")).toBe(0.5)
   expect(scorePhrase("pin14")).toBe(0.5)
+  expect(scorePhrase("PIN_14")).toBe(0.5)
+  expect(scorePhrase("PIN-14")).toBe(0.5)
+  expect(scorePhrase("P14")).toBe(0.5)
   expect(scorePhrase("GP14")).toBeGreaterThan(scorePhrase("CLK"))
   expect(scorePhrase("GPIO14")).toBeGreaterThan(scorePhrase("CLK"))
   expect(scorePhrase("A1")).toBeLessThan(scorePhrase("CLK"))
@@ -29,6 +32,33 @@ it("prefers meaningful signal hints over package coordinate names", () => {
       source_component_id: "source_component_0",
       name: "A1",
       pin_number: 1,
+      port_hints: ["CLK"],
+    },
+  ] as AnyCircuitElement[]
+
+  expect(
+    generateNetName({
+      circuitJson,
+      connectedIds: ["source_port_0"],
+    }),
+  ).toBe("U1_CLK")
+})
+
+it("prefers meaningful signal hints over separated generic pin names", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      source_component_id: "source_component_0",
+      name: "U1",
+      ftype: "simple_chip",
+      manufacturer_part_number: "PIN_HEADER",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_0",
+      source_component_id: "source_component_0",
+      name: "PIN_14",
+      pin_number: 14,
       port_hints: ["CLK"],
     },
   ] as AnyCircuitElement[]
