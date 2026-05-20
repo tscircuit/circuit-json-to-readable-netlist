@@ -31,11 +31,31 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const digitBearingWordQualityScore = {
+  ANEMOMETER: 1.15,
+  GUST: 1.15,
+  RAIN: 1.15,
+  VANE: 1.15,
+  WIND: 1.15,
+}
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
+const containsSignalWord = (phrase: string, word: string) =>
+  new RegExp(`(^|[^A-Za-z])${word}($|[^A-Za-z])`).test(phrase)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (containsSignalWord(phrase, word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
