@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const opticalTransportLabelPattern =
+  /SONET|SDH|OTN|CPRI|ECPRI|OTU\d+|ODU\d+|OPU\d+|OC\d+|STM\d+|FRAME_SYNC|FEC_LOCK/
+
 export const scorePhrase = (phrase: string) => {
+  if (opticalTransportLabelPattern.test(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
