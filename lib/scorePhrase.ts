@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const fpgaConfigSignalPatterns = [
+  /^MSEL(?:_|\d|$)/,
+  /^CFG_?DATA(?:_|\d|$)/,
+  /^CONF_?DONE(?:_|\d|$)/,
+  /^NSTATUS(?:_|\d|$)/,
+  /^NCONFIG(?:_|\d|$)/,
+  /^DCLK(?:_|\d|$)/,
+  /^ASDO(?:_|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    fpgaConfigSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
