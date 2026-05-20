@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const satelliteTunerLabelPattern =
+  /DVB|MPEG_TS|TS_CLK|TS_DATA|TS_SYNC|TS_VALID|LNB|DISEQC|TUNER_LOCK|DEMOD_LOCK/
+
 export const scorePhrase = (phrase: string) => {
+  if (satelliteTunerLabelPattern.test(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
