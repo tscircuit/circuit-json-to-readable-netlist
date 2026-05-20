@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const spmiPmicBusSignalPatterns = [
+  /^SPMI(?:_|-|\d|$)/,
+  /^SSBI(?:_|-|\d|$)/,
+  /^PMIC[_-]?ARB(?:_|-|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    spmiPmicBusSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
