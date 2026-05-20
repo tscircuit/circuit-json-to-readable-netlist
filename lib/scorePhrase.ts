@@ -8,6 +8,11 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  POE: 1.3,
+  PSE: 1.25,
+  IEEE8023: 1.25,
+  MPS: 1.2,
+  T2P: 1.2,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
@@ -36,13 +41,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const normalizedPhrase = phrase.toUpperCase()
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word.toUpperCase())) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
