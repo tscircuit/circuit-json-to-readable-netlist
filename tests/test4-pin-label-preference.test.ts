@@ -1,4 +1,5 @@
 import { expect, it } from "bun:test"
+import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import {
   getPreferredPinLabel,
   getReadableNameForPin,
@@ -31,4 +32,11 @@ it("prefers full pin labels over generic numbered labels", () => {
   })
   expect(readable).toContain("U1 GPIO14")
   expect(readable).not.toContain("U1 pin14")
+})
+
+it("keeps numeric pin identity in COMPONENT_PINS while exposing descriptive aliases", () => {
+  const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
+
+  expect(netlist).toContain("COMPONENT_PINS:")
+  expect(netlist).toContain("- pin14(GPIO14, SDA): NOT_CONNECTED")
 })
