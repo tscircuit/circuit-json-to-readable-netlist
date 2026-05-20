@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const radioTunerLabelPattern =
+  /RDS|FM_TUNER|AM_TUNER|TUNE_LOCK|AFC_LOCK|STEREO_IND|IF_AGC/
+
 export const scorePhrase = (phrase: string) => {
+  if (radioTunerLabelPattern.test(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
