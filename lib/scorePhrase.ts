@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const automotiveSensorInterfaceAliases = [
+  /(^|[_-])SENT([_-]|$)/,
+  /(^|[_-])PSI5([_-]|$)/,
+  /(^|[_-])SENT_(OUT|IN|TX|RX|DATA|SYNC|NIBBLE|PAUSE|CRC|TICK)/,
+  /(^|[_-])PSI5_(DATA|SYNC|TX|RX|BUS|SENSOR)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  if (
+    automotiveSensorInterfaceAliases.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
