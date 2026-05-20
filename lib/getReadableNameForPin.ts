@@ -11,7 +11,7 @@ const isBarePinNumber = (hint: string, pinNumber?: number | null) =>
   pinNumber !== undefined && pinNumber !== null && hint === String(pinNumber)
 
 const isUsefulPinLabel = (hint: string) =>
-  /[a-zA-Z]/.test(hint) && !["left", "right", "top", "bottom"].includes(hint)
+  /[a-zA-Z]/.test(hint) && /\d/.test(hint)
 
 export const getReadableNameForPin = ({
   circuitJson,
