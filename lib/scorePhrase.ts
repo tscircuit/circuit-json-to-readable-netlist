@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const flameDetectorAliasScoreEntries: Array<[string, number]> = [
+  ["UV_FLAME", 1.22],
+  ["IR_FLAME", 1.22],
+  ["FLAME", 1.2],
+  ["FIRE_ALARM", 1.2],
+  ["FIRE_DET", 1.2],
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of flameDetectorAliasScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
