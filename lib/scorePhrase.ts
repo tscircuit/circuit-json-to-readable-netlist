@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const specializedSignalScores = [
+  {
+    pattern:
+      /(?:^|[_-])(?:(?:MRAM|STTMRAM|SPINTRONIC)_(?:HOLD\d+|WP\d+|BUSY\d+|READY\d+|INT\d+)|(?:RRAM|RERAM|RE_RAM)_(?:SET\d+|RESET\d+|READY\d+|BUSY\d+|INT\d+))(?:$|[_+\-\d])/,
+    score: 1.18,
+  },
+]
+
 export const scorePhrase = (phrase: string) => {
+  const upperPhrase = phrase.toUpperCase()
+  for (const { pattern, score } of specializedSignalScores) {
+    if (pattern.test(upperPhrase)) return score
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
