@@ -28,7 +28,7 @@ it("test1 should render a basic circuit", () => {
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
-     - R1: 1kÎ© 0402 resistor
+     - R1: 1kΩ 0402 resistor
      - C1: 1nF 0402 capacitor
 
     NET: C1_pos
@@ -37,7 +37,7 @@ it("test1 should render a basic circuit", () => {
 
 
     COMPONENT_PINS:
-    R1 (1kÎ© 0402)
+    R1 (1kΩ 0402)
     - pin1(anode, pos, left): NETS(C1_pos)
     - pin2(cathode, neg, right): NOT_CONNECTED
 
@@ -47,4 +47,5 @@ it("test1 should render a basic circuit", () => {
     "
   `)
 })
+
 
