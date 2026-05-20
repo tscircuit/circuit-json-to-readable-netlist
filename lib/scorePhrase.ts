@@ -15,6 +15,12 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  MTDI: 1.15,
+  MTDO: 1.15,
+  U0RXD: 1.15,
+  U0TXD: 1.15,
+  CHIP_PU: 1.15,
+  BOOT: 1.15,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
@@ -36,6 +42,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (/^U0(?:RXD|TXD)$/.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
