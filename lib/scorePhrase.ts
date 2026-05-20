@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const broadbandAccessSignalPatterns = [
+  /^XDSL(?:_|-|\d|$)/,
+  /^ADSL(?:_|-|\d|$)/,
+  /^VDSL(?:_|-|\d|$)/,
+  /^GFAST(?:_|-|\d|$)/,
+  /^G_FAST(?:_|-|\d|$)/,
+  /^DOCSIS(?:_|-|\d|$)/,
+  /^MOCA(?:_|-|\d|$)/,
+  /^CABLEMODEM(?:_|-|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    broadbandAccessSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
