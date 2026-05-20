@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const usbSerialBridgeSignalPatterns = [
+  /^CBUS(?:_|\d|$)/,
+  /^TXD(?:_|\d|$)/,
+  /^RXD(?:_|\d|$)/,
+  /^TXDEN(?:_|\d|$)/,
+  /^TXLED(?:_|\d|$)/,
+  /^RXLED(?:_|\d|$)/,
+  /^PWREN(?:#|_|\d|$)/,
+  /^SUSPEND(?:#|_|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    usbSerialBridgeSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
