@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cryptoSignalPatterns = [
+  /^TRNG(?:_|\d|$)/,
+  /^RNG(?:_|\d|$)/,
+  /^ENTROPY(?:_|\d|$)/,
+  /^AES(?:_|\d|$)/,
+  /^SHA(?:_|\d|$)/,
+  /^HMAC(?:_|\d|$)/,
+  /^ECC(?:_|\d|$)/,
+  /^PUF(?:_|\d|$)/,
+  /^CRYPTO(?:_|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (cryptoSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
