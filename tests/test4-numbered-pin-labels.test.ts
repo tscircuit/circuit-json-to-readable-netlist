@@ -1,6 +1,17 @@
 import { expect, it } from "bun:test"
 import type { AnyCircuitElement } from "circuit-json"
 import { getReadableNameForPin } from "lib/getReadableNameForPin"
+import { scorePhrase } from "lib/scorePhrase"
+
+it("scores useful GPIO-style numbered labels without promoting generic coordinates", () => {
+  expect(scorePhrase("14")).toBe(0.5)
+  expect(scorePhrase("pin14")).toBe(0.5)
+  expect(scorePhrase("GP14")).toBeGreaterThan(scorePhrase("CLK"))
+  expect(scorePhrase("GPIO14")).toBeGreaterThan(scorePhrase("CLK"))
+  expect(scorePhrase("A1")).toBeLessThanOrEqual(scorePhrase("CLK"))
+  expect(scorePhrase("B2")).toBeLessThanOrEqual(scorePhrase("RST"))
+  expect(scorePhrase("IO3")).toBeLessThanOrEqual(scorePhrase("CS"))
+})
 
 it("keeps useful numbered pin labels for generic pin names", () => {
   const circuitJson = [

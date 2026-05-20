@@ -44,7 +44,7 @@ export const scorePhrase = (phrase: string) => {
       return score
     }
   }
-  if (/[a-zA-Z].*\d|\d.*[a-zA-Z]/.test(phrase)) {
+  if (/^GP\d+$/i.test(phrase)) {
     return 1.05
   }
   return 1
