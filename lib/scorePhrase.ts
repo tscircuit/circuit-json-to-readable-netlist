@@ -35,7 +35,28 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cameraLensActuatorSignalPatterns = [
+  /^VCM(?:[_-].*)?$/,
+  /^VOICE[_-]?COIL(?:[_-].*)?$/,
+  /^OIS(?:[_-].*)?$/,
+  /^AUTOFOCUS(?:[_-].*)?$/,
+  /^AF[_-]?(?:EN|PWM|DRV|SDA|SCL|INT|FAULT)\d*(?:[_-].*)?$/,
+  /^LENS[_-]?(?:DRV|POS|FOCUS|HOME|INT)\d*(?:[_-].*)?$/,
+  /^IRIS[_-]?(?:PWM|DRV|STEP|EN)\d*(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Camera lens actuator labels often include numeric channel indexes.
+  if (
+    cameraLensActuatorSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
