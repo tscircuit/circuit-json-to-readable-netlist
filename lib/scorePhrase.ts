@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isKeyMatrixPinLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /(^|[_-])(KEYPAD|KEYSCAN|KSCAN|KEYMATRIX|KEY_MATRIX|KBD)([_-]|\d|$)/.test(
+      normalizedPhrase,
+    ) ||
+    /^(KEY|KBD)[_-]?(ROW|COL|IN|OUT|SCAN|INT|WAKE)\d*$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isKeyMatrixPinLabel(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
