@@ -7,6 +7,19 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const lowInformationPinHints = new Set([
+  "anode",
+  "cathode",
+  "left",
+  "right",
+  "neg",
+  "negative",
+  "pos",
+  "positive",
+])
+
+const isGenericPinName = (name: string) => /^pin\d+$/i.test(name)
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -37,18 +50,32 @@ export const getReadableNameForPin = ({
   const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
+  const addAdditionalPinLabel = (label: string) => {
+    if (!label || label === mainPinName) return
+    if (!additionalPinLabels.includes(label)) {
+      additionalPinLabels.push(label)
+    }
+  }
 
   if (isPositive && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("+")
+    addAdditionalPinLabel("+")
   } else if (isNegative && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("-")
+    addAdditionalPinLabel("-")
   }
 
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
+    const trimmedHint = port_hint.trim()
+    if (!trimmedHint || trimmedHint === mainPinName) continue
+    if (trimmedHint === String(port.pin_number)) continue
+    const score = scorePhrase(trimmedHint)
+    const shouldIncludeNumberedLabel =
+      isGenericPinName(mainPinName) &&
+      component.ftype !== "simple_resistor" &&
+      component.ftype !== "simple_capacitor" &&
+      !isGenericPinName(trimmedHint) &&
+      !lowInformationPinHints.has(trimmedHint.toLowerCase())
+    if (score > 1 || shouldIncludeNumberedLabel) {
+      addAdditionalPinLabel(trimmedHint)
     }
   }
 

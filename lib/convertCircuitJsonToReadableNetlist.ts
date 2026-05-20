@@ -36,13 +36,15 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      const details = [component.display_resistance, footprint]
+        .filter(Boolean)
+        .join(" ")
+      componentDescription = [details, "resistor"].filter(Boolean).join(" ")
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      const details = [component.display_capacitance, footprint]
+        .filter(Boolean)
+        .join(" ")
+      componentDescription = [details, "capacitor"].filter(Boolean).join(" ")
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -145,9 +147,15 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
