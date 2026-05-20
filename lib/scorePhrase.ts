@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const i3cSignalPatterns = [
+  /^I3C(?:_|\d|$)/,
+  /^IBI(?:_|\d|$)/,
+  /^HDR_?(?:DDR|TSP|TSL)(?:_|\d|$)/,
+  /^ENTDAA(?:_|\d|$)/,
+  /^RSTDAA(?:_|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (i3cSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
