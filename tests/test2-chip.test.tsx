@@ -45,7 +45,7 @@ it("test2 chip", () => {
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
      - U1: ATMEGA328P, soic8
-     - R1: 1kÎ© 0402 resistor
+     - R1: 1kΩ 0402 resistor
      - C1: 1nF 0402 capacitor
 
     NET: C1_pos
@@ -77,7 +77,7 @@ it("test2 chip", () => {
     - pin7(GPIO5, UART_RX): NOT_CONNECTED
     - pin8(VDD): NETS(V5)
 
-    R1 (1kÎ© 0402)
+    R1 (1kΩ 0402)
     - pin1(anode, pos, left): NETS(C1_pos)
     - pin2(cathode, neg, right): NETS(U1_SDA)
 
@@ -87,4 +87,5 @@ it("test2 chip", () => {
     "
   `)
 })
+
 
