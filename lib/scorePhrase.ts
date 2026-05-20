@@ -35,7 +35,27 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const dbiDisplayControllerSignalPatterns = [
+  /^ILI9341(?:[_-].*)?$/,
+  /^ST77(?:35|89)(?:[_-].*)?$/,
+  /^MIPI[_-]?DBI(?:[_-].*)?$/,
+  /^DBI[_-]?(?:D\d+|WR|RD|DC|CS|TE|RST|RESET)\d*(?:[_-].*)?$/,
+  /^LCD[_-]?8080(?:[_-].*)?$/,
+  /^LCD[_-]?(?:WR|RD|DC|TE)\d*(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // TFT DBI/8080 controller labels commonly include numeric bus indexes.
+  if (
+    dbiDisplayControllerSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
