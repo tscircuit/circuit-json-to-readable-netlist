@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const gpibInstrumentBusAliasPatterns = [
+  /\bGPIB_?(?:DIO|DAV|NRFD|NDAC|IFC|SRQ|ATN|REN|EOI|DATA)?\d?\b/i,
+  /\bIEEE_?488_?(?:DIO|DAV|NRFD|NDAC|IFC|SRQ|ATN|REN|EOI|DATA)?\d?\b/i,
+  /\bHP_?IB_?(?:DIO|DAV|NRFD|NDAC|IFC|SRQ|ATN|REN|EOI|DATA)?\d?\b/i,
+  /\bHPIB_?(?:DIO|DAV|NRFD|NDAC|IFC|SRQ|ATN|REN|EOI|DATA)?\d?\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (gpibInstrumentBusAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
