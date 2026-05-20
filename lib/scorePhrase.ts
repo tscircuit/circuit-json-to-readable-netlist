@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const industrialProcessSignalPatterns = [
+  /^IO_?LINK(?:_|$)/,
+  /^IOLINK(?:_|$)/,
+  /^HART(?:_|$)/,
+  /^LOOP_?4_?20MA(?:_|\d|$)/,
+  /^4_?20MA(?:_|\d|$)/,
+  /^CURRENT_LOOP(?:_|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    industrialProcessSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
