@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const thermalPrinterSignalPattern =
+  /(^|[_\W])(THERMAL|PRINTHEAD|PRINT|PAPER|CUTTER|CASH_DRAWER|FEED|PLATEN|STB)(?=$|[_\W]|\d)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (thermalPrinterSignalPattern.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
