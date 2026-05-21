@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const arcadeControlPatterns = [/^JAMMA(?:_|$)/i, /^JVS(?:_|$)/i]
+
 export const scorePhrase = (phrase: string) => {
+  if (arcadeControlPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
