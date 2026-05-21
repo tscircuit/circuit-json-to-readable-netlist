@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const hdqSdqBatteryGaugeSignalPatterns = [
+  /^HDQ(?:[_-].*)?$/,
+  /^SDQ(?:[_-].*)?$/,
+  /^BQ27[45](?:[_-].*)?$/,
+  /^FUEL(?:[_-]?GAUGE)?(?:[_-].*)?$/,
+  /^GAUGE(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // HDQ/SDQ fuel-gauge labels often end in channel or alert indexes.
+  if (
+    hdqSdqBatteryGaugeSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
