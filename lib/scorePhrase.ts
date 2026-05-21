@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const legacyLanMediaPinPattern =
+  /^(?:ARCNET_(?:TX|RX|DATA|CLK)\d*|TOKEN_RING_(?:TX|RX|DATA|CLK)\d*|ETH_AUI_[A-Z0-9]+|AUI_(?:LINK_TEST|COLL|TX|RX|CD)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (legacyLanMediaPinPattern.test(phrase)) {
+    return 1.3
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
