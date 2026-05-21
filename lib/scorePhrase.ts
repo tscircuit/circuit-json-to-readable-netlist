@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const lcdSegmentDisplayLabelPattern =
+  /^(?:(?:LCD[_-]?)?(?:SEG(?:MENT)?|COM|BP|BACKPLANE)[_-]?\d+|V[_-]?LCD\d*|LCD[_-]?BIAS\d*)$/
+
 export const scorePhrase = (phrase: string) => {
+  if (lcdSegmentDisplayLabelPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
