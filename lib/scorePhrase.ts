@@ -7,6 +7,13 @@
  *
  * These unique port names are usually the best indicator of what the net is for
  */
+const digitBearingWordQualityScore = {
+  USBHID: 1.2,
+  HID_: 1.2,
+  BOOT_KBD: 1.15,
+  BOOT_MOUSE: 1.15,
+}
+
 const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
@@ -34,8 +41,16 @@ const wordQualityScore = {
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
 
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
