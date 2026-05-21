@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const mdioEthernetPhySignalPatterns = [
+  /^MDIO(?:[_-].*)?$/,
+  /^MDC(?:[_-].*)?$/,
+  /^PHYAD(?:\d+|[_-].*)?$/,
+  /^PHY[_-]?(?:INT|IRQ|RST|RESET|ADDR|AD)(?:\d+|[_-].*)?$/,
+  /^ETH[_-]?PHY(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Ethernet PHY management labels often include address or line indexes.
+  if (
+    mdioEthernetPhySignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
