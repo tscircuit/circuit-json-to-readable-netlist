@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingTechnicalWords = [
+  "ELEVATOR",
+  "ESCALATOR",
+  "HALL_CALL",
+  "FLOOR_CALL",
+  "CAR_CALL",
+  "HANDRAIL",
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const word of digitBearingTechnicalWords) {
+    if (phrase.includes(word)) {
+      return 1.2
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
