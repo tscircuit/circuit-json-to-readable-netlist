@@ -33,8 +33,40 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Get all pin labels from port_hints, excluding generic hints
+  const genericHints = ["anode", "cathode", "pos", "neg", "positive", "negative", "left", "right"]
+  const pinLabels = (port.port_hints ?? []).filter((hint) => {
+    const cleanHint = hint.trim()
+    return (
+      cleanHint.length > 1 &&
+      !/^\\d+$/.test(cleanHint) &&
+      !genericHints.includes(cleanHint.toLowerCase()) &&
+      scorePhrase(cleanHint) > 1
+    )
+  })
+
+  // Format pin description - prefer port.name as the main identifier
+  let mainPinName: string
+  if (port.name) {
+    mainPinName = port.name
+  } else if (pinLabels.length > 0) {
+    // Find the pin label with the highest score
+    let bestLabel = pinLabels[0]
+    let bestScore = scorePhrase(bestLabel)
+    
+    for (let i = 1; i < pinLabels.length; i++) {
+      const label = pinLabels[i]
+      const score = scorePhrase(label)
+      if (score > bestScore) {
+        bestScore = score
+        bestLabel = label
+      }
+    }
+    
+    mainPinName = bestLabel
+  } else {
+    mainPinName = `pin${port.pin_number}`
+  }
 
   const additionalPinLabels: string[] = []
 
@@ -44,11 +76,27 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
+  // Add pin labels as additional labels (all of them if port.name was used as main)
+  if (port.name) {
+    for (const label of pinLabels) {
+      // Skip if the label matches the port.name to avoid duplication
+      if (label.toLowerCase() === port.name.toLowerCase()) {
+        continue
+      }
+      const score = scorePhrase(label)
+      if (score > 1) {
+        additionalPinLabels.push(label)
+      }
+    }
+  } else {
+    // Add remaining pin labels (skip the one used as mainPinName)
+    for (const label of pinLabels) {
+      if (label !== mainPinName) {
+        const score = scorePhrase(label)
+        if (score > 1) {
+          additionalPinLabels.push(label)
+        }
+      }
     }
   }
 
