@@ -47,6 +47,7 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     if (port_hint === String(port.pin_number)) continue
+    if (port_hint.toLowerCase() === `pin${port.pin_number}`) continue
 
     const score = scorePhrase(port_hint)
     if (component.ftype === "simple_chip" || score > 1) {
