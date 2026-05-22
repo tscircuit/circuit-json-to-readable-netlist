@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const textileLoomTokens = [
+  "WARP_STOP",
+  "WEFT_STOP",
+  "SHUTTLE_POS",
+  "LOOM_CLUTCH",
+  "PICK_COUNT",
+  "SELVEDGE_SENSOR",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (textileLoomTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
