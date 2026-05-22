@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const chromatographyTokens = [
+  "HPLC_PUMP",
+  "AUTOSAMPLER",
+  "COLUMN_OVEN",
+  "FRACTION_COLLECTOR",
+  "DETECTOR_LAMP",
+  "CHROM_VALVE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (chromatographyTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
