@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const robotVacuumTokens = [
+  "DOCK_CHARGE",
+  "CLIFF_SENSOR",
+  "BRUSH_MOTOR",
+  "DUST_BIN",
+  "WHEEL_ENCODER",
+  "BUMPER_LEFT",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (robotVacuumTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
