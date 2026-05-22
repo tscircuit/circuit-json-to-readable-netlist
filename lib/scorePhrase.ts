@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingEscLabelPattern = /\b(?:BI_?DIR_?)?DSHOT|BLHELI|ESC_?TELEM\b/i
+
 export const scorePhrase = (phrase: string) => {
+  if (digitBearingEscLabelPattern.test(phrase)) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
