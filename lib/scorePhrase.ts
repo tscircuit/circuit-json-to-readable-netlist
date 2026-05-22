@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const telescopeControlTokens = [
+  "GUIDE_PORT",
+  "RA_MOTOR",
+  "DEC_MOTOR",
+  "FOCUSER_STEP",
+  "DEW_HEATER",
+  "SHUTTER_RELEASE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    telescopeControlTokens.some((token) => normalizedPhrase.includes(token))
+  ) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
