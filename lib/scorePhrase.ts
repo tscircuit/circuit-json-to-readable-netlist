@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const vendingPaymentSignalPattern =
+  /(^|[_\W])(MDB|CCTALK|BILL_ACCEPTOR|BILL_VALIDATOR|COIN_ACCEPTOR|CASHLESS|VMC|VEND_MOTOR|ESCROW)(?=$|[_\W]|\d)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (vendingPaymentSignalPattern.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
