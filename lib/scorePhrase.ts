@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pneumaticValveTokens = [
+  "SOLENOID_VALVE",
+  "VALVE_OPEN",
+  "VALVE_CLOSE",
+  "PROPORTIONAL_VALVE",
+  "AIR_PRESSURE",
+  "PNEUMATIC_ENABLE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (pneumaticValveTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
