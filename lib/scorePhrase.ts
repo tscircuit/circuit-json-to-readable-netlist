@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sewingMachineTokens = [
+  "FOOT_PEDAL",
+  "NEEDLE_UP",
+  "THREAD_CUTTER",
+  "BOBBIN_SENSOR",
+  "PRESSER_FOOT",
+  "TENSION_SOLENOID",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (sewingMachineTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
