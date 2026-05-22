@@ -4,7 +4,7 @@ import { renderCircuit } from "tests/fixtures/render-circuit"
 
 declare module "bun:test" {
   interface Matchers<T = unknown> {
-    toMatchInlineSnapshot(snapshot?: string | null): Promise<MatcherResult>
+    toMatchInlineSnapshot(snapshot?: string | null): void
   }
 }
 
