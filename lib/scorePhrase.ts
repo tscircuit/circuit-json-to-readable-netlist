@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const dentalUnitTokens = [
+  "HANDPIECE",
+  "CUSPIDOR",
+  "CHAIR_UP",
+  "CHAIR_DOWN",
+  "WATER_SYRINGE",
+  "FOOT_CONTROL",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (dentalUnitTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
