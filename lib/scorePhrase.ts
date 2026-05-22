@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pipetteTokens = [
+  "PIPETTE",
+  "ASPIRATE",
+  "TIP_DETECT",
+  "PLUNGER_STEP",
+  "LIQUID_HANDLER",
+  "REAGENT_DISPENSE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (pipetteTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
