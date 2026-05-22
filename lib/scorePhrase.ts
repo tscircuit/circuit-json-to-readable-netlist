@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const autoclaveTokens = [
+  "AUTOCLAVE",
+  "STERILIZE_CYCLE",
+  "CHAMBER_PRESS",
+  "STEAM_VALVE",
+  "VACUUM_PUMP",
+  "DOOR_INTERLOCK",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (autoclaveTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
