@@ -35,7 +35,34 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const labVacuumInstrumentationWords = [
+  "PIRANI",
+  "ION_GAUGE",
+  "MASS_SPEC",
+  "MASSSPEC",
+  "TURBO_READY",
+  "TURBO_PUMP",
+  "ROUGHING_PUMP",
+  "FORELINE",
+  "VAC_GAUGE",
+]
+
+const scoreLabVacuumInstrumentationPhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    labVacuumInstrumentationWords.some((word) =>
+      normalizedPhrase.includes(word),
+    )
+  ) {
+    return 1.2
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const labVacuumScore = scoreLabVacuumInstrumentationPhrase(phrase)
+  if (labVacuumScore) {
+    return labVacuumScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
