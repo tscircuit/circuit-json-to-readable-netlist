@@ -5,7 +5,6 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
-import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -44,12 +43,28 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
+  const genericHints = new Set([
+    mainPinName.toLowerCase(),
+    String(port.pin_number),
+    `pin${port.pin_number}`,
+    `pin ${port.pin_number}`,
+    "anode",
+    "cathode",
+    "pos",
+    "positive",
+    "neg",
+    "negative",
+    "left",
+    "right",
+    "top",
+    "bottom",
+  ])
+
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
+    const hintLower = port_hint.toLowerCase().trim()
+    if (genericHints.has(hintLower)) continue
+    if (additionalPinLabels.includes(port_hint)) continue
+    additionalPinLabels.push(port_hint)
   }
 
   const displayValue = component.display_value
