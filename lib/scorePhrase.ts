@@ -42,8 +42,8 @@ const isDigitalIsolatorLabel = (phrase: string) => {
       normalized,
     ) ||
     /^V[IO][A-H]\d+$/.test(normalized) ||
-    /^(?:VE|N?EN|N?OE|DISABLE)_?(?:[12AB]|\d+)$/.test(normalized) ||
-    /^(?:VDD|GND|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
+    /^(?:VE|N?EN)_?(?:[12AB]|\d+)$/.test(normalized) ||
+    /^(?:VDD|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
   )
 }
 

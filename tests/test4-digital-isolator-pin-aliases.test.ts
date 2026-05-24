@@ -304,5 +304,8 @@ it("scores digital isolator channel aliases above passive labels", () => {
   expect(scorePhrase("VOB2")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("VE1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("nEN2")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("DISABLE1")).toBe(0.5)
+  expect(scorePhrase("NOE1")).toBe(0.5)
+  expect(scorePhrase("GND1")).toBe(0.5)
   expect(scorePhrase("pin14")).toBe(0.5)
 })
