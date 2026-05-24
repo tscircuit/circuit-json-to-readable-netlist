@@ -168,6 +168,7 @@ export const convertCircuitJsonToReadableNetlist = (
         const { primaryLabel, aliases, pinNumberLabel } =
           getReadableLabelsForPin({
             component,
+            includeLowSignalHints: true,
             port,
           })
         const mainPin = pinNumberLabel ?? primaryLabel

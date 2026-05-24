@@ -57,9 +57,11 @@ const getComponentPinLabels = ({
 
 export const getReadableLabelsForPin = ({
   component,
+  includeLowSignalHints = false,
   port,
 }: {
   component: AnyCircuitElement | undefined
+  includeLowSignalHints?: boolean
   port: SourcePort
 }): {
   primaryLabel: string
@@ -80,7 +82,11 @@ export const getReadableLabelsForPin = ({
   const uniqueLabels = Array.from(new Set(rawLabels))
   const semanticLabels = uniqueLabels.filter((label) => {
     if (isPinNumberOnlyLabel(label, port.pin_number)) return false
-    if (lowSignalPinHints.has(label.toLowerCase()) && scorePhrase(label) <= 1) {
+    if (
+      !includeLowSignalHints &&
+      lowSignalPinHints.has(label.toLowerCase()) &&
+      scorePhrase(label) <= 1
+    ) {
       return false
     }
     return true
