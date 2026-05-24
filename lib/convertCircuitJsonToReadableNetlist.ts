@@ -7,7 +7,10 @@ import type {
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  getReadableLabelsForPort,
+  getReadableNameForPin,
+} from "./getReadableNameForPin"
 
 const joinDisplayParts = (
   parts: Array<string | number | null | undefined>,
@@ -176,24 +179,7 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const pinNumberLabel =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
-        const mainPin = port.name ?? pinNumberLabel ?? port.source_port_id
-        const aliases: string[] = []
-        if (pinNumberLabel && pinNumberLabel !== mainPin) {
-          aliases.push(pinNumberLabel)
-        }
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (
-            hint === mainPin ||
-            hint === port.name ||
-            hint === pinNumberLabel
-          ) {
-            continue
-          }
-          aliases.push(hint)
-        }
+        const { primaryLabel, aliases } = getReadableLabelsForPort(port)
         const aliasPart =
           aliases.length > 0
             ? `(${Array.from(new Set(aliases)).join(", ")})`
@@ -201,7 +187,7 @@ export const convertCircuitJsonToReadableNetlist = (
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =
           nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
-        netlist.push(`- ${mainPin}${aliasPart}: ${netsPart}`)
+        netlist.push(`- ${primaryLabel}${aliasPart}: ${netsPart}`)
       }
       netlist.push("")
     }

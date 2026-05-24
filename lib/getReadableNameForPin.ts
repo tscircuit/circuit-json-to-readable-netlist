@@ -7,6 +7,65 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const nonPrimaryPinLabels = new Set([
+  "anode",
+  "cathode",
+  "left",
+  "neg",
+  "negative",
+  "pos",
+  "positive",
+  "right",
+])
+
+const getPinNumberLabel = (port: SourcePort) =>
+  port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+
+const isGenericPinLabel = (label: string, port: SourcePort): boolean => {
+  const normalizedLabel = label.trim().toLowerCase()
+  return (
+    normalizedLabel === String(port.pin_number) ||
+    normalizedLabel === getPinNumberLabel(port)?.toLowerCase()
+  )
+}
+
+const shouldUseAsPrimaryLabel = (label: string, port: SourcePort): boolean => {
+  if (isGenericPinLabel(label, port)) return false
+  if (nonPrimaryPinLabels.has(label.trim().toLowerCase())) return false
+  return scorePhrase(label) > 0.5
+}
+
+const uniqueLabels = (labels: string[]) => Array.from(new Set(labels))
+
+export const getReadableLabelsForPort = (port: SourcePort) => {
+  const pinNumberLabel = getPinNumberLabel(port)
+  const allLabels = [
+    ...(port.name ? [port.name] : []),
+    ...(port.port_hints ?? []),
+  ]
+  const primaryLabel =
+    allLabels.find((label) => shouldUseAsPrimaryLabel(label, port)) ??
+    port.name ??
+    pinNumberLabel ??
+    port.source_port_id
+  const aliases: string[] = []
+
+  if (pinNumberLabel && pinNumberLabel !== primaryLabel) {
+    aliases.push(pinNumberLabel)
+  }
+
+  for (const label of allLabels) {
+    if (label === primaryLabel) continue
+    if (label === pinNumberLabel) continue
+    if (label === String(port.pin_number)) continue
+    if (isGenericPinLabel(label, port)) continue
+    if (nonPrimaryPinLabels.has(label.trim().toLowerCase())) continue
+    aliases.push(label)
+  }
+
+  return { primaryLabel, aliases: uniqueLabels(aliases) }
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +93,7 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const { primaryLabel, aliases } = getReadableLabelsForPort(port)
 
   const additionalPinLabels: string[] = []
 
@@ -44,16 +103,10 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
-  }
+  additionalPinLabels.push(...aliases)
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${component.name} ${primaryLabel}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(", ")})` : ""}${displayValue}`
 }
