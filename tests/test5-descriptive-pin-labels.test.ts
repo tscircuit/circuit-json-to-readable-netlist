@@ -2,12 +2,6 @@ import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import type { AnyCircuitElement } from "circuit-json"
 
-declare module "bun:test" {
-  interface Matchers<T = unknown> {
-    toMatchInlineSnapshot(snapshot?: string | null): Promise<MatcherResult>
-  }
-}
-
 it("netlist uses descriptive pin labels from port_hints instead of pin numbers", () => {
   const circuitJson: AnyCircuitElement[] = [
     {
@@ -16,82 +10,82 @@ it("netlist uses descriptive pin labels from port_hints instead of pin numbers",
       name: "U1",
       ftype: "simple_chip",
       manufacturer_part_number: "ESP32",
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_1",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 1,
       port_hints: ["1", "GND"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_2",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 2,
       port_hints: ["2", "GPIO0"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_3",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 3,
       port_hints: ["3", "GPIO1", "SCL"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_4",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 4,
       port_hints: ["4", "VDD"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_5",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 5,
       port_hints: ["5", "GPIO2", "SDA"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_6",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 6,
       port_hints: ["6", "TX"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_7",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 7,
       port_hints: ["7", "RX"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_8",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 8,
       port_hints: ["8", "MISO"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_trace",
       source_trace_id: "source_trace_1",
       connected_source_port_ids: ["source_port_1", "source_port_4"],
-      connected_source_net_id: "source_net_1",
-    } as AnyCircuitElement,
+      connected_source_net_ids: ["source_net_1"],
+    } as unknown as AnyCircuitElement,
     {
       type: "source_net",
       source_net_id: "source_net_1",
       name: "VDD_GND",
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
   ]
 
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
@@ -115,23 +109,23 @@ it("netlist does not contain 'undefined' for chip without pinLabels", () => {
       name: "LED1",
       ftype: "simple_chip",
       manufacturer_part_number: "WS2812B",
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_1",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 1,
       port_hints: ["1"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
     {
       type: "source_port",
       source_port_id: "source_port_2",
       source_component_id: "source_component_1",
-      name: undefined,
+      name: undefined as unknown as string,
       pin_number: 2,
       port_hints: ["2"],
-    } as AnyCircuitElement,
+    } as unknown as AnyCircuitElement,
   ]
 
   const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
