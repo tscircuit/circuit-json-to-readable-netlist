@@ -30,19 +30,20 @@ const wordQualityScore = {
   left: 0.3,
   right: 0.3,
 }
-
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  // Check word quality first, before the digit penalty.
+  // This ensures "GPIO1_RX" scores 1.15 (RX match) instead of 0.5 (digit match).
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
