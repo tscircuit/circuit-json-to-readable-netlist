@@ -36,13 +36,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  // Check for known high-quality words first — a phrase like "GPIO14" or
+  // "SCL2" should inherit the word's score even though it contains digits.
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  // Generic numeric-only or pin-number labels score lower
+  if (phrase.match(/^\d+$/) || phrase.match(/^pin\d+$/i)) {
+    return 0.5
   }
   return 1
 }
