@@ -4,7 +4,7 @@ import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToRea
 import { getReadableNameForPin } from "lib/getReadableNameForPin"
 
 it("correctly preserves descriptive pin labels containing digits in getReadableNameForPin", () => {
-  const circuitJson: AnyCircuitElement[] = [
+  const circuitJson: any[] = [
     {
       type: "source_component",
       source_component_id: "source_component_0",
