@@ -52,4 +52,3 @@ it("renders readable semiconductor and power source descriptions", () => {
     "
   `)
 })
-
