@@ -13,7 +13,6 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
-  MVB: 1.2,
   WTB: 1.2,
   TRDP: 1.2,
   TCN: 1.2,

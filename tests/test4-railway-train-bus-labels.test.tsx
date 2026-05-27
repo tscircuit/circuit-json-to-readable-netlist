@@ -8,10 +8,10 @@ it("preserves railway train-bus pin labels", () => {
       <chip
         name="U1"
         footprint="soic8"
-        manufacturerPartNumber="Train Communication Controller"
+        manufacturerPartNumber="Train Backbone Gateway"
         pinLabels={{
-          pin1: ["P1", "MVB_A"],
-          pin2: ["P2", "MVB_B"],
+          pin1: ["P1", "TCN_SYNC"],
+          pin2: ["P2", "TCN_REF"],
           pin3: ["P3", "WTB_A"],
           pin4: ["P4", "WTB_B"],
           pin5: ["P5", "TRDP_TX"],
@@ -27,13 +27,13 @@ it("preserves railway train-bus pin labels", () => {
     convertCircuitJsonToReadableNetlist(circuitJson),
   ).toMatchInlineSnapshot(`
     "COMPONENTS:
-     - U1: Train Communication Controller, soic8
+     - U1: Train Backbone Gateway, soic8
 
 
     COMPONENT_PINS:
-    U1 (Train Communication Controller)
-    - pin1(P1, MVB_A): NOT_CONNECTED
-    - pin2(P2, MVB_B): NOT_CONNECTED
+    U1 (Train Backbone Gateway)
+    - pin1(P1, TCN_SYNC): NOT_CONNECTED
+    - pin2(P2, TCN_REF): NOT_CONNECTED
     - pin3(P3, WTB_A): NOT_CONNECTED
     - pin4(P4, WTB_B): NOT_CONNECTED
     - pin5(P5, TRDP_TX): NOT_CONNECTED
