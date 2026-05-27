@@ -1,6 +1,12 @@
 import { expect, it } from "bun:test"
 import type { AnyCircuitElement } from "circuit-json"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
+import { scorePhrase } from "lib/scorePhrase"
+
+it("scores ultrasound front-end labels above generic numbered labels", () => {
+  expect(scorePhrase("ULTRASOUND_TX1")).toBeGreaterThan(scorePhrase("pin14"))
+  expect(scorePhrase("TGC_CTRL1")).toBeGreaterThan(scorePhrase("pos"))
+})
 
 it("keeps ultrasound front-end pin labels readable when labels contain digits", () => {
   const circuitJson = [
