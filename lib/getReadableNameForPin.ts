@@ -1,11 +1,39 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement, SourcePort } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
+
+const isGenericPinLabel = (
+  label: string | undefined,
+  pinNumber: number | undefined,
+) => {
+  if (!label) return true
+  if (pinNumber === undefined) return false
+
+  const normalizedLabel = label.toLowerCase()
+
+  return normalizedLabel === `pin${pinNumber}` || label === String(pinNumber)
+}
+
+const isSpecificPinLabel = (
+  label: string | undefined,
+  pinNumber: number | undefined,
+) => {
+  if (!label || isGenericPinLabel(label, pinNumber)) return false
+
+  return scorePhrase(label) > 1 || (/[a-z]/i.test(label) && /\d/.test(label))
+}
+
+const getMainPinName = (port: SourcePort) => {
+  if (!isGenericPinLabel(port.name, port.pin_number)) {
+    return port.name
+  }
+
+  const bestHint = port.port_hints?.find((hint) =>
+    isSpecificPinLabel(hint, port.pin_number),
+  )
+
+  return bestHint ?? port.name ?? `Pin${port.pin_number}`
+}
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -34,7 +62,7 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName = getMainPinName(port)
 
   const additionalPinLabels: string[] = []
 
@@ -46,8 +74,7 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (isSpecificPinLabel(port_hint, port.pin_number)) {
       additionalPinLabels.push(port_hint)
     }
   }
