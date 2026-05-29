@@ -13,6 +13,9 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  DALI: 1.2,
+  DMX: 1.2,
+  KNX: 1.2,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +38,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreBuildingLightingLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    normalizedPhrase.includes("DALI") ||
+    normalizedPhrase.includes("DMX512") ||
+    normalizedPhrase.includes("DMX") ||
+    normalizedPhrase.includes("KNX") ||
+    normalizedPhrase.includes("0_10V") ||
+    normalizedPhrase.includes("0-10V")
+  ) {
+    return 1.2
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const buildingLightingLabelScore = scoreBuildingLightingLabel(phrase)
+  if (buildingLightingLabelScore) {
+    return buildingLightingLabelScore
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
