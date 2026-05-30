@@ -41,9 +41,9 @@ const isDigitalIsolatorLabel = (phrase: string) => {
     /^(?:(?:ISO|ISOLATED|ADUM)_?(?:IN|OUT|TX|RX|CH)[A-Z]?\d*|SI86_?CH[A-Z]?\d*)$/.test(
       normalized,
     ) ||
-    /^V[IO][A-H]\d+$/.test(normalized) ||
-    /^(?:VE|N?EN)_?(?:[12AB]|\d+)$/.test(normalized) ||
-    /^(?:VDD|VISO|EN)_?(?:[12AB]|\d+)$/.test(normalized)
+    /^V[IO][A-H][12]$/.test(normalized) ||
+    /^(?:VE|N?EN)_?[12AB]$/.test(normalized) ||
+    /^(?:VDD|VISO|EN)_?[12AB]$/.test(normalized)
   )
 }
 
