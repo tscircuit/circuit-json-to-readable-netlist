@@ -43,7 +43,7 @@ const isMipiCsiDsiLaneLabel = (phrase: string) => {
     normalized.startsWith("MIPI_")
   return (
     hasMipiLaneFamily &&
-    /(?:D\d+_?[PN]|D[PN]_?\d+|(?:CLK|CK)_?[PN])/.test(normalized)
+    /(?:D\d+_?[PN]|D[PN]_?\d+|(?:CLK|CK)_?[PN])(?:_|$)/.test(normalized)
   )
 }
 
