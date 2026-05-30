@@ -458,4 +458,6 @@ it("scores MIPI lane aliases without broadening generic numbered pins", () => {
   expect(scorePhrase("MIPI_D0POWER")).toBeLessThan(laneScore)
   expect(scorePhrase("MIPI_DSI_CLKPWR")).toBeLessThan(laneScore)
   expect(scorePhrase("MIPI_DSI_CLKNRESET")).toBeLessThan(laneScore)
+  expect(scorePhrase("MIPI_DSI_CLK_N_EN")).toBeLessThan(laneScore)
+  expect(scorePhrase("MIPI_CSI_D0_P_AUX")).toBeLessThan(laneScore)
 })
