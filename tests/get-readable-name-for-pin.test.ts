@@ -1,0 +1,51 @@
+import { expect, it } from "bun:test"
+import { getReadableNameForPin } from "lib/getReadableNameForPin"
+
+it("keeps alphanumeric chip pin labels in readable pin names", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      source_component_id: "source_component_1",
+      name: "U1",
+      ftype: "simple_chip",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_1",
+      source_component_id: "source_component_1",
+      pin_number: 14,
+      port_hints: ["14", "GP14", "UART_TX", "pin14"],
+    },
+  ] as any
+
+  expect(
+    getReadableNameForPin({
+      circuitJson,
+      source_port_id: "source_port_1",
+    }),
+  ).toBe("U1 Pin14 (GP14,UART_TX)")
+})
+
+it("falls back safely when a source port has no name or pin number", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      source_component_id: "source_component_1",
+      name: "U1",
+      ftype: "simple_chip",
+    },
+    {
+      type: "source_port",
+      source_port_id: "source_port_1",
+      source_component_id: "source_component_1",
+      port_hints: ["GPIO"],
+    },
+  ] as any
+
+  expect(
+    getReadableNameForPin({
+      circuitJson,
+      source_port_id: "source_port_1",
+    }),
+  ).toBe("U1 source_port_1 (GPIO)")
+})
