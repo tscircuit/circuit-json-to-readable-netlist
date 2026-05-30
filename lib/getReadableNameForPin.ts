@@ -7,6 +7,32 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinLabel = (label: string) => /^pin\d+$/i.test(label)
+
+const isNumericPinHint = (hint: string, pinNumber: number | undefined) =>
+  pinNumber !== undefined && hint === String(pinNumber)
+
+const shouldIncludeAdditionalPinLabel = ({
+  hint,
+  mainPinName,
+  componentType,
+  pinNumber,
+}: {
+  hint: string
+  mainPinName: string
+  componentType: string | undefined
+  pinNumber: number | undefined
+}) => {
+  if (hint === mainPinName) return false
+  if (isGenericPinLabel(hint)) return false
+  if (isNumericPinHint(hint, pinNumber)) return false
+
+  const score = scorePhrase(hint)
+  if (score > 1) return true
+
+  return componentType === "simple_chip" && score >= 0.5
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +60,8 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    port.name ?? port.port_hints?.[0] ?? `Pin${port.pin_number ?? ""}`
 
   const additionalPinLabels: string[] = []
 
@@ -45,15 +72,22 @@ export const getReadableNameForPin = ({
   }
 
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (
+      shouldIncludeAdditionalPinLabel({
+        hint: port_hint,
+        mainPinName,
+        componentType: component.ftype,
+        pinNumber: port.pin_number,
+      })
+    ) {
       additionalPinLabels.push(port_hint)
     }
   }
 
+  const componentName = component.name ?? component.source_component_id
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const uniqueAdditionalPinLabels = Array.from(new Set(additionalPinLabels))
+  return `${componentName} ${mainPinName}${uniqueAdditionalPinLabels.length > 0 ? ` (${uniqueAdditionalPinLabels.join(",")})` : ""}${displayValue}`
 }
