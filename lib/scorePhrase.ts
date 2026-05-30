@@ -11,8 +11,22 @@ const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
+  QSPI: 1.2,
+  SDIO: 1.2,
+  SDMMC: 1.2,
+  EMMC: 1.2,
+  RGMII: 1.2,
+  RMII: 1.2,
+  MDIO: 1.2,
+  MDC: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  CLK: 1.15,
+  CMD: 1.15,
+  DAT: 1.15,
+  DQS: 1.15,
+  CRS: 1.15,
+  COL: 1.15,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -36,13 +50,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
