@@ -343,6 +343,9 @@ it("keeps data-line hints for generic chip pin labels", () => {
 })
 
 it("scores data-line aliases without broadening generic numbered pins", () => {
+  expect(scorePhrase("DATA")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("CLK")).toBeGreaterThan(scorePhrase("pos"))
+  expect(scorePhrase("CS")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("DATA_1")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("DQ_2")).toBeGreaterThan(scorePhrase("pos"))
   expect(scorePhrase("SIO0")).toBeGreaterThan(scorePhrase("pos"))
@@ -357,4 +360,9 @@ it("scores data-line aliases without broadening generic numbered pins", () => {
   expect(scorePhrase("CS_GPIO1")).toBe(0.5)
   expect(scorePhrase("DATETIME1")).toBe(0.5)
   expect(scorePhrase("DOUT_EN1")).toBe(0.5)
+  expect(scorePhrase("DATA_READY")).toBe(1)
+  expect(scorePhrase("CLK_EN")).toBe(1)
+  expect(scorePhrase("CS_GPIO")).toBe(scorePhrase("GPIO"))
+  expect(scorePhrase("CS_GPIO")).toBeLessThan(scorePhrase("CS"))
+  expect(scorePhrase("DOUT_EN")).toBe(1)
 })
