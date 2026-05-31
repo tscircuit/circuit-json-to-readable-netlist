@@ -31,18 +31,19 @@ const wordQualityScore = {
   right: 0.3,
 }
 
-const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
-  (a, b) => b[1] - a[1],
-)
+const wordQualityScoreEntries = Object.entries(wordQualityScore)
+  .map(([word, score]) => [word.toLowerCase(), score] as const)
+  .sort((a, b) => b[1] - a[1])
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const lowerPhrase = phrase.toLowerCase()
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (lowerPhrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
