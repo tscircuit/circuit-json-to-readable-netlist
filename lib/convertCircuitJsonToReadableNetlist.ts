@@ -9,6 +9,23 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const formatPinHeaderDescription = ({
+  pinCount,
+  gender,
+  displayValue,
+  footprint,
+}: {
+  pinCount: number
+  gender?: string
+  displayValue?: string
+  footprint?: string
+}) => {
+  const headerType = [`${pinCount}-pin`, gender, "header"]
+    .filter(Boolean)
+    .join(" ")
+  return [displayValue, headerType, footprint].filter(Boolean).join(", ")
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -48,6 +65,13 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+    } else if (component.ftype === "simple_pin_header") {
+      componentDescription = formatPinHeaderDescription({
+        pinCount: component.pin_count,
+        gender: component.gender,
+        displayValue: component.display_value,
+        footprint,
+      })
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -148,6 +172,14 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_pin_header") {
+        const pinHeaderDescription = formatPinHeaderDescription({
+          pinCount: component.pin_count,
+          gender: component.gender,
+          displayValue: component.display_value,
+          footprint,
+        })
+        header = `${component.name} (${pinHeaderDescription})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
