@@ -11,6 +11,17 @@ const wordQualityScore = {
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
+  I2S: 1.2,
+  MCLK: 1.2,
+  BCLK: 1.2,
+  LRCLK: 1.2,
+  SWDIO: 1.2,
+  SWCLK: 1.2,
+  JTAG: 1.2,
+  TCK: 1.2,
+  TMS: 1.2,
+  TDI: 1.2,
+  TDO: 1.2,
   SDA: 1.2,
   SCL: 1.2,
   RX: 1.15,
@@ -35,7 +46,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const audioDebugBusWords = [
+  "I2S",
+  "MCLK",
+  "BCLK",
+  "LRCLK",
+  "SWDIO",
+  "SWCLK",
+  "JTAG",
+  "TCK",
+  "TMS",
+  "TDI",
+  "TDO",
+] as const
+
 export const scorePhrase = (phrase: string) => {
+  for (const word of audioDebugBusWords) {
+    if (phrase.includes(word)) {
+      return wordQualityScore[word]
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
