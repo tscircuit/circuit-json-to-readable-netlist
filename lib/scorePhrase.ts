@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const keypadMatrixRowColumnPattern =
+  /(^|[_-])(?:KEY[_-]?(?:ROW|COL)|SCAN[_-]?(?:ROW|COL)|ROW|COL)\d*($|[_-])/
+const keypadMatrixScanIoPattern = /(^|[_-])(?:KSI|KSO)\d*($|[_-])/
+
 export const scorePhrase = (phrase: string) => {
+  if (keypadMatrixRowColumnPattern.test(phrase)) {
+    return 1.2
+  }
+  if (keypadMatrixScanIoPattern.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
