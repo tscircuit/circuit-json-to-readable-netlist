@@ -1,5 +1,9 @@
 {
   "name": "circuit-json-to-readable-netlist",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tscircuit/circuit-json-to-readable-netlist.git"
+  },
   "main": "dist/index.js",
   "version": "0.0.15",
   "files": [
