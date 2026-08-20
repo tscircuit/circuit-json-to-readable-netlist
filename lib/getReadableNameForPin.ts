@@ -25,16 +25,27 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
+  const portHints = port.port_hints ?? []
+
   // Determine pin polarity from hints
-  const isPositive = port.port_hints?.some((hint) =>
+  const isPositive = portHints.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
   )
-  const isNegative = port.port_hints?.some((hint) =>
+  const isNegative = portHints.some((hint) =>
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const firstReadableHint = portHints.find((hint) => scorePhrase(hint) >= 1)
+  const mainPinName =
+    port.name ??
+    (port.pin_number !== undefined ? `Pin${port.pin_number}` : undefined) ??
+    firstReadableHint ??
+    "unnamed_pin"
+  const mainPinNameIsGeneric =
+    port.pin_number !== undefined &&
+    (mainPinName.toLowerCase() === `pin${port.pin_number}` ||
+      mainPinName === String(port.pin_number))
 
   const additionalPinLabels: string[] = []
 
@@ -44,10 +55,17 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
+  for (const port_hint of portHints) {
     if (port_hint === mainPinName) continue
+    if (
+      port.pin_number !== undefined &&
+      (port_hint.toLowerCase() === `pin${port.pin_number}` ||
+        port_hint === String(port.pin_number))
+    ) {
+      continue
+    }
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score > 1 || (mainPinNameIsGeneric && score >= 1)) {
       additionalPinLabels.push(port_hint)
     }
   }
