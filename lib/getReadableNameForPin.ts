@@ -5,6 +5,7 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import { getUsefulSchematicLabelsForPort } from "./getUsefulSchematicLabelsForPort"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -47,13 +48,17 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score >= 1) {
       additionalPinLabels.push(port_hint)
     }
   }
+  additionalPinLabels.push(
+    ...getUsefulSchematicLabelsForPort({ circuitJson, port }),
+  )
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const dedupedAdditionalPinLabels = Array.from(new Set(additionalPinLabels))
+  return `${component.name} ${mainPinName}${dedupedAdditionalPinLabels.length > 0 ? ` (${dedupedAdditionalPinLabels.join(",")})` : ""}${displayValue}`
 }
