@@ -36,6 +36,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (phrase.toUpperCase().match(/RTCM|NTRIP|RTK/)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
