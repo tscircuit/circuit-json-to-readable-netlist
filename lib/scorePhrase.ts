@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingTechnicalPhraseScores = [
+  {
+    pattern:
+      /(?:^|[^A-Za-z0-9])(?:IRDA|SIR|MIR|FIR|IR)(?:[_-]?(?:RX|TX|IN|OUT|LED|REMOTE|BLASTER|LEARN))?\d*(?=$|[^A-Za-z0-9])/i,
+    score: 1.18,
+  },
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const { pattern, score } of digitBearingTechnicalPhraseScores) {
+    if (pattern.test(phrase)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
