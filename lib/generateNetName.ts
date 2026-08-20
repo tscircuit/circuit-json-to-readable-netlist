@@ -60,14 +60,14 @@ export const generateNetName = ({
         new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
       ),
     )
-    .concat(nets.map((n) => n.name))
+    .concat(nets.flatMap((n) => (n.name ? [n.name] : [])))
 
   const phrases = possibleNames.map((name) => ({
     name,
     score: scorePhrase(name),
   }))
 
-  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0].name
+  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0]?.name ?? "Net"
 
   // Find the component that has the best port name
   const bestPort = ports.find(

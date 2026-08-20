@@ -36,11 +36,11 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
+      componentDescription = `${component.display_resistance ?? "?"}${
         footprint ? ` ${footprint}` : ""
       } resistor`
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
+      componentDescription = `${component.display_capacitance ?? "?"}${
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
@@ -145,9 +145,9 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${component.name} (${component.display_resistance ?? "?"} ${footprint ?? ""})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${component.name} (${component.display_capacitance ?? "?"} ${footprint ?? ""})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -157,7 +157,7 @@ export const convertCircuitJsonToReadableNetlist = (
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          port.name ?? (port.pin_number !== undefined ? `pin${port.pin_number}` : "?")
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
