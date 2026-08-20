@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const currentSenseAliasPattern =
+  /^(?:[IVC]_?SENSE\d*|CURRENT_?SENSE\d*|SENSE_[PN]|SHUNT(?:_[PN]|[PN])?)$/
+
 export const scorePhrase = (phrase: string) => {
+  if (currentSenseAliasPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
