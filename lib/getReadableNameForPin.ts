@@ -7,6 +7,20 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+export const getSchematicDisplayLabelForPort = ({
+  circuitJson,
+  port,
+}: {
+  circuitJson: AnyCircuitElement[]
+  port: SourcePort
+}): string | undefined => {
+  return su(circuitJson)
+    .schematic_port.list()
+    .find(
+      (schematicPort) => schematicPort.source_port_id === port.source_port_id,
+    )?.display_pin_label
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +48,12 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    (component.ftype === "simple_chip"
+      ? getSchematicDisplayLabelForPort({ circuitJson, port })
+      : undefined) ??
+    port.name ??
+    `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 
