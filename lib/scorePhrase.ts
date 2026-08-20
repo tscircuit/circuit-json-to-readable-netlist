@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const numberedKnownPinLabelPatterns = [
+  /\bSAO(?:_|-)?(?:GPIO|SDA|SCL|VCC|5V|3V3|GND|ID)\d*\b/i,
+  /\bSHITTY(?:_|-)?ADD(?:_|-)?ON\d*\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const pattern of numberedKnownPinLabelPatterns) {
+    if (pattern.test(phrase)) {
+      return 1.2
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
