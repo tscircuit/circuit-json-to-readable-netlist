@@ -1,4 +1,4 @@
-import { expect, it } from "bun:test"
+﻿import { expect, it } from "bun:test"
 import { convertCircuitJsonToReadableNetlist } from "lib/convertCircuitJsonToReadableNetlist"
 import { renderCircuit } from "tests/fixtures/render-circuit"
 
@@ -32,8 +32,8 @@ it("test1 should render a basic circuit", () => {
      - C1: 1nF 0402 capacitor
 
     NET: C1_pos
-      - R1 pin1
-      - C1 pin1 (+)
+      - R1 anode
+      - C1 pos (+)
 
 
     COMPONENT_PINS:
@@ -47,3 +47,5 @@ it("test1 should render a basic circuit", () => {
     "
   `)
 })
+
+
