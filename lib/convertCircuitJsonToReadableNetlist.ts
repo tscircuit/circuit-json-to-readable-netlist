@@ -9,6 +9,7 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+// Convert Circuit JSON into readable netlist text with stable display-name fallbacks.
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -27,6 +28,7 @@ export const convertCircuitJsonToReadableNetlist = (
   netlist.push("COMPONENTS:")
   for (const component of source_components) {
     let componentDescription = ""
+    const componentName = component.name ?? component.source_component_id
 
     // Get the cad_component associated with the source_component
     const cadComponent = su(circuitJson).cad_component.getWhere({
@@ -54,7 +56,7 @@ export const convertCircuitJsonToReadableNetlist = (
         .join(", ")
     }
 
-    netlist.push(` - ${component.name}: ${componentDescription}`)
+    netlist.push(` - ${componentName}: ${componentDescription}`)
   }
   netlist.push("")
 
@@ -143,13 +145,14 @@ export const convertCircuitJsonToReadableNetlist = (
         source_component_id: component.source_component_id,
       })
       const footprint = cadComponent?.footprinter_string
-      let header = component.name
+      const componentName = component.name ?? component.source_component_id
+      let header = componentName
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${componentName} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${componentName} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+        header = `${componentName} (${component.manufacturer_part_number})`
       }
       netlist.push(header)
       const ports = source_ports

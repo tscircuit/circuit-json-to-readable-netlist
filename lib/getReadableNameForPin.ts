@@ -7,6 +7,7 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+// Build a readable source-port label, falling back to component ID when needed.
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -24,6 +25,7 @@ export const getReadableNameForPin = ({
     (c) => c.source_component_id === port.source_component_id,
   )
   if (!component) return ""
+  const componentName = component.name ?? component.source_component_id
 
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
@@ -55,5 +57,5 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${componentName} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
