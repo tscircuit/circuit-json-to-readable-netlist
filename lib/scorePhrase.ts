@@ -8,6 +8,8 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  "D+": 1.2,
+  "D-": 1.2,
   MISO: 1.2,
   MOSI: 1.2,
   SCLK: 1.2,
