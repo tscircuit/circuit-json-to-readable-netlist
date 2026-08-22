@@ -33,8 +33,17 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Prefer semantic pin labels over generic "pin14" names when available.
+  const genericPinName =
+    port.name && /^pin\d+$/i.test(port.name) ? port.name : undefined
+  const semanticPinName = genericPinName
+    ? port.port_hints?.find((hint) => {
+        if (hint === String(port.pin_number)) return false
+        if (hint.toLowerCase() === genericPinName.toLowerCase()) return false
+        return scorePhrase(hint) > 1
+      })
+    : undefined
+  const mainPinName = semanticPinName ?? port.name ?? `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 
@@ -50,6 +59,10 @@ export const getReadableNameForPin = ({
     if (score > 1) {
       additionalPinLabels.push(port_hint)
     }
+  }
+
+  if (genericPinName && semanticPinName) {
+    additionalPinLabels.push(genericPinName)
   }
 
   const displayValue = component.display_value
