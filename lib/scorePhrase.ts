@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScore = {
+  BT656: 1.2,
+  BT1120: 1.2,
+  CCIR656: 1.2,
+}
+
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
