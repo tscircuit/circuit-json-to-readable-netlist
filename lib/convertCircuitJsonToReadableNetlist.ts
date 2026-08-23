@@ -74,7 +74,7 @@ export const convertCircuitJsonToReadableNetlist = (
       id.startsWith("source_port"),
     ).length
 
-    if (connectedPortCount <= 1) continue
+    if (connectedPortCount <= 1 && !net?.name) continue
 
     // Add net header
     netlist.push(`NET: ${netName}`)
@@ -100,7 +100,8 @@ export const convertCircuitJsonToReadableNetlist = (
     const connectedPortCount = connectedIds.filter((id) =>
       id.startsWith("source_port"),
     ).length
-    if (connectedPortCount === 1) {
+    const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
+    if (connectedPortCount === 1 && !net?.name) {
       if (!hasEmptyNets) {
         netlist.push("")
         netlist.push("EMPTY NET PINS:")

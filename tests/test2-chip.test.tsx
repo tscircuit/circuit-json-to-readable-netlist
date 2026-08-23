@@ -61,10 +61,12 @@ it("test2 chip", () => {
       - U1 GPIO2 (SDA)
       - R1 pin2
 
-
-    EMPTY NET PINS:
+    NET: GPIO4
       - U1 GPIO3
+
+    NET: V5
       - U1 VDD
+
 
     COMPONENT_PINS:
     U1 (ATMEGA328P)
