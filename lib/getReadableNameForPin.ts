@@ -1,11 +1,40 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
+
+const isUsefulChipPinLabel = ({
+  label,
+  pinNumber,
+}: {
+  label: string
+  pinNumber?: number
+}) => {
+  const normalizedLabel = label.trim()
+  if (!normalizedLabel) return false
+
+  const lowerLabel = normalizedLabel.toLowerCase()
+  const genericHints = new Set([
+    "pin",
+    "left",
+    "right",
+    "top",
+    "bottom",
+    "pos",
+    "neg",
+    "positive",
+    "negative",
+    "anode",
+    "cathode",
+  ])
+
+  if (genericHints.has(lowerLabel)) return false
+  if (pinNumber !== undefined) {
+    if (lowerLabel === String(pinNumber)) return false
+    if (lowerLabel === `pin${pinNumber}`) return false
+  }
+
+  return /[a-z]/i.test(normalizedLabel)
+}
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -47,7 +76,14 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (
+      score > 1 ||
+      (component.ftype === "simple_chip" &&
+        isUsefulChipPinLabel({
+          label: port_hint,
+          pinNumber: port.pin_number,
+        }))
+    ) {
       additionalPinLabels.push(port_hint)
     }
   }
