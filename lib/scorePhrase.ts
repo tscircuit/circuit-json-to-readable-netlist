@@ -36,6 +36,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (
+    phrase.match(
+      /DIP_?SW(?:ITCH)?|ROTARY_?SW(?:ITCH)?|CODED_?SWITCH|THUMBWHEEL|(^|[_-])BCD/,
+    )
+  ) {
+    return 1.1
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
