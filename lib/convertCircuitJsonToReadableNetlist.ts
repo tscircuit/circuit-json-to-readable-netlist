@@ -44,10 +44,9 @@ export const convertCircuitJsonToReadableNetlist = (
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [manufacturerPartNumber, footprint]
-        .filter(Boolean)
-        .join(", ")
+      const chipLabel =
+        component.manufacturer_part_number ?? component.display_value
+      componentDescription = [chipLabel, footprint].filter(Boolean).join(", ")
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -150,6 +149,8 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_capacitance} ${footprint})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (component.ftype === "simple_chip" && component.display_value) {
+        header = `${component.name} (${component.display_value})`
       }
       netlist.push(header)
       const ports = source_ports
