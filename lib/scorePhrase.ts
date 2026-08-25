@@ -35,7 +35,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const ultrasoundFrontEndLabelPattern =
+  /(?:^|[_-])(ULTRASOUND|PULSER|TGC|HV_MUX|PMUT|CMUT|HIFU|TR_SWITCH)(?=$|[_-]|\d)/i
+
 export const scorePhrase = (phrase: string) => {
+  // Ultrasound front-end labels often include channel numbers; keep them above
+  // the generic numeric fallback so readable netlists show the useful label.
+  if (ultrasoundFrontEndLabelPattern.test(phrase)) {
+    return 1.16
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
