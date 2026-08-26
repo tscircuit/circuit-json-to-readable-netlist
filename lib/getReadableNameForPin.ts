@@ -33,8 +33,16 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Format pin description - handle undefined cases
+  let mainPinName: string
+  if (port.name) {
+    mainPinName = port.name
+  } else if (port.pin_number !== undefined) {
+    mainPinName = `pin${port.pin_number}`
+  } else {
+    // Fallback if both name and pin_number are undefined
+    mainPinName = "unknown_pin"
+  }
 
   const additionalPinLabels: string[] = []
 
@@ -47,7 +55,9 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    // Include hints with score >= 1 (unknown words) or score > 1 (known good words)
+    // This includes custom pin names while filtering out low-quality hints
+    if (score >= 1) {
       additionalPinLabels.push(port_hint)
     }
   }
