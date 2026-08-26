@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const securityEventWords = ["TAMPER", "INTRUSION", "CASE_OPEN", "COVER_OPEN"]
+const securityEventScore = 1.2
+
 export const scorePhrase = (phrase: string) => {
+  const uppercasePhrase = phrase.toUpperCase()
+  if (securityEventWords.some((word) => uppercasePhrase.includes(word))) {
+    return securityEventScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
