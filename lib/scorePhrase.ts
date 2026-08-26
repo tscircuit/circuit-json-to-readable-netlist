@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const automotiveDiagnosticPattern =
+  /(^|[_-])(OBD|KLINE|K_LINE|K-LINE|L_LINE|L-LINE|J1850|FLEXRAY)(\d+|[_-]|$)/i
+
 export const scorePhrase = (phrase: string) => {
+  if (automotiveDiagnosticPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
