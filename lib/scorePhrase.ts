@@ -35,7 +35,41 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const highValueProtocolSignalPatterns = [
+  /^HDQ(?:[_-].*)?$/,
+  /^SDQ(?:[_-].*)?$/,
+  /^BQ27[45](?:[_-].*)?$/,
+  /^FUEL[_-]?GAUGE(?:[_-].*)?$/,
+  /^GAUGE(?:[_-].*)?$/,
+  /^MDIO(?:[_-].*)?$/,
+  /^MDC(?:[_-].*)?$/,
+  /^PHYAD\d*$/,
+  /^PHY[_-].*$/,
+  /^ETH[_-]?PHY(?:[_-].*)?$/,
+  /^DMX(?:512)?(?:[_-].*)?$/,
+  /^RDM(?:[_-].*)?$/,
+  /^DALI(?:[_-].*)?$/,
+  /^ARINC(?:429)?(?:[_-].*)?$/,
+  /^A429(?:[_-].*)?$/,
+  /^MIL(?:1553|STD1553)(?:[_-].*)?$/,
+  /^M1553(?:[_-].*)?$/,
+  /^1553B(?:[_-].*)?$/,
+  /^SENT(?:[_-].*)?$/,
+  /^SPC(?:[_-].*)?$/,
+  /^PSI5(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  if (
+    highValueProtocolSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
