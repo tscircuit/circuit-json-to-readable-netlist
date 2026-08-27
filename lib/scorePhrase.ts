@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const solarHarvestingAliasPattern =
+  /^(?:PV(?:IN|OUT)?\d*|SOLAR(?:_[A-Z0-9]+)?|MPPT\d*|VMPP\d*|HARVEST(?:_EN)?|ENERGY_HARVEST(?:_EN)?)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (solarHarvestingAliasPattern.test(phrase)) {
+    return 1.17
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
