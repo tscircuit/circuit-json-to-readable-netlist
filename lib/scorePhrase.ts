@@ -35,7 +35,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreStorageLinkPhrase = (phrase: string) => {
+  if (/(^|[_-])(SATA|SAS)([_-]|$)/.test(phrase)) return 1.2
+  if (/(^|[_-])DEVSLP([_-]|$)/.test(phrase)) return 1.15
+}
+
 export const scorePhrase = (phrase: string) => {
+  const storageLinkScore = scoreStorageLinkPhrase(phrase)
+  if (storageLinkScore) return storageLinkScore
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
