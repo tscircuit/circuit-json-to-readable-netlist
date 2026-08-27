@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const systemTimingAliasPatterns = [
+  /(^|[_-])(RTC|RTCC|WDT|IWDG|WWDG|WATCHDOG)([_-]|$|\d)/,
+  /(^|[_-])(?:LP|HR)?TIM\d*(?:[_-](?:CH|ETR|BKIN|PWM|CAP|CCP)\d*)?([_-]|$)/,
+  /(^|[_-])(?:PWM[_-])?TIM\d+([_-]|$)/,
+  /(^|[_-])(?:CCP|CAPTURE|CAP)\d*([_-]|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    systemTimingAliasPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
