@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scorePoePhrase = (phrase: string) => {
+  if (/(^|[_-])POE([_-]|$)/.test(phrase)) return 1.2
+  if (
+    /(^|[_-])(PSE|PD|VPORT[PN]?|RDET\d*|CLASS\d*|CLS\d*)([_-]|$)/.test(phrase)
+  ) {
+    return 1.15
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const poeScore = scorePoePhrase(phrase)
+  if (poeScore) return poeScore
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
