@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const aerospaceDataBusSignalPatterns = [
+  /^ARINC(?:429)?(?:[_-].*)?$/,
+  /^A429(?:[_-].*)?$/,
+  /^MIL(?:[_-]?STD)?[_-]?1553(?:[_-].*)?$/,
+  /^M1553(?:[_-].*)?$/,
+  /^1553B(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Aerospace data-bus labels often include lane, stub, or word indexes.
+  if (
+    aerospaceDataBusSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
