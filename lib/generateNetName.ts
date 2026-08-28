@@ -55,12 +55,21 @@ export const generateNetName = ({
   )
 
   const possibleNames = ports
-    .flatMap((p) =>
-      Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
-      ),
-    )
-    .concat(nets.map((n) => n.name))
+    .flatMap((p) => {
+      const names = new Set([
+        ...(p.name ? [p.name] : []),
+        ...(p.port_hints ?? []),
+      ])
+      if (names.size === 0 && p.pin_number !== undefined) {
+        names.add(`pin${p.pin_number}`)
+      }
+      return Array.from(names)
+    })
+    .concat(nets.map((n) => n.name).filter(Boolean))
+
+  if (possibleNames.length === 0) {
+    return "unnamed_net"
+  }
 
   const phrases = possibleNames.map((name) => ({
     name,
@@ -71,7 +80,10 @@ export const generateNetName = ({
 
   // Find the component that has the best port name
   const bestPort = ports.find(
-    (p) => p.name === bestPortName || p.port_hints?.includes(bestPortName),
+    (p) =>
+      p.name === bestPortName ||
+      p.port_hints?.includes(bestPortName) ||
+      (p.pin_number !== undefined && `pin${p.pin_number}` === bestPortName),
   )
 
   const componentWithBestPort = all_source_components.find(
