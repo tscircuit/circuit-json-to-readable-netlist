@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const acMainsControlLabelPattern =
+  /^(?:ZERO_?CROSS\d*|ZERO_?X\d*|ZC\d*|TRIAC(?:_?GATE|_?OUT)?\d*|OPTO_?TRIAC\d*|SSR(?:_?(?:IN|OUT|CTRL|LOAD))?\d*|MAINS(?:_?(?:DET|SENSE|LOAD|IN))?\d*|AC_?(?:LOAD|IN|SENSE|DET)\d*|VAC(?:_?(?:SENSE|DET))?\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (acMainsControlLabelPattern.test(phrase)) {
+    return 1.1
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
