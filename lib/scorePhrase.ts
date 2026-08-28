@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const biopotentialAliasPattern =
+  /(?:^|[_-])(?:ECG|EEG|EMG|EOG|LEAD_OFF|LOFF|RLD|DRL|BIOZ|RESP|ELECTRODE)(?=$|[_-]|\d)/
+
 export const scorePhrase = (phrase: string) => {
+  if (biopotentialAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
