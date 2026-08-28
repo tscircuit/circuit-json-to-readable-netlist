@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isRadarFrontendAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return /^(RADAR|FMCW|DOPPLER|IF|MIXER|LNA|PA|VCO|LO)_(TX|RX|IF|OUT|IN|IFOUT|IFIN|LO|RF|EN|TRIG|SYNC|CLK|DATA|I|Q)(?:[_-]?[PN])?\d*(?:[_-]?[PN])?$/.test(
+    normalizedPhrase,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isRadarFrontendAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
