@@ -35,7 +35,27 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const automotiveAudioBusSignalPatterns = [
+  /^A2B(?:[_-]?(?:AP|AN|BP|BN|P|N|TX|RX|BUS|LINE)\d*)?(?:[_-].*)?$/,
+  /^AD242\d(?:[_-].*)?$/,
+  /^MOST(?:25|50|150)?(?:[_-].*)?$/,
+  /^MOST[_-]?BUS(?:[_-].*)?$/,
+  /^MEDIA[_-]?ORIENTED(?:[_-].*)?$/,
+  /^AUTOMOTIVE[_-]?AUDIO(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Automotive audio bus labels often carry numeric channel or port indexes.
+  if (
+    automotiveAudioBusSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
