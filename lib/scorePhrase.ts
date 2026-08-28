@@ -36,6 +36,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (
+    /HYDROPONIC|NUTRIENT|DOSER|DOSING|EC_SENSOR|PH_SENSOR|WATER_LEVEL/i.test(
+      phrase,
+    )
+  ) {
+    return 1.16
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
