@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isRtcPinLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /(^|[_-])(RTC|RTCC|DS3231|DS1307|PCF8523|PCF8563|RV3028|MCP7940)([_-]|\d|$)/.test(
+      normalizedPhrase,
+    ) ||
+    /(^|[_-])(SQW|ALARM|ALM|32KOUT|32KHZ|CLKOUT|VBAT)([_-]|\d|$)/.test(
+      normalizedPhrase,
+    )
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isRtcPinLabel(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
