@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const chipletInterconnectWords = ["UCIE", "AIB", "BOW", "D2D"]
+
 export const scorePhrase = (phrase: string) => {
+  if (chipletInterconnectWords.some((word) => phrase.includes(word))) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
