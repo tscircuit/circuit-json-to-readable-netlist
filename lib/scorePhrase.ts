@@ -35,7 +35,25 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const labInstrumentationAliasPatterns = [
+  /^SMU(?:_|$)/,
+  /^SENSE_(?:HI|LO)\d*$/,
+  /^KELVIN(?:_SENSE)?\d*$/,
+  /^GUARD\d*$/,
+  /^TRIAX(?:_|$)/,
+  /^ELECTROMETER(?:_|$)/,
+  /^LCR(?:_|$)/,
+]
+
+const isLabInstrumentationAlias = (phrase: string) =>
+  labInstrumentationAliasPatterns.some((pattern) =>
+    pattern.test(phrase.toUpperCase()),
+  )
+
 export const scorePhrase = (phrase: string) => {
+  if (isLabInstrumentationAlias(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
