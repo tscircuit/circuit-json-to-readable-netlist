@@ -34,7 +34,21 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const pinLabels = Array.from(
+    new Set(
+      [port.name, ...(port.port_hints ?? [])]
+        .filter(Boolean)
+        .map((p) => String(p)),
+    ),
+  ).sort((a, b) => scorePhrase(b) - scorePhrase(a))
+
+  const bestLabel = pinLabels[0]
+  const mainPinName =
+    bestLabel && scorePhrase(bestLabel) > 1
+      ? bestLabel
+      : port.name
+        ? port.name
+        : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 
@@ -44,11 +58,11 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
+  for (const labelCandidate of pinLabels) {
+    if (labelCandidate === mainPinName) continue
+    const score = scorePhrase(labelCandidate)
     if (score > 1) {
-      additionalPinLabels.push(port_hint)
+      additionalPinLabels.push(labelCandidate)
     }
   }
 
