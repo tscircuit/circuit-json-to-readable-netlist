@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const poolSpaTokens = [
+  "CHLORINATOR",
+  "SALT_CELL",
+  "SPA_BLOWER",
+  "FILTER_PUMP",
+  "HEATER_FIRE",
+  "COVER_SWITCH",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (poolSpaTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
