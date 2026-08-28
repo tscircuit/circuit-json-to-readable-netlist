@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const saunaTokens = [
+  "SAUNA_HEATER",
+  "STEAM_GEN",
+  "TEMP_LIMIT",
+  "HUMIDITY_FAN",
+  "BENCH_LIGHT",
+  "DOOR_SWITCH",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (saunaTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
