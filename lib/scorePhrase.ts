@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const osdpAccessReaderPinPattern =
+  /^(?:OSDP_(?:A|B|TXEN|POLL|ADDR|TAMPER)\d*|READER_(?:TAMPER|LED|BEEP|BUZZER)\d*|CARD_PRESENT\d*|ACCESS_READER_[A-Z0-9]+)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (osdpAccessReaderPinPattern.test(phrase)) {
+    return 1.3
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
