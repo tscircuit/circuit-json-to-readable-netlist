@@ -8,11 +8,17 @@
  * These unique port names are usually the best indicator of what the net is for
  */
 const wordQualityScore = {
+  MDC: 1.2,
+  MDIO: 1.2,
   MISO: 1.2,
   MOSI: 1.2,
+  REFCLK: 1.2,
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  CRS_DV: 1.2,
+  TXEN: 1.2,
+  RXER: 1.2,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +41,18 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const exactPhraseScore = {
+  TXD0: 1.2,
+  TXD1: 1.2,
+  RXD0: 1.2,
+  RXD1: 1.2,
+}
+
 export const scorePhrase = (phrase: string) => {
+  const exactScore = exactPhraseScore[phrase as keyof typeof exactPhraseScore]
+  if (exactScore !== undefined) {
+    return exactScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
