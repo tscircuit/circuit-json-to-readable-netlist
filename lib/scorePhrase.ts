@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingAutomotiveBusWords = ["CAN", "CAN_FD", "LIN", "FlexRay"]
+
 export const scorePhrase = (phrase: string) => {
+  for (const word of digitBearingAutomotiveBusWords) {
+    if (phrase.includes(word)) {
+      return 1.15
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
