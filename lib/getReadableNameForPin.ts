@@ -7,6 +7,8 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (label: string) => /^pin\d+$/i.test(label)
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -33,8 +35,21 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const informativeHints = Array.from(new Set(port.port_hints ?? []))
+    .filter((hint) => hint !== String(port.pin_number))
+    .filter((hint) => !isGenericPinName(hint))
+    .sort((a, b) => scorePhrase(b) - scorePhrase(a) || b.length - a.length)
+
+  const bestInformativeHint =
+    informativeHints[0] && scorePhrase(informativeHints[0]) > 1
+      ? informativeHints[0]
+      : undefined
+
+  // Prefer a more descriptive port hint when the generated name is just "pinN".
+  const mainPinName =
+    port.name && !isGenericPinName(port.name)
+      ? port.name
+      : bestInformativeHint ?? (port.name ? port.name : `Pin${port.pin_number}`)
 
   const additionalPinLabels: string[] = []
 
@@ -44,10 +59,13 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
+  for (const port_hint of Array.from(new Set(port.port_hints ?? []))) {
+    if (port_hint === mainPinName || port_hint === String(port.pin_number)) {
+      continue
+    }
+    if (isGenericPinName(port_hint)) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score >= 1) {
       additionalPinLabels.push(port_hint)
     }
   }
