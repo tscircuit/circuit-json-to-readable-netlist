@@ -34,7 +34,11 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    port.name ??
+    (port.pin_number !== undefined
+      ? `Pin${port.pin_number}`
+      : port.source_port_id)
 
   const additionalPinLabels: string[] = []
 
