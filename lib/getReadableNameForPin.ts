@@ -52,8 +52,8 @@ export const getReadableNameForPin = ({
     }
   }
 
-  const displayValue = component.display_value
-    ? ` (${component.display_value})`
+  const displayValue = component.display_value?.trim()
+    ? ` (${component.display_value.trim()})`
     : ""
   return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
