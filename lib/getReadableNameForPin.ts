@@ -36,24 +36,33 @@ export const getReadableNameForPin = ({
   // Format pin description
   const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
 
-  const additionalPinLabels: string[] = []
+  const additionalPinLabels = new Map<string, string>()
+  const addPinAlias = (label: string) => {
+    const normalized = label.trim()
+    if (!normalized) return
+    const key = normalized.toLowerCase()
+    if (!additionalPinLabels.has(key)) {
+      additionalPinLabels.set(key, normalized)
+    }
+  }
 
   if (isPositive && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("+")
+    addPinAlias("+")
   } else if (isNegative && component.ftype !== "simple_resistor") {
-    additionalPinLabels.push("-")
+    addPinAlias("-")
   }
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
-      additionalPinLabels.push(port_hint)
+      addPinAlias(port_hint)
     }
   }
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const additionalLabels = Array.from(additionalPinLabels.values())
+  return `${component.name} ${mainPinName}${additionalLabels.length > 0 ? ` (${additionalLabels.join(",")})` : ""}${displayValue}`
 }
