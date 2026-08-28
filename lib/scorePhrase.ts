@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingHighSpeedInterfaceWords = ["USB", "PCIE", "PCIe", "SATA"]
+
 export const scorePhrase = (phrase: string) => {
+  for (const word of digitBearingHighSpeedInterfaceWords) {
+    if (phrase.includes(word)) {
+      return 1.15
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
