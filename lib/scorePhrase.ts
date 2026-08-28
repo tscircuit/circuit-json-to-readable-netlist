@@ -31,11 +31,33 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const digitBearingWordQualityScore = {
+  FINGERPRINT: 1.35,
+  FINGER_DETECT: 1.35,
+  FINGER_DET: 1.35,
+  FP_IRQ: 1.3,
+  FP_INT: 1.3,
+  IMG_RDY: 1.25,
+  IMAGE_READY: 1.25,
+}
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
 export const scorePhrase = (phrase: string) => {
+  const upperPhrase = phrase.toUpperCase()
+
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (upperPhrase.includes(word)) {
+      return score
+    }
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
