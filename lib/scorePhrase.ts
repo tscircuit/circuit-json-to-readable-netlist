@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const bowlingPinsetterTokens = [
+  "PINSETTER",
+  "SWEEP_MOTOR",
+  "TABLE_HOME",
+  "BALL_RETURN",
+  "FOUL_LINE",
+  "LANE_SENSOR",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    bowlingPinsetterTokens.some((token) => normalizedPhrase.includes(token))
+  ) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
