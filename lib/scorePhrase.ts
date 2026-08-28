@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const characterLcdSignalPatterns = [
+  /^HD44780(?:[_-].*)?$/,
+  /^CHAR(?:ACTER)?[_-]?LCD(?:[_-].*)?$/,
+  /^LCD[_-]?(?:RS|RW|E|EN|ENABLE)\d*(?:[_-].*)?$/,
+  /^LCD[_-]?D[4-7]\d*(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Character LCD labels often include pin/control indexes, e.g. LCD_D4.
+  if (
+    characterLcdSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
