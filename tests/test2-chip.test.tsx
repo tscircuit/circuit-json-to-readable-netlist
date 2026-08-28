@@ -87,3 +87,59 @@ it("test2 chip", () => {
     "
   `)
 })
+
+it("keeps digit-bearing descriptive pin labels readable", () => {
+  const circuitJson = renderCircuit(
+    <board width="10mm" height="10mm" routingDisabled>
+      <chip
+        name="U2"
+        footprint="soic16"
+        manufacturerPartNumber="RP2040"
+        pinLabels={{
+          pin14: ["GPIO17"],
+          pin15: ["GPIO18"],
+        }}
+      />
+      <resistor resistance="10k" footprint="0402" name="R2" />
+
+      <trace from=".U2 .GPIO17" to=".R2 > .pin1" />
+    </board>,
+  )
+
+  expect(
+    convertCircuitJsonToReadableNetlist(circuitJson),
+  ).toMatchInlineSnapshot(`
+    "COMPONENTS:
+     - U2: RP2040, soic16
+     - R2: 10kΩ 0402 resistor
+
+    NET: U2_GPIO17
+      - U2 GPIO17
+      - R2 pin1
+
+
+    COMPONENT_PINS:
+    U2 (RP2040)
+    - pin1: NOT_CONNECTED
+    - pin2: NOT_CONNECTED
+    - pin3: NOT_CONNECTED
+    - pin4: NOT_CONNECTED
+    - pin5: NOT_CONNECTED
+    - pin6: NOT_CONNECTED
+    - pin7: NOT_CONNECTED
+    - pin8: NOT_CONNECTED
+    - pin9: NOT_CONNECTED
+    - pin10: NOT_CONNECTED
+    - pin11: NOT_CONNECTED
+    - pin12: NOT_CONNECTED
+    - pin13: NOT_CONNECTED
+    - pin14(GPIO17): NETS(U2_GPIO17)
+    - pin15(GPIO18): NOT_CONNECTED
+    - pin16: NOT_CONNECTED
+
+    R2 (10kΩ 0402)
+    - pin1(anode, pos, left): NETS(U2_GPIO17)
+    - pin2(cathode, neg, right): NOT_CONNECTED
+    "
+  `)
+})
