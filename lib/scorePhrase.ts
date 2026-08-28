@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const debugPortWords = ["SWDIO", "SWCLK", "JTMS", "JTCK", "JTDI", "JTDO"]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (debugPortWords.some((word) => normalizedPhrase.includes(word))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
