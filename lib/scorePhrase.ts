@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isVendingPaymentAlias = (phrase: string) => {
+  const normalized = phrase.toUpperCase()
+  return /(^|[_-])(MDB|CCTALK|CC_TALK|COIN|BILL|HOPPER|CASHLESS|VEND|VENDING|ESCROW|PAYOUT)([_-]|\d|$)/.test(
+    normalized,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isVendingPaymentAlias(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
