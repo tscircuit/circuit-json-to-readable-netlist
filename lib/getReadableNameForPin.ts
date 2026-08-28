@@ -5,6 +5,7 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import { getBestPinNameFromHints } from "./getBestPinNameFromHints"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -25,7 +26,6 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
-  // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
   )
@@ -33,8 +33,7 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName = getBestPinNameFromHints(port)
 
   const additionalPinLabels: string[] = []
 
@@ -46,6 +45,7 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (port_hint === String(port.pin_number)) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)

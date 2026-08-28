@@ -49,8 +49,8 @@ it("test2 chip", () => {
      - C1: 1nF 0402 capacitor
 
     NET: C1_pos
-      - R1 pin1
-      - C1 pin1 (+)
+      - R1 pos
+      - C1 pos (+)
 
     NET: GND
       - U1 GPIO1 (SCL)
@@ -59,7 +59,7 @@ it("test2 chip", () => {
 
     NET: U1_SDA
       - U1 GPIO2 (SDA)
-      - R1 pin2
+      - R1 neg
 
 
     EMPTY NET PINS:
@@ -68,22 +68,22 @@ it("test2 chip", () => {
 
     COMPONENT_PINS:
     U1 (ATMEGA328P)
-    - pin1(GND): NETS(GND)
-    - pin2(AGND): NETS(GND)
-    - pin3(GPIO1, SCL): NETS(GND)
-    - pin4(GPIO2, SDA): NETS(U1_SDA)
-    - pin5(GPIO3): NETS(GPIO4)
-    - pin6(GPIO4, UART_TX): NOT_CONNECTED
-    - pin7(GPIO5, UART_RX): NOT_CONNECTED
-    - pin8(VDD): NETS(V5)
+    - GND(pin1): NETS(GND)
+    - AGND(pin2): NETS(GND)
+    - GPIO1(SCL, pin3): NETS(GND)
+    - GPIO2(SDA, pin4): NETS(U1_SDA)
+    - GPIO3(pin5): NETS(GPIO4)
+    - GPIO4(UART_TX, pin6): NOT_CONNECTED
+    - GPIO5(UART_RX, pin7): NOT_CONNECTED
+    - VDD(pin8): NETS(V5)
 
     R1 (1kΩ 0402)
-    - pin1(anode, pos, left): NETS(C1_pos)
-    - pin2(cathode, neg, right): NETS(U1_SDA)
+    - pos(anode, left): NETS(C1_pos)
+    - neg(cathode, right): NETS(U1_SDA)
 
     C1 (1nF 0402)
-    - pin1(pos, anode, left): NETS(C1_pos)
-    - pin2(neg, cathode, right): NOT_CONNECTED
+    - pos(anode, left): NETS(C1_pos)
+    - neg(cathode, right): NOT_CONNECTED
     "
   `)
 })
