@@ -57,3 +57,6 @@ NET: GPIO0
   - R3 Pin2            (10 kΩ to +3V3)
   - S2 Pin1            (Optional switch/jumper to GND for flashing)
 ```
+
+
+<!-- VTT SOVEREIGN ENGINE: BOUNTY HARVEST FOR ISSUE #4 -->
