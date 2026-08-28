@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const substationAutomationAliasPatterns = [
+  /\bDNP3_?(?:TX|RX|RTS|CTS|DE|RE|DATA|P|N)?\d?\b/i,
+  /\bIEC_?61850_?(?:GOOSE|MMS|SV|SMV|TRIP|PUBLISH|SUBSCRIBE)\d?\b/i,
+  /\bGOOSE_?(?:TX|RX|TRIP|PUBLISH|SUBSCRIBE|DATA)\d?\b/i,
+  /\bSAMPLED_?VALUE_?(?:TX|RX|DATA)?\d?\b/i,
+  /\bSMV_?(?:TX|RX|DATA)\d?\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (
+    substationAutomationAliasPatterns.some((pattern) => pattern.test(phrase))
+  ) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
