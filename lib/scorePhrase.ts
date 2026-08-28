@@ -35,7 +35,23 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitalCarrierFramerAliasPatterns = [
+  /^(?:DS[13]|T[13]|E[13])_(?:RX|TX|RCLK|TCLK|CLK|LOS|LOF|AIS|RAI|SYNC|FRAME|FRAMER)(?:_|$|\d)/,
+  /^FRAMER_(?:CLK|SYNC|RESET|INT|LOS|LOF|AIS|RAI)(?:_|$|\d)/,
+  /^(?:B8ZS|HDB3|AMI|HDLC_FLAG)(?:_|$|\d)/,
+  /^HDLC_(?:FLAG|CLK|RX|TX)(?:_|$|\d)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    digitalCarrierFramerAliasPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.15
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
