@@ -8,6 +8,10 @@ import type {
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  normalizeReadableLabel,
+  normalizeReadableLabels,
+} from "./normalizeReadableLabel"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -63,7 +67,7 @@ export const convertCircuitJsonToReadableNetlist = (
     // Get net name
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
 
-    let netName = net?.name
+    let netName = normalizeReadableLabel(net?.name)
 
     if (!netName) {
       // Generate a net name from the connected port names
@@ -125,7 +129,7 @@ export const convertCircuitJsonToReadableNetlist = (
     const portIds = connectedIds.filter((id) => id.startsWith("source_port"))
     if (portIds.length === 0) continue
     const net = source_nets.find((n) => connectedIds.includes(n.source_net_id))
-    let netName = net?.name
+    let netName = normalizeReadableLabel(net?.name)
     if (!netName) {
       netName = generateNetName({ circuitJson, connectedIds })
     }
@@ -156,13 +160,16 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
+        const portName = normalizeReadableLabel(port.name)
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          port.pin_number !== undefined
+            ? `pin${port.pin_number}`
+            : (portName ?? "unnamed_pin")
         const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
+        if (portName && portName !== mainPin) aliases.push(portName)
+        for (const hint of normalizeReadableLabels(port.port_hints ?? [])) {
           if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
+          if (hint !== mainPin && hint !== portName) aliases.push(hint)
         }
         const aliasPart =
           aliases.length > 0

@@ -5,6 +5,10 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import {
+  normalizeReadableLabel,
+  normalizeReadableLabels,
+} from "./normalizeReadableLabel"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -26,15 +30,19 @@ export const getReadableNameForPin = ({
   if (!component) return ""
 
   // Determine pin polarity from hints
-  const isPositive = port.port_hints?.some((hint) =>
+  const portHints = normalizeReadableLabels(port.port_hints ?? [])
+
+  const isPositive = portHints.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
   )
-  const isNegative = port.port_hints?.some((hint) =>
+  const isNegative = portHints.some((hint) =>
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    normalizeReadableLabel(port.name) ??
+    (port.pin_number !== undefined ? `Pin${port.pin_number}` : "unnamed_pin")
 
   const additionalPinLabels: string[] = []
 
@@ -44,7 +52,7 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
+  for (const port_hint of portHints) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
