@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const chassisShieldGroundLabelPattern =
+  /^(?:(?:CHASSIS|SHIELD|SHLD|FRAME|EARTH|PE|FG)(?:[_-]?(?:GND|GROUND|RTN|REF))?|CASE[_-]?(?:GND|GROUND|SHIELD)|(?:GND|GROUND|EARTH)[_-]?(?:CHASSIS|SHIELD|SHLD|FRAME|PE|FG|CASE))\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (chassisShieldGroundLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
