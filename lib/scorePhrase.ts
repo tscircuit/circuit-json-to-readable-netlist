@@ -35,7 +35,25 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const satcomModemSignalPatterns = [
+  /^IRIDIUM(?:[_-].*)?$/,
+  /^ROCKBLOCK(?:[_-].*)?$/,
+  /^SWARM(?:[_-].*)?$/,
+  /^ORBCOMM(?:[_-].*)?$/,
+  /^GLOBALSTAR(?:[_-].*)?$/,
+  /^SAT(?:COM|MODEM)(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // SATCOM modem labels often include link or status channel indexes.
+  if (
+    satcomModemSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
