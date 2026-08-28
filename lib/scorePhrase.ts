@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const appleDesktopBusPinPattern =
+  /^(?:ADB_(?:DATA|PWR|POWER|RESET|ATTENTION|ATTN|SRQ)\d*|MAC_ADB_[A-Z0-9]+|APPLE_DESKTOP_BUS\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (appleDesktopBusPinPattern.test(phrase)) {
+    return 1.3
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
