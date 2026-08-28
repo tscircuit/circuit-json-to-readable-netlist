@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const dmxDaliLightingSignalPatterns = [
+  /^DMX(?:512)?(?:[_-].*)?$/,
+  /^RDM(?:[_-].*)?$/,
+  /^DALI(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Lighting-control labels often include channel or differential pair indexes.
+  if (
+    dmxDaliLightingSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
