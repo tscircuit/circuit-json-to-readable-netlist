@@ -43,6 +43,10 @@ export const generateNetName = ({
 
   const all_source_nets = su(circuitJson).source_net.list()
   const all_source_traces = su(circuitJson).source_trace.list()
+  const all_source_groups = su(circuitJson).source_group.list()
+  const sourceGroupNameById = new Map(
+    all_source_groups.map((group) => [group.source_group_id, group.name]),
+  )
 
   const ports = all_source_ports.filter((p) =>
     connectedIds.includes(p.source_port_id),
@@ -53,6 +57,14 @@ export const generateNetName = ({
   const traces = all_source_traces.filter((t) =>
     connectedIds.includes(t.source_trace_id),
   )
+  const netNameCandidates = nets.flatMap((n): string[] =>
+    [
+      n.name,
+      ...(n.member_source_group_ids ?? []).map((sourceGroupId) =>
+        sourceGroupNameById.get(sourceGroupId),
+      ),
+    ].filter((name): name is string => Boolean(name?.trim())),
+  )
 
   const possibleNames = ports
     .flatMap((p) =>
@@ -60,7 +72,11 @@ export const generateNetName = ({
         new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
       ),
     )
-    .concat(nets.map((n) => n.name))
+    .concat(netNameCandidates)
+    .filter((name): name is string => Boolean(name?.trim()))
+    .map((name) => name.trim())
+
+  if (possibleNames.length === 0) return ""
 
   const phrases = possibleNames.map((name) => ({
     name,
