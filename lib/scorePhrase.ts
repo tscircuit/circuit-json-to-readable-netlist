@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isBacklightPinLabel = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /(^|[_-])(BACKLIGHT|BL|WLED|LEDDRV|LED_DRIVER|LP855|TPS611)([_-]|\d|$)/.test(
+      normalizedPhrase,
+    ) || /^(LEDA|LEDK|ILED|LEDSTRING)\d*$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isBacklightPinLabel(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
