@@ -33,7 +33,7 @@ export const convertCircuitJsonToReadableNetlist = (
       source_component_id: component.source_component_id,
     })
 
-    const footprint = cadComponent?.footprinter_string
+    const footprint = cadComponent?.footprinter_string ?? null
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance}${
@@ -45,9 +45,9 @@ export const convertCircuitJsonToReadableNetlist = (
       } capacitor`
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
-      componentDescription = [manufacturerPartNumber, footprint]
-        .filter(Boolean)
-        .join(", ")
+      componentDescription = footprint
+        ? `${manufacturerPartNumber}, ${footprint}`
+        : `${manufacturerPartNumber}`
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
