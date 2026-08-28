@@ -1,6 +1,7 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import { normalizeReadableLabel } from "./readable-labels"
 import { scorePhrase } from "./scorePhrase"
 
 // Order components by how much better they are as a reference (chips are
@@ -57,10 +58,18 @@ export const generateNetName = ({
   const possibleNames = ports
     .flatMap((p) =>
       Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
+        new Set(
+          [p.name, ...(p.port_hints ?? [])]
+            .map(normalizeReadableLabel)
+            .filter((name): name is string => Boolean(name)),
+        ),
       ),
     )
-    .concat(nets.map((n) => n.name))
+    .concat(
+      nets
+        .map((n) => normalizeReadableLabel(n.name))
+        .filter((name): name is string => Boolean(name)),
+    )
 
   const phrases = possibleNames.map((name) => ({
     name,
