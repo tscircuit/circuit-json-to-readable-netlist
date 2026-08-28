@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const heavyVehicleNetworkPinPattern =
+  /^(?:J1939_(?:CANH|CANL|TX|RX|WAKE)\d*|J1708_(?:A|B|TX|RX)\d*|J1587_(?:TX|RX|DATA|WAKE)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (heavyVehicleNetworkPinPattern.test(phrase)) {
+    return 1.3
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
