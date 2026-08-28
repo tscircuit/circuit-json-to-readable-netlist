@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const highSpeedFabricLinkPattern =
+  /\b(?:SRIO|RAPIDIO|AURORA|INTERLAKEN|ILKN)(?:[_-]?(?:TXP|TXN|RXP|RXN|TX|RX|LANE|SYNC|REFCLK|CLK|VALID|READY|ERR|RESET|RST)\d*|[_-]?\d+)?\b/i
+
 export const scorePhrase = (phrase: string) => {
+  if (highSpeedFabricLinkPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
