@@ -35,7 +35,33 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pcrMicrofluidicInstrumentationWords = [
+  "PCR",
+  "QPCR",
+  "THERMOCYCLER",
+  "MICROFLUIDIC",
+  "LAB_ON_CHIP",
+  "ELECTROPHORESIS",
+  "GEL_DOC",
+  "SPECTROPHOTOMETER",
+]
+
+const scorePcrMicrofluidicInstrumentationPhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    pcrMicrofluidicInstrumentationWords.some((word) =>
+      normalizedPhrase.includes(word),
+    )
+  ) {
+    return 1.2
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const pcrMicrofluidicScore = scorePcrMicrofluidicInstrumentationPhrase(phrase)
+  if (pcrMicrofluidicScore) {
+    return pcrMicrofluidicScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
