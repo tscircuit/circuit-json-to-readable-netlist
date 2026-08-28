@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const parallelPrinterPinPattern =
+  /^(?:(?:CENTRONICS|LPT|PRINTER|PARPORT)_(?:STROBE|ACK|BUSY|PAPER|SELECT|INIT|ERROR|DATA)\d*|(?:AUTOFEED|AUTO_FEED)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (parallelPrinterPinPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
