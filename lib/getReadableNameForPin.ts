@@ -7,6 +7,16 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isTrivialPinHint = (hint: string, mainPinName: string) => {
+  const normalizedHint = hint.toLowerCase()
+  return (
+    normalizedHint === mainPinName.toLowerCase() ||
+    normalizedHint === mainPinName.replace(/^pin/i, "").toLowerCase() ||
+    /^pin\d+$/i.test(hint) ||
+    /^\d+$/.test(hint)
+  )
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -45,9 +55,9 @@ export const getReadableNameForPin = ({
   }
 
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
+    if (isTrivialPinHint(port_hint, mainPinName)) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score > 1 || component.ftype === "simple_chip") {
       additionalPinLabels.push(port_hint)
     }
   }
