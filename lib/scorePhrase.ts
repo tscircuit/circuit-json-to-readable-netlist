@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const contactlessReaderAliases = [
+  "NFC_IRQ",
+  "NFC_FIELD",
+  "NFC_CLK",
+  "NFC_TX",
+  "NFC_RX",
+  "RFID_IRQ",
+  "RFID_FIELD",
+  "RFID_CLK",
+  "RFID_TX",
+  "RFID_RX",
+  "ISO14443",
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (contactlessReaderAliases.some((alias) => phrase.includes(alias))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
