@@ -12,12 +12,19 @@ import { getReadableNameForPin } from "./getReadableNameForPin"
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
+  const source_components = su(circuitJson).source_component.list()
   const connectivityMap = getFullConnectivityMapFromCircuitJson(
     circuitJson.filter((e) => e.type.startsWith("source_")),
   )
+  for (const component of source_components) {
+    if ("internally_connected_source_port_ids" in component) {
+      connectivityMap.addConnections(
+        component.internally_connected_source_port_ids ?? [],
+      )
+    }
+  }
   const netMap = connectivityMap.netMap
   const source_ports = su(circuitJson).source_port.list()
-  const source_components = su(circuitJson).source_component.list()
   const source_nets = su(circuitJson).source_net.list()
   const source_traces = su(circuitJson).source_trace.list()
   // Build readable netlist
