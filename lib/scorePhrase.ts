@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const theaterStageTokens = [
+  "CURTAIN_MOTOR",
+  "FLY_BAR",
+  "HOUSE_LIGHT",
+  "ORCHESTRA_PIT",
+  "STAGE_LIFT",
+  "PROSCENIUM",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (theaterStageTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
