@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreBarometricSensorPhrase = (phrase: string) => {
+  if (
+    /^(BARO|BMP|BME|LPS|ALT)(?:_|$)/.test(phrase) ||
+    /(?:^|_)(PRESSURE|ALTIMETER)(?:_|$)/.test(phrase)
+  ) {
+    return 1.15
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const barometricSensorScore = scoreBarometricSensorPhrase(phrase)
+  if (barometricSensorScore) {
+    return barometricSensorScore
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
