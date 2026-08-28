@@ -13,6 +13,12 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  SPK_OUT: 1.15,
+  HPOUT: 1.15,
+  LINEOUT: 1.15,
+  HP_DET: 1.15,
+  MIC_BIAS: 1.15,
+  CLASSD: 1.1,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -36,6 +42,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const [word, score] of wordQualityScoreEntries) {
+    if (
+      ["SPK_OUT", "HPOUT", "LINEOUT", "HP_DET", "MIC_BIAS", "CLASSD"].includes(
+        word,
+      ) &&
+      normalizedPhrase.includes(word)
+    ) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
