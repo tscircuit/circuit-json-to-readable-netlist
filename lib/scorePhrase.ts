@@ -36,13 +36,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const cleanedPhrase = phrase?.trim()
+  if (!cleanedPhrase) return 0
+  const upperPhrase = cleanedPhrase.toUpperCase()
+
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (upperPhrase.includes(word.toUpperCase())) {
       return score
     }
   }
+
+  if (cleanedPhrase.match(/\d+/)) {
+    return 0.5
+  }
+
   return 1
 }
