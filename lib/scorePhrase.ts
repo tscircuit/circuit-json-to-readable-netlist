@@ -35,7 +35,25 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const timeSyncSignalTokens = [
+  "1PPS",
+  "GNSS_PPS",
+  "GPS_PPS",
+  "PPS_IN",
+  "PPS_OUT",
+  "PTP_SYNC",
+  "IEEE1588",
+  "TIMEPULSE",
+  "TIME_PULSE",
+  "CLKOUT",
+  "CLK_OUT",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (timeSyncSignalTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
