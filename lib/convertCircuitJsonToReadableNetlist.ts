@@ -48,6 +48,14 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+    } else if (component.ftype === "simple_switch") {
+      componentDescription = [component.display_value, footprint, "switch"]
+        .filter(Boolean)
+        .join(" ")
+    } else if (component.ftype === "simple_push_button") {
+      componentDescription = [component.display_value, footprint, "push button"]
+        .filter(Boolean)
+        .join(" ")
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -148,6 +156,22 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_switch") {
+        header = `${component.name} (${[
+          component.display_value,
+          footprint,
+          "switch",
+        ]
+          .filter(Boolean)
+          .join(" ")})`
+      } else if (component.ftype === "simple_push_button") {
+        header = `${component.name} (${[
+          component.display_value,
+          footprint,
+          "push button",
+        ]
+          .filter(Boolean)
+          .join(" ")})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
