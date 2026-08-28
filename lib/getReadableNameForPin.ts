@@ -34,7 +34,11 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName = port.name
+    ? port.name
+    : port.pin_number !== undefined
+      ? `Pin${port.pin_number}`
+      : "unnamed"
 
   const additionalPinLabels: string[] = []
 
@@ -44,16 +48,56 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
+  const polaritiesAndDirections = new Set([
+    "anode",
+    "cathode",
+    "pos",
+    "neg",
+    "positive",
+    "negative",
+    "left",
+    "right",
+    "top",
+    "bottom",
+  ])
+
   for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
+    if (!port_hint) continue
+    const normalizedHint = port_hint.toLowerCase()
+
+    // Skip if hint is exactly equal to mainPinName (case insensitive)
+    if (normalizedHint === mainPinName.toLowerCase()) continue
+
+    // Skip if hint is just the pin number
+    if (
+      port.pin_number !== undefined &&
+      normalizedHint === String(port.pin_number)
+    )
+      continue
+
+    // Skip if hint is generic "pin" + pin number
+    if (
+      port.pin_number !== undefined &&
+      normalizedHint === `pin${port.pin_number}`
+    )
+      continue
+
+    // Skip if hint is a polarity or direction
+    if (polaritiesAndDirections.has(normalizedHint)) continue
+
+    // Skip if hint is just a number
+    if (/^\d+$/.test(port_hint)) continue
+
+    // Skip duplicates
+    if (additionalPinLabels.includes(port_hint)) continue
+
+    additionalPinLabels.push(port_hint)
   }
 
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${component.name} ${mainPinName}${
+    additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""
+  }${displayValue}`
 }

@@ -9,6 +9,28 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const formatVoltage = (voltage?: number) =>
+  voltage !== undefined ? `${voltage}V` : undefined
+
+const getMosfetDescription = (component: {
+  channel_type?: string
+  mosfet_mode?: string
+}) =>
+  [
+    component.channel_type
+      ? `${component.channel_type.toUpperCase()}-channel`
+      : undefined,
+    component.mosfet_mode,
+    "MOSFET",
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+const getTransistorDescription = (component: { transistor_type?: string }) =>
+  [component.transistor_type?.toUpperCase(), "transistor"]
+    .filter(Boolean)
+    .join(" ")
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -46,6 +68,22 @@ export const convertCircuitJsonToReadableNetlist = (
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
+        .filter(Boolean)
+        .join(", ")
+    } else if (component.ftype === "simple_power_source") {
+      componentDescription = [
+        component.display_value ?? formatVoltage(component.voltage),
+        footprint,
+        "power source",
+      ]
+        .filter(Boolean)
+        .join(" ")
+    } else if (component.ftype === "simple_mosfet") {
+      componentDescription = [getMosfetDescription(component), footprint]
+        .filter(Boolean)
+        .join(", ")
+    } else if (component.ftype === "simple_transistor") {
+      componentDescription = [getTransistorDescription(component), footprint]
         .filter(Boolean)
         .join(", ")
     } else {
@@ -145,11 +183,25 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const parts = [component.display_resistance, footprint].filter(Boolean)
+        header = `${component.name} (${parts.join(" ")})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const parts = [component.display_capacitance, footprint].filter(Boolean)
+        header = `${component.name} (${parts.join(" ")})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (component.ftype === "simple_power_source") {
+        const powerSourceDescription = [
+          component.display_value ?? formatVoltage(component.voltage),
+          footprint,
+        ]
+          .filter(Boolean)
+          .join(" ")
+        header = `${component.name} (${powerSourceDescription})`
+      } else if (component.ftype === "simple_mosfet") {
+        header = `${component.name} (${getMosfetDescription(component)})`
+      } else if (component.ftype === "simple_transistor") {
+        header = `${component.name} (${getTransistorDescription(component)})`
       }
       netlist.push(header)
       const ports = source_ports
@@ -157,7 +209,9 @@ export const convertCircuitJsonToReadableNetlist = (
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          port.pin_number !== undefined
+            ? `pin${port.pin_number}`
+            : port.name || "unnamed"
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
