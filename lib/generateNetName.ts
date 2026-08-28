@@ -61,6 +61,11 @@ export const generateNetName = ({
       ),
     )
     .concat(nets.map((n) => n.name))
+    .filter(Boolean)
+
+  if (possibleNames.length === 0) {
+    return "unnamed_net"
+  }
 
   const phrases = possibleNames.map((name) => ({
     name,
