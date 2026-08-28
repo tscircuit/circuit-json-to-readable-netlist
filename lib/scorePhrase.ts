@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isGpibInstrumentBusLabel = (phrase: string) =>
+  /(^|_)(GPIB|IEEE488|HPIB)(_|$)/i.test(phrase) || /^HP[-_]?IB_/i.test(phrase)
+
 export const scorePhrase = (phrase: string) => {
+  if (isGpibInstrumentBusLabel(phrase)) {
+    return 1.18
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
