@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const absoluteEncoderAliasPattern =
+  /^(?:BISS(?:_|[0-9])|ENDAT(?:_|[0-9])|HIPERFACE(?:_|[0-9])|SSI(?:_|[0-9])|ABS_ENCODER(?:_|[0-9]))/
+
 export const scorePhrase = (phrase: string) => {
+  if (absoluteEncoderAliasPattern.test(phrase.toUpperCase())) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
