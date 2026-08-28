@@ -8,6 +8,25 @@ import type {
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import { scorePhrase } from "./scorePhrase"
+
+const getPortPinNumberName = (port: SourcePort) =>
+  port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+
+const getReadablePortName = (port: SourcePort) => {
+  const pinNumberName = getPortPinNumberName(port)
+  const aliases = [port.name, ...(port.port_hints ?? [])].filter(
+    (label): label is string => Boolean(label),
+  )
+  const usefulAlias = aliases.find(
+    (label) => label !== pinNumberName && scorePhrase(label) > 1,
+  )
+
+  return usefulAlias ?? port.name ?? pinNumberName ?? ""
+}
+
+const getComponentPinsHeaderDetail = (...parts: Array<string | undefined>) =>
+  parts.filter(Boolean).join(" ")
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -145,9 +164,17 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const detail = getComponentPinsHeaderDetail(
+          component.display_resistance,
+          footprint,
+        )
+        header = detail ? `${component.name} (${detail})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const detail = getComponentPinsHeaderDetail(
+          component.display_capacitance,
+          footprint,
+        )
+        header = detail ? `${component.name} (${detail})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,14 +183,17 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
+        const mainPin = getReadablePortName(port)
+        const pinNumberName = getPortPinNumberName(port)
+        const aliases = [port.name].filter(
+          (alias): alias is string => Boolean(alias) && alias !== mainPin,
+        )
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
+          if (hint === pinNumberName) continue
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
         }
+        if (pinNumberName && pinNumberName !== mainPin) aliases.push(pinNumberName)
         const aliasPart =
           aliases.length > 0
             ? `(${Array.from(new Set(aliases)).join(", ")})`
