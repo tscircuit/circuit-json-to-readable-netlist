@@ -9,13 +9,60 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const getAugmentedNetMap = ({
+  netMap,
+  circuitJson,
+}: {
+  netMap: Record<string, string[]>
+  circuitJson: AnyCircuitElement[]
+}): Record<string, string[]> => {
+  const sourcePorts = su(circuitJson).source_port.list()
+  const sourcePortIds = new Set(sourcePorts.map((p) => p.source_port_id))
+  const netSets = Object.values(netMap).map((ids) => new Set(ids))
+  let internalNetIndex = 0
+
+  for (const component of su(circuitJson).source_component.list()) {
+    for (const internalGroup of component.internally_connected_source_port_ids ??
+      []) {
+      const internalPortIds = internalGroup.filter((id) =>
+        sourcePortIds.has(id),
+      )
+      if (internalPortIds.length <= 1) continue
+
+      const overlappingSets = netSets.filter((set) =>
+        internalPortIds.some((id) => set.has(id)),
+      )
+
+      if (overlappingSets.length === 0) {
+        netSets.push(new Set(internalPortIds))
+        continue
+      }
+
+      const mergedSet = overlappingSets[0]
+      for (const id of internalPortIds) mergedSet.add(id)
+
+      for (const set of overlappingSets.slice(1)) {
+        for (const id of set) mergedSet.add(id)
+        netSets.splice(netSets.indexOf(set), 1)
+      }
+    }
+  }
+
+  return Object.fromEntries(
+    netSets.map((set) => [`net${internalNetIndex++}`, Array.from(set)]),
+  )
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
   const connectivityMap = getFullConnectivityMapFromCircuitJson(
     circuitJson.filter((e) => e.type.startsWith("source_")),
   )
-  const netMap = connectivityMap.netMap
+  const netMap = getAugmentedNetMap({
+    netMap: connectivityMap.netMap,
+    circuitJson,
+  })
   const source_ports = su(circuitJson).source_port.list()
   const source_components = su(circuitJson).source_component.list()
   const source_nets = su(circuitJson).source_net.list()
