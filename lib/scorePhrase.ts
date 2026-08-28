@@ -35,7 +35,18 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const rfDetectorAliasPatterns = [
+  /RSSI/i,
+  /RF_?DET/i,
+  /LOG_?DET/i,
+  /PWR_?DET/i,
+  /POWER_?DET/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (rfDetectorAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
