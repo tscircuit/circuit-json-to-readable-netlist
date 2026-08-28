@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const vibrationSensorLabelPattern =
+  /^((GEOPHONE|KNOCK|VIB|VIBRATION)[_-]?(P|N|SENSE|SENSOR|OUT|IN)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (vibrationSensorLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
