@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const oneWireAliasPatterns = [
+  /(^|_)1WIRE(_|$)/i,
+  /(^|_)ONEWIRE(_|$)/i,
+  /(^|_)ONE_WIRE(_|$)/i,
+  /(^|_)OWIO(_|$)/i,
+  /(^|_)OW_DQ\d*(_|$)/i,
+  /(^|_)ONEWIRE_DQ\d*(_|$)/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const pattern of oneWireAliasPatterns) {
+    if (pattern.test(phrase)) {
+      return 1.2
+    }
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
