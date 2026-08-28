@@ -1,13 +1,11 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  getReadableNameForPin,
+  getReadablePinLabel,
+} from "./getReadableNameForPin"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -156,22 +154,10 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
-        }
-        const aliasPart =
-          aliases.length > 0
-            ? `(${Array.from(new Set(aliases)).join(", ")})`
-            : ""
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =
           nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
-        netlist.push(`- ${mainPin}${aliasPart}: ${netsPart}`)
+        netlist.push(`- ${getReadablePinLabel(port)}: ${netsPart}`)
       }
       netlist.push("")
     }
