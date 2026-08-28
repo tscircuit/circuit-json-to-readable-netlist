@@ -7,6 +7,28 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const genericPinHints = new Set([
+  "pin",
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "pos",
+  "positive",
+  "neg",
+  "negative",
+  "anode",
+  "cathode",
+])
+
+const isMeaningfulPinLabel = (hint: string) => {
+  const normalizedHint = hint.trim()
+  if (!normalizedHint) return false
+  if (genericPinHints.has(normalizedHint.toLowerCase())) return false
+  if (/^pin\d+$/i.test(normalizedHint)) return false
+  return /[a-z]/i.test(normalizedHint)
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +56,9 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    port.name ??
+    (port.pin_number !== undefined ? `Pin${port.pin_number}` : source_port_id)
 
   const additionalPinLabels: string[] = []
 
@@ -47,7 +71,7 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score > 1 || isMeaningfulPinLabel(port_hint)) {
       additionalPinLabels.push(port_hint)
     }
   }
