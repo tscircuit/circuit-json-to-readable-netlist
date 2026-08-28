@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const waterQualityProbeLabelPattern =
+  /^(?:(?:PH|ORP|EC|TDS|SALINITY|COND|CONDUCTIVITY|DO)(?:[_-]?(?:ELECTRODE|PROBE|SENSE|SENSOR|IN|OUT|SIG|SIGNAL|READY|ALERT|TEMP))?)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (waterQualityProbeLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
