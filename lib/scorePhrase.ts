@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingPhraseScores = [
+  {
+    pattern:
+      /(^|[_\-\s])(?:WIFI|WLAN|ZIGBEE|BLE|BLUETOOTH|RFID|NFC)(?:[_\-\s]?(?:IRQ|INT|RESET|RST|HOST_WAKE|DEV_WAKE|WAKE|ENABLE|EN|BOOT|FIELD|PAIR|STATUS|COEX|REQ|GRANT|TX|RX|DIO|BUSY|CS|SLEEP))*\d*(?=$|[_\-\s])/,
+    score: 1.18,
+  },
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const { pattern, score } of digitBearingPhraseScores) {
+    if (pattern.test(normalizedPhrase)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
