@@ -31,11 +31,40 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const digitBearingPhraseScores = [
+  {
+    pattern:
+      /(^|[_\-\s])LIN(?:BUS)?(?:[_\-\s]?(?:RX|TX|EN|WAKE|SLP|NSLP|INH|FAULT))?\d*(?=$|[_\-\s])/,
+    score: 1.18,
+  },
+  {
+    pattern:
+      /(^|[_\-\s])(?:MIPI(?:[_\-\s]?(?:DSI|CSI))?|DSI|CSI|D[\-\s]?PHY)(?:[_\-\s]?(?:D|DATA|LANE|CLK|CLOCK)\d*)?(?:[_\-\s]?[PN])?\d*(?=$|[_\-\s])/,
+    score: 1.19,
+  },
+  {
+    pattern:
+      /(^|[_\-\s])(?:PMBUS|SMBUS|SMBALERT|VRM|VID)(?:[_\-\s]?(?:SCL|SDA|ALERT|CTRL|EN|PGOOD|FAULT|VID|VOUT|IOUT))?\d*(?=$|[_\-\s])/,
+    score: 1.19,
+  },
+  {
+    pattern:
+      /(^|[_\-\s])(?:JTAG|SWD|SWDIO|SWCLK|TMS|TCK|TDI|TDO|TRST|NTRST|NJTRST)(?:[_\-\s]?(?:TMS|TCK|TDI|TDO|TRST|SWDIO|SWCLK|SWO|RST))?\d*(?=$|[_\-\s])/,
+    score: 1.19,
+  },
+]
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const { pattern, score } of digitBearingPhraseScores) {
+    if (pattern.test(normalizedPhrase)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
