@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const highVoltageDisplayLabelPattern =
+  /^(?:(?:NIXIE|NEON)(?:[_-]?(?:A|K|ANODE|CATHODE|COM|COMMON|GRID|SEG|DIGIT|LAMP|HV|BIAS))?|VFD(?:[_-]?(?:GRID|SEG|SEGMENT|ANODE|CATHODE|FIL|FILAMENT|COM|COMMON|DIGIT|HV|BIAS))?)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (highVoltageDisplayLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
