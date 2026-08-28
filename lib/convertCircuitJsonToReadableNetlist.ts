@@ -48,6 +48,9 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+      if (!componentDescription.trim()) {
+        componentDescription = component.type
+      }
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
