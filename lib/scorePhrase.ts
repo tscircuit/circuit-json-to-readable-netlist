@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const thunderboltLabelPattern =
+  /^(TBT|THUNDERBOLT)[_-]?(TXP|TXN|RXP|RXN|TX_P|TX_N|RX_P|RX_N|HPD|AUXP|AUXN|AUX_P|AUX_N)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (thunderboltLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
