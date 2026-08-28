@@ -48,6 +48,8 @@ export const convertCircuitJsonToReadableNetlist = (
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
+    } else if (component.ftype === "simple_ground") {
+      componentDescription = "ground"
     } else {
       componentDescription = [component.name, component.type]
         .filter(Boolean)
@@ -148,6 +150,8 @@ export const convertCircuitJsonToReadableNetlist = (
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
+      } else if (component.ftype === "simple_ground") {
+        header = `${component.name} (ground)`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
