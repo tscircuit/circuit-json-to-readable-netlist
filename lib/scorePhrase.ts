@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cxpiBodyBusSignalPatterns = [
+  /^CXPI(?:[_-]?(?:BUS|TX|RX|WAKE|SLP|SLEEP|FAULT|EN)\d*)?(?:[_-].*)?$/,
+  /^CLOCK[_-]?EXTENSION[_-]?PERIPHERAL(?:[_-].*)?$/,
+  /^BODY[_-]?BUS(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // CXPI body-bus labels often carry channel or control indexes.
+  if (
+    cxpiBodyBusSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
