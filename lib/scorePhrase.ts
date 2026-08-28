@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isDdrSdramSramAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return /^(DDR\d*|LPDDR\d*|SDRAM|DRAM|SRAM)_(DQ|DQS|DQM|DM|A|BA|CK|CLK|CKE|CS|RAS|CAS|WE|OE|ODT|RESET)(?:[_-]?[PN])?\d*$/.test(
+    normalizedPhrase,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isDdrSdramSramAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
