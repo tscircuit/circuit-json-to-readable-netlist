@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const heaterAliasPattern =
+  /(?:^|_)(?:HEATER|HEAT|BED_HEATER|HOTEND|HEATING|RESISTIVE_LOAD)(?:_|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (heaterAliasPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
