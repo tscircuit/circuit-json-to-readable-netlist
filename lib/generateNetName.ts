@@ -1,5 +1,6 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
+import { getReadableComponentName } from "./getReadableComponentName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 import { scorePhrase } from "./scorePhrase"
 
@@ -77,5 +78,12 @@ export const generateNetName = ({
   const componentWithBestPort = all_source_components.find(
     (c) => c.source_component_id === bestPort?.source_component_id,
   )
-  return [componentWithBestPort?.name, bestPortName].filter(Boolean).join("_")
+  return [
+    componentWithBestPort
+      ? getReadableComponentName(componentWithBestPort)
+      : undefined,
+    bestPortName,
+  ]
+    .filter(Boolean)
+    .join("_")
 }

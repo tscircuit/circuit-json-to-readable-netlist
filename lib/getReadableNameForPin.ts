@@ -5,6 +5,7 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import { getReadableComponentName } from "./getReadableComponentName"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -24,6 +25,7 @@ export const getReadableNameForPin = ({
     (c) => c.source_component_id === port.source_component_id,
   )
   if (!component) return ""
+  const componentName = getReadableComponentName(component)
 
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
@@ -55,5 +57,5 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${componentName} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
