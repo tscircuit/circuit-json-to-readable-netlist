@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isKeyMatrixAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /^(KEY|KBD|KEYPAD|MATRIX)[_-]?(ROW|COL|COLUMN)\d*$/.test(
+      normalizedPhrase,
+    ) || /^(ROW|COL|COLUMN)\d+$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isKeyMatrixAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
