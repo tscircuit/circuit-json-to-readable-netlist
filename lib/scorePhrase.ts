@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const voltageReferenceAliasPattern =
+  /(^|_)(VREFP|VREFN|VREF|REFP|REFN|REFIN|REFOUT|REFCLK|BIAS|VBIAS|IBIAS)(\d|_|$)/
+
 export const scorePhrase = (phrase: string) => {
+  if (voltageReferenceAliasPattern.test(phrase.toUpperCase())) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
