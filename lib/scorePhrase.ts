@@ -15,7 +15,11 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  ADC: 1.15,
+  UART: 1.15,
+  SPI: 1.15,
   GPIO: 1.1,
+  GP: 1.1,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -36,13 +40,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const normalizedPhrase = phrase.toUpperCase()
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (normalizedPhrase.includes(word.toUpperCase())) {
       return score
     }
   }
+  if (phrase.match(/\d+/)) return 0.5
   return 1
 }
