@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cashDrawerTokens = [
+  "CASH_DRAWER",
+  "DRAWER_KICK",
+  "DRAWER_OPEN",
+  "RJ12_KICK",
+  "KICK_SOLENOID",
+  "KICK_SENSE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (cashDrawerTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
