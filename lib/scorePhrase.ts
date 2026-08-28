@@ -21,6 +21,11 @@ const wordQualityScore = {
   GND: 1.1,
   VDD: 1.1,
   AGND: 1.1,
+  VCC: 1.1,
+  VBAT: 1.1,
+  VBUS: 1.1,
+  "3V3": 1.1,
+  "5V": 1.1,
   V5: 1.1,
   V3: 1.1,
   V1: 1.1,
@@ -36,13 +41,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
