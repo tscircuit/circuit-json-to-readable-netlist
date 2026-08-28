@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sdi12SensorBusSignalPatterns = [/^SDI[-_]?12(?:[_-].*)?$/]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // SDI-12 sensor-bus labels often include bus or channel indexes.
+  if (
+    sdi12SensorBusSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
