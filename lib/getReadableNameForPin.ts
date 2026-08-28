@@ -7,6 +7,12 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+// Polarity/directional hints that should never be used as a main pin name.
+// They are already represented by the +/- suffix, or are too generic.
+const POLARITY_HINTS = new Set([
+  "anode", "cathode", "pos", "neg", "positive", "negative", "left", "right",
+])
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -33,11 +39,37 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // When port.name is a generic "pin<N>" placeholder (e.g. from footprinter),
+  // try to find a more descriptive name from port_hints (e.g. "GP14", "GPIO3").
+  // Exclude polarity/directional hints — those are already shown as +/-.
+  const isGenericPinName =
+    port.name != null && /^pin\d+$/i.test(port.name)
+
+  let mainPinName: string
+  if (isGenericPinName && port.port_hints && port.port_hints.length > 0) {
+    let bestHint: string | null = null
+    let bestScore = -Infinity
+    for (const hint of port.port_hints) {
+      if (!hint) continue
+      if (/^pin\d+$/i.test(hint)) continue  // skip generic pin<N>
+      if (/^\d+$/.test(hint)) continue        // skip bare numbers
+      if (POLARITY_HINTS.has(hint.toLowerCase())) continue  // skip polarity words
+      const score = scorePhrase(hint)
+      if (score > bestScore) {
+        bestScore = score
+        bestHint = hint
+      }
+    }
+    // Accept any non-polarity hint that scores >= 0.5 (includes GP14 with digit score)
+    mainPinName =
+      bestHint != null && bestScore >= 0.5
+        ? bestHint
+        : (port.name ?? `Pin${port.pin_number}`)
+  } else {
+    mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  }
 
   const additionalPinLabels: string[] = []
-
   if (isPositive && component.ftype !== "simple_resistor") {
     additionalPinLabels.push("+")
   } else if (isNegative && component.ftype !== "simple_resistor") {
@@ -45,7 +77,11 @@ export const getReadableNameForPin = ({
   }
 
   for (const port_hint of port.port_hints ?? []) {
+    if (!port_hint) continue
     if (port_hint === mainPinName) continue
+    // Skip generic pin<N> hints and bare digit strings
+    if (/^pin\d+$/i.test(port_hint)) continue
+    if (/^\d+$/.test(port_hint)) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
@@ -55,5 +91,6 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
+
   return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
 }
