@@ -1,6 +1,6 @@
 import { su } from "@tscircuit/circuit-json-util"
 import type { AnyCircuitElement, AnySourceComponent } from "circuit-json"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import { getSourcePortLabelCandidates } from "./getSourcePortLabelCandidates"
 import { scorePhrase } from "./scorePhrase"
 
 // Order components by how much better they are as a reference (chips are
@@ -55,11 +55,7 @@ export const generateNetName = ({
   )
 
   const possibleNames = ports
-    .flatMap((p) =>
-      Array.from(
-        new Set([...(p.name ? [p.name] : []), ...(p.port_hints ?? [])]),
-      ),
-    )
+    .flatMap((p) => getSourcePortLabelCandidates({ circuitJson, port: p }))
     .concat(nets.map((n) => n.name))
 
   const phrases = possibleNames.map((name) => ({
@@ -70,8 +66,10 @@ export const generateNetName = ({
   const bestPortName = phrases.sort((a, b) => b.score - a.score)[0].name
 
   // Find the component that has the best port name
-  const bestPort = ports.find(
-    (p) => p.name === bestPortName || p.port_hints?.includes(bestPortName),
+  const bestPort = ports.find((p) =>
+    getSourcePortLabelCandidates({ circuitJson, port: p }).includes(
+      bestPortName,
+    ),
   )
 
   const componentWithBestPort = all_source_components.find(
