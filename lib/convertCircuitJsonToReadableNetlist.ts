@@ -7,7 +7,18 @@ import type {
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  getReadableLabelsForPort,
+  getReadableNameForPin,
+} from "./getReadableNameForPin"
+
+const joinDisplayParts = (
+  parts: Array<string | number | null | undefined>,
+): string =>
+  parts
+    .filter((part) => part !== undefined && part !== null && part !== "")
+    .map(String)
+    .join(" ")
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -36,13 +47,17 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      componentDescription = joinDisplayParts([
+        component.display_resistance,
+        footprint,
+        "resistor",
+      ])
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      componentDescription = joinDisplayParts([
+        component.display_capacitance,
+        footprint,
+        "capacitor",
+      ])
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -145,9 +160,17 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = joinDisplayParts([
+          component.display_resistance,
+          footprint,
+        ])
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = joinDisplayParts([
+          component.display_capacitance,
+          footprint,
+        ])
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,14 +179,7 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
-        }
+        const { primaryLabel, aliases } = getReadableLabelsForPort(port)
         const aliasPart =
           aliases.length > 0
             ? `(${Array.from(new Set(aliases)).join(", ")})`
@@ -171,7 +187,7 @@ export const convertCircuitJsonToReadableNetlist = (
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =
           nets.length > 0 ? `NETS(${nets.join(", ")})` : "NOT_CONNECTED"
-        netlist.push(`- ${mainPin}${aliasPart}: ${netsPart}`)
+        netlist.push(`- ${primaryLabel}${aliasPart}: ${netsPart}`)
       }
       netlist.push("")
     }

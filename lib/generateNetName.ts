@@ -62,12 +62,17 @@ export const generateNetName = ({
     )
     .concat(nets.map((n) => n.name))
 
-  const phrases = possibleNames.map((name) => ({
-    name,
-    score: scorePhrase(name),
-  }))
+  const phrases = possibleNames
+    .filter((name): name is string => Boolean(name))
+    .map((name) => ({
+      name,
+      score: scorePhrase(name),
+    }))
 
-  const bestPortName = phrases.sort((a, b) => b.score - a.score)[0].name
+  const bestPhrase = phrases.sort((a, b) => b.score - a.score)[0]
+  if (!bestPhrase) return "unnamed_net"
+
+  const bestPortName = bestPhrase.name
 
   // Find the component that has the best port name
   const bestPort = ports.find(
