@@ -7,6 +7,17 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinName = (name: string | undefined): boolean =>
+  Boolean(name?.match(/^pin\d+$/i))
+
+const isPinNumberHint = (
+  hint: string,
+  pinNumber: number | string | undefined,
+): boolean => {
+  if (pinNumber === undefined) return false
+  return hint === String(pinNumber) || hint.toLowerCase() === `pin${pinNumber}`
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -25,6 +36,10 @@ export const getReadableNameForPin = ({
   )
   if (!component) return ""
 
+  const bestPinHint = port.port_hints?.find(
+    (hint) => !isPinNumberHint(hint, port.pin_number),
+  )
+
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
     ["anode", "pos", "positive"].includes(hint.toLowerCase()),
@@ -34,9 +49,16 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const mainPinName =
+    port.name && !isGenericPinName(port.name)
+      ? port.name
+      : (bestPinHint ?? port.name ?? `Pin${port.pin_number}`)
 
   const additionalPinLabels: string[] = []
+
+  if (port.name && port.name !== mainPinName) {
+    additionalPinLabels.push(port.name)
+  }
 
   if (isPositive && component.ftype !== "simple_resistor") {
     additionalPinLabels.push("+")
@@ -55,5 +77,6 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  const uniqueAdditionalLabels = Array.from(new Set(additionalPinLabels))
+  return `${component.name} ${mainPinName}${uniqueAdditionalLabels.length > 0 ? ` (${uniqueAdditionalLabels.join(",")})` : ""}${displayValue}`
 }
