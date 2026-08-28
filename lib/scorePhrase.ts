@@ -35,7 +35,12 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const mcuPortAliasPattern = /^P[A-Z]\d+(?:_[A-Z0-9]+)?$/
+
 export const scorePhrase = (phrase: string) => {
+  if (mcuPortAliasPattern.test(phrase)) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
