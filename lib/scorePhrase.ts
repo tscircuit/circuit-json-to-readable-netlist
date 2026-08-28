@@ -36,13 +36,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
   for (const [word, score] of wordQualityScoreEntries) {
-    if (phrase.includes(word)) {
+    if (phrase.toLowerCase().includes(word.toLowerCase())) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 1.1 // usually specific pins like GP14, D1
   }
   return 1
 }
