@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cameraSignalPatterns = [
+  /^CAM_(PWDN|RESET|RST|STBY|EN|ENABLE|XCLK|PCLK|PIXCLK|VSYNC|HREF|HSYNC)$/,
+  /^DVP_D\d+$/,
+  /^DVP_(PCLK|PIXCLK|VSYNC|HREF|HSYNC)$/,
+  /^(XCLK|PCLK|PIXCLK|VSYNC|HREF|HSYNC)$/,
+]
+
+const scoreCameraSignalPhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (cameraSignalPatterns.some((pattern) => pattern.test(normalizedPhrase))) {
+    return 1.18
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const cameraSignalScore = scoreCameraSignalPhrase(phrase)
+  if (cameraSignalScore !== undefined) {
+    return cameraSignalScore
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
