@@ -34,7 +34,16 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const fallbackPinName =
+    port.name ?? (port.pin_number !== undefined ? `Pin${port.pin_number}` : "")
+  const semanticPinLabel = (port.port_hints ?? [])
+    .filter((hint) => hint !== fallbackPinName)
+    .map((hint) => ({ hint, score: scorePhrase(hint) }))
+    .sort((a, b) => b.score - a.score)
+    .find(({ score }) => score > 1)?.hint
+  const mainPinName = /^pin\d+$/i.test(fallbackPinName)
+    ? (semanticPinLabel ?? fallbackPinName)
+    : fallbackPinName
 
   const additionalPinLabels: string[] = []
 
@@ -46,6 +55,7 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (port_hint === fallbackPinName) continue
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
