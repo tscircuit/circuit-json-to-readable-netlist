@@ -6,6 +6,7 @@ import type {
   SourcePort,
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
+import { formatPinLabelFromNumber } from "./formatPinLabelFromNumber"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
@@ -157,7 +158,10 @@ export const convertCircuitJsonToReadableNetlist = (
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          formatPinLabelFromNumber({
+            pinNumber: port.pin_number,
+            numericPrefix: "pin",
+          }) ?? port.name
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
