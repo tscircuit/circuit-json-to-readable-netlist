@@ -7,6 +7,14 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isBarePinNumber = (hint: string, pinNumber?: number | null) =>
+  pinNumber !== undefined &&
+  pinNumber !== null &&
+  (hint === String(pinNumber) || hint.toLowerCase() === `pin${pinNumber}`)
+
+const isUsefulPinLabel = (hint: string) =>
+  /[a-zA-Z]/.test(hint) && /\d/.test(hint)
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -46,8 +54,9 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (isBarePinNumber(port_hint, port.pin_number)) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score > 1 || isUsefulPinLabel(port_hint)) {
       additionalPinLabels.push(port_hint)
     }
   }
