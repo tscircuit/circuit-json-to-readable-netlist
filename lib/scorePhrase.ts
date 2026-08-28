@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cellularModemControlLabelPattern =
+  /^(?:(?:MODEM|CELL|CELLULAR|LTE|GSM|WWAN|NB_IOT|NBIOT)_?(?:PWRKEY|NETLIGHT)\d*|PWRKEY\d*|NETLIGHT\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (cellularModemControlLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
