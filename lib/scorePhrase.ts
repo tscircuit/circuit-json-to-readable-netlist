@@ -31,11 +31,25 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+const digitBearingPhraseScores = [
+  {
+    pattern:
+      /(^|[_\-\s])(?:JTAG|SWD|SWDIO|SWCLK|TMS|TCK|TDI|TDO|TRST|NTRST|NJTRST)(?:[_\-\s]?(?:TMS|TCK|TDI|TDO|TRST|SWDIO|SWCLK|SWO|RST))?\d*(?=$|[_\-\s])/,
+    score: 1.19,
+  },
+]
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const { pattern, score } of digitBearingPhraseScores) {
+    if (pattern.test(normalizedPhrase)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
