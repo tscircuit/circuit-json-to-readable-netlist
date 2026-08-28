@@ -7,6 +7,34 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const isGenericPinLabel = (label: string, pinNumber?: number) => {
+  const normalizedLabel = label.trim().toLowerCase()
+  return (
+    normalizedLabel === String(pinNumber) ||
+    normalizedLabel === `pin${pinNumber}` ||
+    /^pin\d+$/i.test(normalizedLabel)
+  )
+}
+
+const getBestMainPinLabel = (port: SourcePort): string => {
+  const fallbackLabel =
+    port.name || (port.pin_number !== undefined ? `Pin${port.pin_number}` : "")
+  const labels = Array.from(
+    new Set([...(port.name ? [port.name] : []), ...(port.port_hints ?? [])]),
+  ).filter(Boolean)
+
+  if (port.name && !isGenericPinLabel(port.name, port.pin_number)) {
+    return port.name
+  }
+
+  const readableLabels = labels.filter(
+    (label) => !isGenericPinLabel(label, port.pin_number),
+  )
+  if (readableLabels.length === 0) return fallbackLabel
+
+  return readableLabels.sort((a, b) => scorePhrase(b) - scorePhrase(a))[0]
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -33,8 +61,13 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Prefer semantic labels over generated chip names such as "pin14".
+  const mainPinName =
+    component.ftype === "simple_chip"
+      ? getBestMainPinLabel(port)
+      : port.name
+        ? port.name
+        : `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 
@@ -47,7 +80,11 @@ export const getReadableNameForPin = ({
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (
+      score > 1 ||
+      (component.ftype === "simple_chip" &&
+        !isGenericPinLabel(port_hint, port.pin_number))
+    ) {
       additionalPinLabels.push(port_hint)
     }
   }
