@@ -2,8 +2,12 @@
  * Ranks how good a word is for a net name. Usually uncommon words are better.
  * If a word isn't on this list, it's given a score of 1
  *
- * A phrase is scored by finding the highest scoring word that it contains, so
- * for example GPIO1 would score 1.1, but GPIO1_RX would score 1.15
+ * Model railroad control aliases are scored first because their digits are part
+ * of the domain-specific name. Other phrases with digits are treated as generic
+ * pin labels and score 0.5 before matching against the word list.
+ *
+ * Phrases without digits are scored by finding the highest scoring word that
+ * they contain, so for example GPIO_RX would score 1.15
  *
  * These unique port names are usually the best indicator of what the net is for
  */
@@ -35,7 +39,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const modelRailroadControlAliasRegex =
+  /^(DCC|DCC_RAIL|RAILCOM|LOCONET)(?:[_-]?[A-Z0-9]+)*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (modelRailroadControlAliasRegex.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
