@@ -5,6 +5,7 @@ import type {
   SourceNet,
   SourcePort,
 } from "circuit-json"
+import { getDisplayPinLabel } from "./getDisplayPinLabel"
 import { scorePhrase } from "./scorePhrase"
 
 export const getReadableNameForPin = ({
@@ -33,8 +34,7 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const { mainPinName } = getDisplayPinLabel(port)
 
   const additionalPinLabels: string[] = []
 
