@@ -35,7 +35,26 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const stylusDigitizerSignalPatterns = [
+  /^STYLUS(?:[_-].*)?$/,
+  /^PEN(?:[_-].*)?$/,
+  /^WACOM(?:[_-].*)?$/,
+  /^USI(?:[_-].*)?$/,
+  /^EMR(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Active stylus and pen digitizer labels often carry channel indexes.
+  if (
+    stylusDigitizerSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
