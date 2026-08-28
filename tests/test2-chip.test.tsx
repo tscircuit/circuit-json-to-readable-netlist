@@ -68,14 +68,14 @@ it("test2 chip", () => {
 
     COMPONENT_PINS:
     U1 (ATMEGA328P)
-    - pin1(GND): NETS(GND)
-    - pin2(AGND): NETS(GND)
-    - pin3(GPIO1, SCL): NETS(GND)
-    - pin4(GPIO2, SDA): NETS(U1_SDA)
-    - pin5(GPIO3): NETS(GPIO4)
-    - pin6(GPIO4, UART_TX): NOT_CONNECTED
-    - pin7(GPIO5, UART_RX): NOT_CONNECTED
-    - pin8(VDD): NETS(V5)
+    - GND(pin1): NETS(GND)
+    - AGND(pin2): NETS(GND)
+    - GPIO1(pin3, SCL): NETS(GND)
+    - GPIO2(pin4, SDA): NETS(U1_SDA)
+    - GPIO3(pin5): NETS(GPIO4)
+    - GPIO4(pin6, UART_TX): NOT_CONNECTED
+    - GPIO5(pin7, UART_RX): NOT_CONNECTED
+    - VDD(pin8): NETS(V5)
 
     R1 (1kΩ 0402)
     - pin1(anode, pos, left): NETS(C1_pos)
@@ -86,4 +86,56 @@ it("test2 chip", () => {
     - pin2(neg, cathode, right): NOT_CONNECTED
     "
   `)
+})
+
+it("prioritizes MCU debug aliases over pin numbers", () => {
+  const circuitJson = renderCircuit(
+    <board width="10mm" height="10mm" routingDisabled>
+      <chip
+        name="U1"
+        footprint="soic8"
+        manufacturerPartNumber="STM32G030F4P"
+        pinLabels={{
+          pin1: ["SWDIO"],
+          pin2: ["SWCLK"],
+          pin3: ["TMS"],
+          pin4: ["TCK"],
+          pin5: ["TDI"],
+          pin6: ["TDO"],
+        }}
+      />
+      <resistor name="R1" resistance="1k" footprint="0402" />
+      <resistor name="R2" resistance="1k" footprint="0402" />
+      <resistor name="R3" resistance="1k" footprint="0402" />
+      <resistor name="R4" resistance="1k" footprint="0402" />
+      <resistor name="R5" resistance="1k" footprint="0402" />
+      <resistor name="R6" resistance="1k" footprint="0402" />
+
+      <trace from=".U1 .SWDIO" to=".R1 .pin1" />
+      <trace from=".U1 .SWCLK" to=".R2 .pin1" />
+      <trace from=".U1 .TMS" to=".R3 .pin1" />
+      <trace from=".U1 .TCK" to=".R4 .pin1" />
+      <trace from=".U1 .TDI" to=".R5 .pin1" />
+      <trace from=".U1 .TDO" to=".R6 .pin1" />
+    </board>,
+  )
+  const netlist = convertCircuitJsonToReadableNetlist(circuitJson)
+
+  const debugAliasByPin = {
+    SWDIO: 1,
+    SWCLK: 2,
+    TMS: 3,
+    TCK: 4,
+    TDI: 5,
+    TDO: 6,
+  }
+
+  for (const alias of Object.keys(debugAliasByPin)) {
+    expect(netlist).toContain(`NET: U1_${alias}`)
+    expect(netlist).toMatch(new RegExp(`^  - U1 .*\\b${alias}\\b`, "m"))
+  }
+
+  for (const pin of Object.values(debugAliasByPin)) {
+    expect(netlist).not.toContain(`U1_pin${pin}`)
+  }
 })
