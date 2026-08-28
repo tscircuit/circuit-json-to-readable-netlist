@@ -7,6 +7,23 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const normalizePinHint = (hint: string) => hint.trim()
+
+const isGenericPinHint = (hint: string) =>
+  ["anode", "cathode", "pos", "neg", "positive", "negative"].includes(
+    normalizePinHint(hint).toLowerCase(),
+  )
+
+const isPinNumberName = (name: string, pin_number: number | undefined) => {
+  const normalizedName = normalizePinHint(name).toLowerCase()
+  if (/^\d+$/.test(normalizedName)) return true
+  if (pin_number === undefined) return /^pin\d+$/.test(normalizedName)
+  return (
+    normalizedName === String(pin_number) ||
+    normalizedName === `pin${pin_number}`
+  )
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -27,10 +44,12 @@ export const getReadableNameForPin = ({
 
   // Determine pin polarity from hints
   const isPositive = port.port_hints?.some((hint) =>
-    ["anode", "pos", "positive"].includes(hint.toLowerCase()),
+    ["anode", "pos", "positive"].includes(normalizePinHint(hint).toLowerCase()),
   )
   const isNegative = port.port_hints?.some((hint) =>
-    ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
+    ["cathode", "neg", "negative"].includes(
+      normalizePinHint(hint).toLowerCase(),
+    ),
   )
 
   // Format pin description
@@ -44,10 +63,21 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
+  const allowLowScoreChipHint =
+    component.ftype === "simple_chip" &&
+    isPinNumberName(mainPinName, port.pin_number)
+
+  for (const raw_port_hint of port.port_hints ?? []) {
+    const port_hint = normalizePinHint(raw_port_hint)
+    const normalized_port_hint = port_hint.toLowerCase()
+    if (port_hint === "") continue
+    if (normalized_port_hint === normalizePinHint(mainPinName).toLowerCase())
+      continue
+    if (normalized_port_hint === String(port.pin_number)) continue
+    if (normalized_port_hint === `pin${port.pin_number}`) continue
+    if (isGenericPinHint(port_hint)) continue
     const score = scorePhrase(port_hint)
-    if (score > 1) {
+    if (score > 1 || allowLowScoreChipHint) {
       additionalPinLabels.push(port_hint)
     }
   }
@@ -55,5 +85,5 @@ export const getReadableNameForPin = ({
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${Array.from(new Set(additionalPinLabels)).join(",")})` : ""}${displayValue}`
 }
