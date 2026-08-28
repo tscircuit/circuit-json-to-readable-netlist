@@ -31,11 +31,32 @@ const wordQualityScore = {
   right: 0.3,
 }
 
+// Domain labels often include channel indices; keep these useful words above
+// the generic digit fallback without changing the existing broader scoring.
+const digitBearingWordQualityScore = {
+  QUBIT: 1.25,
+  JOSEPHSON: 1.2,
+  SQUID: 1.2,
+  FLUX: 1.15,
+  READOUT: 1.15,
+  AWG: 1.15,
+  MIXER: 1.15,
+}
+
 const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingWordQualityScoreEntries = Object.entries(
+  digitBearingWordQualityScore,
+).sort((a, b) => b[1] - a[1])
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of digitBearingWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
