@@ -9,6 +9,10 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const joinComponentDetails = (
+  ...parts: Array<string | number | undefined>
+): string => parts.filter(Boolean).join(" ")
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -36,13 +40,15 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      componentDescription = `${joinComponentDetails(
+        component.display_resistance,
+        footprint,
+      )} resistor`.trim()
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      componentDescription = `${joinComponentDetails(
+        component.display_capacitance,
+        footprint,
+      )} capacitor`.trim()
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -145,9 +151,17 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = joinComponentDetails(
+          component.display_resistance,
+          footprint,
+        )
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = joinComponentDetails(
+          component.display_capacitance,
+          footprint,
+        )
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
