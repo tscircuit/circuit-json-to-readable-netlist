@@ -35,7 +35,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingProtocolLabelPatterns = [
+  /(?:^|[^A-Z0-9])(?:LANC|VISCA|PELCO(?:[_-]?[DP])?|RS485_CAMERA)(?:[_-]?(?:TX|RX|DATA|CTRL|ZOOM|FOCUS|IRIS)\d*)?(?=$|[^A-Z0-9])/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const pattern of digitBearingProtocolLabelPatterns) {
+    if (pattern.test(normalizedPhrase)) return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
