@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pataIdePinPattern =
+  /^(?:PATA(?:_[A-Z0-9]+)*|IDE_(?:CS|DIOW|DIOR|IORDY|INTRQ|DMARQ|DASP)\d*|ATA_(?:DIOW|DIOR|IORDY|INTRQ|DMARQ|DASP)\d*|ATAPI_(?:DMARQ|INTRQ|IORDY|DASP)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (pataIdePinPattern.test(phrase)) {
+    return 1.3
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
