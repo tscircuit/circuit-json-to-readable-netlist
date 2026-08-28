@@ -35,7 +35,17 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isWirelessCoexistenceAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return /^(?:(?:WIFI|WLAN|BT|BLE|ZIGBEE|ZB|THREAD|UWB)(?:[_-]?(?:TX|RX|TXEN|RXEN|ACTIVE|STATUS|PRI|PRIO|PRIORITY|GRANT|REQ|REQUEST|DENY|COEX|PTA|WAKE|RST|RESET|IRQ|INT|CLKREQ|CCA|FEM|CTX|CRX|CSD|CPS|ANT|SW|EN|MODE|SEL))|(?:PTA|COEX|FEM|RF_SW)(?:[_-]?(?:GRANT|REQ|REQUEST|PRI|PRIO|ACTIVE|TXEN|RXEN|CTX|CRX|CPS|CSD|ANT|SW|EN|SEL)))\d*(?:[_-]?[PN])?$/.test(
+    normalizedPhrase,
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isWirelessCoexistenceAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
