@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sgmiiPhyLabelPattern =
+  /^SGMII[_-]?(TXP|TXN|RXP|RXN|TX_P|TX_N|RX_P|RX_N|REFCLK|CLK)\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (sgmiiPhyLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
