@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sevenSegmentAliasPattern =
+  /^(?:SEG(?:MENT)?_?[A-G]|DIG(?:IT)?_?\d+|COM(?:MON)?_?\d+|DP|DECIMAL_?P(?:OINT)?)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (sevenSegmentAliasPattern.test(phrase)) {
+    return 1.16
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
