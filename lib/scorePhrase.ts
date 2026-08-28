@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const centrifugeTokens = [
+  "CENTRIFUGE",
+  "ROTOR_LOCK",
+  "IMBALANCE_SENSE",
+  "RPM_TACH",
+  "BRAKE_COIL",
+  "LID_LOCK",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (centrifugeTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
