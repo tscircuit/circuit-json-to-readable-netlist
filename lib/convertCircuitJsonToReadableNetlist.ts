@@ -9,6 +9,14 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const normalizeOptionalText = (
+  value: string | null | undefined,
+): string | undefined => {
+  if (typeof value !== "string") return undefined
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -33,7 +41,7 @@ export const convertCircuitJsonToReadableNetlist = (
       source_component_id: component.source_component_id,
     })
 
-    const footprint = cadComponent?.footprinter_string
+    const footprint = normalizeOptionalText(cadComponent?.footprinter_string)
 
     if (component.ftype === "simple_resistor") {
       componentDescription = `${component.display_resistance}${
@@ -44,7 +52,9 @@ export const convertCircuitJsonToReadableNetlist = (
         footprint ? ` ${footprint}` : ""
       } capacitor`
     } else if (component.ftype === "simple_chip") {
-      const manufacturerPartNumber = component.manufacturer_part_number
+      const manufacturerPartNumber = normalizeOptionalText(
+        component.manufacturer_part_number,
+      )
       componentDescription = [manufacturerPartNumber, footprint]
         .filter(Boolean)
         .join(", ")
@@ -142,14 +152,19 @@ export const convertCircuitJsonToReadableNetlist = (
       const cadComponent = su(circuitJson).cad_component.getWhere({
         source_component_id: component.source_component_id,
       })
-      const footprint = cadComponent?.footprinter_string
+      const footprint = normalizeOptionalText(cadComponent?.footprinter_string)
+      const manufacturerPartNumber = normalizeOptionalText(
+        component.manufacturer_part_number,
+      )
       let header = component.name
       if (component.ftype === "simple_resistor") {
         header = `${component.name} (${component.display_resistance} ${footprint})`
       } else if (component.ftype === "simple_capacitor") {
         header = `${component.name} (${component.display_capacitance} ${footprint})`
-      } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+      } else if (manufacturerPartNumber) {
+        header = `${component.name} (${manufacturerPartNumber})`
+      } else if (component.ftype === "simple_chip" && footprint) {
+        header = `${component.name} (${footprint})`
       }
       netlist.push(header)
       const ports = source_ports
