@@ -52,8 +52,13 @@ export const getReadableNameForPin = ({
     }
   }
 
+  // Deduplicate additionalPinLabels to avoid duplicates in output
+  const uniqueLabels = Array.from(new Set(additionalPinLabels))
+
   const displayValue = component.display_value
     ? ` (${component.display_value})`
     : ""
-  return `${component.name} ${mainPinName}${additionalPinLabels.length > 0 ? ` (${additionalPinLabels.join(",")})` : ""}${displayValue}`
+  // Fallback to "Unknown" if component.name is undefined
+  const componentName = component.name || "Unknown"
+  return `${componentName} ${mainPinName}${uniqueLabels.length > 0 ? ` (${uniqueLabels.join(",")})` : ""}${displayValue}`
 }

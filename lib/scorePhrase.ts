@@ -36,13 +36,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  // First check known vocabulary (higher priority than digit penalty)
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  // Then apply generic digit penalty for unknown numeric phrases
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
