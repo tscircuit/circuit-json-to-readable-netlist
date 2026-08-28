@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitalAudioTransportLabelPattern =
+  /^(S\/?PDIF|SPDIF|TOSLINK|AES3)[_-]?(IN|OUT|RX|TX|DIN|DOUT)?\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (digitalAudioTransportLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
