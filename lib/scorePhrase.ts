@@ -13,9 +13,18 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  MICROSTEP: 1.2,
+  STEP: 1.2,
+  DIR: 1.2,
   RX: 1.15,
   TX: 1.15,
+  SLEEP: 1.15,
+  RESET: 1.15,
+  FAULT: 1.15,
+  ENABLE: 1.15,
   GPIO: 1.1,
+  MS: 1.1,
+  DECAY: 1.1,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -35,7 +44,27 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const semanticNumberedWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) =>
+    [
+      "MICROSTEP",
+      "STEP",
+      "DIR",
+      "SLEEP",
+      "RESET",
+      "FAULT",
+      "ENABLE",
+      "MS",
+      "DECAY",
+    ].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of semanticNumberedWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
