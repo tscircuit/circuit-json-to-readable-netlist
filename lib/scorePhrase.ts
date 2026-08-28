@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const firePanelTokens = [
+  "FACP",
+  "NAC_CIRCUIT",
+  "SLC_LOOP",
+  "PULL_STATION",
+  "HORN_STROBE",
+  "ANNUNCIATOR",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (firePanelTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
