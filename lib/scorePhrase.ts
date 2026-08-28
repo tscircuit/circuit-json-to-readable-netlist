@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const cxlMemoryLinkLabelPattern =
+  /^(CXL|CCIX|NVLINK)([_-]?(TX|RX)?[PN]?\d*|[_-]?(CLK|REFCLK|WAKE|RST|RESET|PERST|READY|LINK|PRSNT|PWR|VDD|VSS))$|^HBM([_-]?(CK|CKE|RESET|TEMP|ALERT|DBI|DQ|DQS|CA|WCK|RDQS)\d*)?$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (cxlMemoryLinkLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
