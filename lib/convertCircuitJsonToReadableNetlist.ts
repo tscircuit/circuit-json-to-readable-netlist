@@ -7,7 +7,10 @@ import type {
 } from "circuit-json"
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
-import { getReadableNameForPin } from "./getReadableNameForPin"
+import {
+  getReadableLabelsForPin,
+  getReadableNameForPin,
+} from "./getReadableNameForPin"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -145,9 +148,15 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,17 +165,19 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
-        const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
-        }
+        const { primaryLabel, aliases, pinNumberLabel } =
+          getReadableLabelsForPin({
+            component,
+            includeLowSignalHints: true,
+            port,
+          })
+        const mainPin = pinNumberLabel ?? primaryLabel
+        const componentPinAliases = [primaryLabel, ...aliases].filter(
+          (alias) => alias && alias !== mainPin,
+        )
         const aliasPart =
-          aliases.length > 0
-            ? `(${Array.from(new Set(aliases)).join(", ")})`
+          componentPinAliases.length > 0
+            ? `(${Array.from(new Set(componentPinAliases)).join(", ")})`
             : ""
         const nets = portIdToNetNames[port.source_port_id] ?? []
         const netsPart =

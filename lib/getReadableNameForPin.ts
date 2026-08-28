@@ -7,6 +7,101 @@ import type {
 } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
 
+const lowSignalPinHints = new Set([
+  "anode",
+  "cathode",
+  "left",
+  "right",
+  "neg",
+  "negative",
+  "pos",
+  "positive",
+])
+
+type PinLabelsByName = Record<string, string | string[] | undefined>
+
+const normalizePinLabel = (label: string) => label.trim()
+
+const isPinNumberOnlyLabel = (label: string, pinNumber?: number) => {
+  if (label.match(/^\d+$/)) return true
+  if (pinNumber === undefined) return false
+  return label.toLowerCase() === `pin${pinNumber}`.toLowerCase()
+}
+
+const getComponentPinLabels = ({
+  component,
+  port,
+}: {
+  component: AnyCircuitElement | undefined
+  port: SourcePort
+}) => {
+  const pinLabels =
+    (component as { pin_labels?: PinLabelsByName; pinLabels?: PinLabelsByName })
+      ?.pin_labels ??
+    (component as { pin_labels?: PinLabelsByName; pinLabels?: PinLabelsByName })
+      ?.pinLabels
+  if (!pinLabels) return []
+
+  const labelKeys = [
+    port.pin_number !== undefined ? `pin${port.pin_number}` : undefined,
+    port.pin_number !== undefined ? String(port.pin_number) : undefined,
+    port.name,
+  ].filter(Boolean) as string[]
+
+  return labelKeys.flatMap((key) => {
+    const labels = pinLabels[key]
+    if (!labels) return []
+    return Array.isArray(labels) ? labels : [labels]
+  })
+}
+
+export const getReadableLabelsForPin = ({
+  component,
+  includeLowSignalHints = false,
+  port,
+}: {
+  component: AnyCircuitElement | undefined
+  includeLowSignalHints?: boolean
+  port: SourcePort
+}): {
+  primaryLabel: string
+  aliases: string[]
+  pinNumberLabel: string | undefined
+} => {
+  const pinNumberLabel =
+    port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+  const rawLabels = [
+    port.name,
+    ...(port.port_hints ?? []),
+    ...getComponentPinLabels({ component, port }),
+  ]
+    .filter(Boolean)
+    .map((label) => normalizePinLabel(label as string))
+    .filter(Boolean)
+
+  const uniqueLabels = Array.from(new Set(rawLabels))
+  const semanticLabels = uniqueLabels.filter((label) => {
+    if (isPinNumberOnlyLabel(label, port.pin_number)) return false
+    if (
+      !includeLowSignalHints &&
+      lowSignalPinHints.has(label.toLowerCase()) &&
+      scorePhrase(label) <= 1
+    ) {
+      return false
+    }
+    return true
+  })
+
+  const primaryLabel = semanticLabels[0] ?? port.name ?? pinNumberLabel ?? ""
+  const aliases = semanticLabels.filter((label) => label !== primaryLabel)
+
+  return {
+    primaryLabel,
+    aliases,
+    pinNumberLabel,
+  }
+}
+
 export const getReadableNameForPin = ({
   circuitJson,
   source_port_id,
@@ -34,7 +129,10 @@ export const getReadableNameForPin = ({
   )
 
   // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  const { primaryLabel: mainPinName, aliases } = getReadableLabelsForPin({
+    component,
+    port,
+  })
 
   const additionalPinLabels: string[] = []
 
@@ -44,12 +142,9 @@ export const getReadableNameForPin = ({
     additionalPinLabels.push("-")
   }
 
-  for (const port_hint of port.port_hints ?? []) {
-    if (port_hint === mainPinName) continue
-    const score = scorePhrase(port_hint)
-    if (score > 1) {
-      additionalPinLabels.push(port_hint)
-    }
+  for (const alias of aliases) {
+    if (alias === mainPinName) continue
+    additionalPinLabels.push(alias)
   }
 
   const displayValue = component.display_value
