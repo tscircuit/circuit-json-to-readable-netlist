@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isThermocoupleRtdLabel = (phrase: string) =>
+  /(^|[_-])(THERMOCOUPLE|RTD|PT100|PT1000)([_-]|$)/i.test(phrase)
+
 export const scorePhrase = (phrase: string) => {
+  if (isThermocoupleRtdLabel(phrase)) {
+    return 1.18
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
