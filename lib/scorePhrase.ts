@@ -35,7 +35,22 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const smartHomeWirelessTokens = [
+  "ZWAVE",
+  "Z_WAVE",
+  "Z-WAVE",
+  "THREAD_MESH",
+  "MATTER_COMMISSION",
+  "ENOCEAN",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    smartHomeWirelessTokens.some((token) => normalizedPhrase.includes(token))
+  ) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
