@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const automotiveSerdesLabelPattern =
+  /^(?:GMSL\d*|FPD[-_]?LINK\d*|FPD3|SERDES|POC|COAX)(?:[-_]?[A-Z]+)*\d*$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (automotiveSerdesLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
