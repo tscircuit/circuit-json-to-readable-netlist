@@ -36,13 +36,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
+  if (/^(?:pin[-_ ]?|p)?\d+$/i.test(phrase)) {
     return 0.5
   }
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (/^GP\d+$/i.test(phrase)) {
+    return 1.05
+  }
+  if (/^[A-Z]{1,2}\d+$/i.test(phrase)) {
+    return 0.5
   }
   return 1
 }
