@@ -1,11 +1,34 @@
 import { su } from "@tscircuit/circuit-json-util"
-import type {
-  AnyCircuitElement,
-  CircuitJson,
-  SourceNet,
-  SourcePort,
-} from "circuit-json"
+import type { AnyCircuitElement } from "circuit-json"
 import { scorePhrase } from "./scorePhrase"
+
+const isGenericPinName = (
+  name: string | undefined,
+  pinNumber: number | undefined,
+) => {
+  if (!name) return true
+  if (pinNumber === undefined) return false
+  return name.toLowerCase() === `pin${pinNumber}` || name === String(pinNumber)
+}
+
+const isPinNumberHint = (hint: string, pinNumber: number | undefined) => {
+  if (pinNumber === undefined) return false
+  return hint === String(pinNumber) || hint.toLowerCase() === `pin${pinNumber}`
+}
+
+const getBestPinLabel = (port: {
+  name?: string
+  pin_number?: number
+  port_hints?: string[]
+}) => {
+  if (!isGenericPinName(port.name, port.pin_number)) return port.name!
+
+  const bestHint = (port.port_hints ?? [])
+    .filter((hint) => !isPinNumberHint(hint, port.pin_number))
+    .sort((a, b) => scorePhrase(b) - scorePhrase(a))[0]
+
+  return bestHint ?? port.name ?? `Pin${port.pin_number}`
+}
 
 export const getReadableNameForPin = ({
   circuitJson,
@@ -33,8 +56,11 @@ export const getReadableNameForPin = ({
     ["cathode", "neg", "negative"].includes(hint.toLowerCase()),
   )
 
-  // Format pin description
-  const mainPinName = port.name ? port.name : `Pin${port.pin_number}`
+  // Format pin description. For chips, prefer semantic labels over generic pin numbers.
+  const mainPinName =
+    component.ftype === "simple_chip"
+      ? getBestPinLabel(port)
+      : port.name || `Pin${port.pin_number}`
 
   const additionalPinLabels: string[] = []
 
@@ -46,6 +72,12 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (
+      component.ftype === "simple_chip" &&
+      isPinNumberHint(port_hint, port.pin_number)
+    ) {
+      continue
+    }
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
