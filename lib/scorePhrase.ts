@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const optocouplerLabelPattern =
+  /^(OPTOCOUPLER[_-]?(LED[_-]?[AK]|ANODE|CATHODE|OUT|COLLECTOR|EMITTER)\d*|OPTOISO[_-]?(IN|OUT|LED[_-]?[AK]|COLLECTOR|EMITTER)\d*|PHOTOTRANS[_-]?(C|E|OUT)\d*|PC817[_-]?(A|K|C|E|OUT)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (optocouplerLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
