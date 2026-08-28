@@ -35,7 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const industrialFieldbusAliasPatterns = [
+  /\bPROFIBUS_?(?:DP|PA|FMS|A|B|TX|RX|DE|RE|RTS|CTS|DATA|P|N)?\d?\b/i,
+  /\bCC_?LINK_?(?:A|B|TX|RX|DATA|P|N)?\d?\b/i,
+  /\bCCLINK_?(?:A|B|TX|RX|DATA|P|N)?\d?\b/i,
+  /\bINTERBUS_?(?:DI|DO|CLK|DATA|TX|RX|P|N)?\d?\b/i,
+  /\bMVB_?(?:A|B|TX|RX|DATA|P|N)\d?\b/i,
+  /\bWTB_?(?:A|B|TX|RX|DATA|P|N)\d?\b/i,
+]
+
 export const scorePhrase = (phrase: string) => {
+  if (industrialFieldbusAliasPatterns.some((pattern) => pattern.test(phrase))) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
