@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const joystickInputLabelPattern =
+  /^(?:(?:JOYSTICK|THUMBSTICK|JOY)_?(?:VRX|VRY|SW|BTN|X|Y)\d*|(?:GAMEPAD|DPAD)_?(?:BTN|UP|DOWN|LEFT|RIGHT|X|Y|A|B)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (joystickInputLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
