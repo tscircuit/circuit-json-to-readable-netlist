@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const boardStrapLabelPattern =
+  /^(?:STRAP\d*|JUMPER\d*|MODE_?SEL\d*|HW_?ID\d*|BOARD_?ID\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (boardStrapLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
