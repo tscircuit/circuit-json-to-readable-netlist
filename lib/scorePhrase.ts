@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const laserDiodeTokens = [
+  "LASER_DIODE",
+  "LD_ENABLE",
+  "LD_MONITOR",
+  "LASER_FAULT",
+  "APC_SET",
+  "PHOTO_DIODE",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (laserDiodeTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
