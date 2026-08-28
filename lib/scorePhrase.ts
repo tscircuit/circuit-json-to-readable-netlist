@@ -35,7 +35,27 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const addressableLedSignalPatterns = [
+  /^NEOPIXEL(?:_|-|\d|$)/,
+  /^WS2812(?:_|-|\d|$)/,
+  /^SK6812(?:_|-|\d|$)/,
+  /^APA102(?:_|-|\d|$)/,
+  /^DOTSTAR(?:_|-|\d|$)/,
+  /^PIXEL_DATA(?:_|-|\d|$)/,
+  /^LED_DATA(?:_|-|\d|$)/,
+  /^LED_DIN(?:_|-|\d|$)/,
+  /^LED_DOUT(?:_|-|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    addressableLedSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
