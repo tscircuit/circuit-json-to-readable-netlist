@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const touchAndProximityAliasPattern =
+  /^(?:(?:CAP|CAPACITIVE)[_-]?)?(?:TOUCH\d*|CAP[_-]?SENSE\d*|CAPSENSE\d*|CSD\d*|CSX\d*|CTSU\d*|PROX(?:IMITY)?(?:[_-]?(?:INT|IN|OUT|\d+))?)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (touchAndProximityAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
