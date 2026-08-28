@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const scoreInfraredAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    /\bIR(?:DA)?(?:[_-]|$)/.test(normalizedPhrase) ||
+    normalizedPhrase.includes("INFRARED") ||
+    normalizedPhrase.includes("DEMOD")
+  ) {
+    return 1.18
+  }
+}
+
 export const scorePhrase = (phrase: string) => {
+  const infraredScore = scoreInfraredAlias(phrase)
+  if (infraredScore) return infraredScore
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
