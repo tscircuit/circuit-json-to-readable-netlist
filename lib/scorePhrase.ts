@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const photoDiodeLabelPattern =
+  /^((PHOTODIODE|PHOTO[_-]?DIODE|PD|LASERDIODE|LASER[_-]?DIODE|LD)[_-]?(A|K|ANODE|CATHODE)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (photoDiodeLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
