@@ -35,7 +35,28 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pmbusVoltageRegulatorPatterns = [
+  /^PMBUS(?:_|\d|$)/,
+  /^SMBALERT(?:_|\d|$)/,
+  /^VR_?HOT(?:_|\d|$)/,
+  /^VR_?RDY(?:_|\d|$)/,
+  /^IMON(?:_|\d|$)/,
+  /^PSYS(?:_|\d|$)/,
+  /^PGOOD(?:_|\d|$)/,
+  /^PWRGD(?:_|\d|$)/,
+  /^VSEL(?:_|\d|$)/,
+  /^VID(?:_|\d|$)/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (
+    pmbusVoltageRegulatorPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
