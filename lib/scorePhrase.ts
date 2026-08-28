@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitalPotentiometerLabelPattern =
+  /^(?:(?:DIGIPOT|DPOT|POT)_?(?:WIPER|W)\d*|WIPER\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (digitalPotentiometerLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
