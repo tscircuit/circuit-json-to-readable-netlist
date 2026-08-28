@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const fuelCellAliasPattern =
+  /FUEL_?CELL|HYDROGEN|H2_|STACK_?VOLT|ELECTROLY[ZS]ER|PEMFC/
+
 export const scorePhrase = (phrase: string) => {
+  if (fuelCellAliasPattern.test(phrase.toUpperCase())) {
+    return 1.15
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
