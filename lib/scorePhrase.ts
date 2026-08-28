@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const quadratureEncoderAliasPattern =
+  /^(?:QEA\d*|QEB\d*|QEI\d*|ENC(?:ODER)?[_-]?[ABZ]\d*|ENC(?:ODER)?[_-]?(?:INDEX|IDX)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (quadratureEncoderAliasPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
