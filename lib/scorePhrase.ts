@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const logicIcLabelPattern =
+  /^(?:(?:SCHMITT|INVERTER|INV|XOR|XNOR)_?(?:IN|OUT|A|B|Y)?\d*|(?:LATCH|DFF)_?(?:D|Q|QB|QBAR)?\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (logicIcLabelPattern.test(phrase)) {
+    return 1.1
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
