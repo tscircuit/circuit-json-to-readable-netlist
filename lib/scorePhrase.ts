@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const digitBearingPowerBusWords = [
+  "PMBUS",
+  "SMBUS",
+  "BMS",
+  "FUEL_GAUGE",
+  "CHG",
+  "BAT",
+]
+
 export const scorePhrase = (phrase: string) => {
+  for (const word of digitBearingPowerBusWords) {
+    if (phrase.includes(word)) {
+      return 1.15
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
