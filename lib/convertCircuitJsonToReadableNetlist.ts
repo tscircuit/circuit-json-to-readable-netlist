@@ -8,6 +8,7 @@ import type {
 import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectivity-map"
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
+import { scorePhrase } from "./scorePhrase"
 
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
@@ -145,9 +146,15 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const detail = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = detail ? `${component.name} (${detail})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const detail = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = detail ? `${component.name} (${detail})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,13 +163,72 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+        const pinNumberLabel =
+          port.pin_number !== undefined ? `pin${port.pin_number}` : undefined
+
+        // Collect every textual label this port has, excluding the bare pin
+        // number string (e.g. "14") that often appears in port_hints.
+        const labelCandidates = Array.from(
+          new Set(
+            [
+              ...(port.port_hints ?? []),
+              ...(port.name ? [port.name] : []),
+            ].filter(
+              (label): label is string =>
+                typeof label === "string" &&
+                label.length > 0 &&
+                label !== String(port.pin_number),
+            ),
+          ),
+        )
+
+        // Prefer a meaningful label (e.g. GP14, SDA, VDD) as the primary
+        // identifier. Generic positional hints like "pos", "left", or
+        // "anode" are auto-attached to passives; they should stay as
+        // aliases rather than replace pinN. We rank labels by scorePhrase
+        // and only promote one above pinN if it is not one of these
+        // generic positional words.
+        const GENERIC_POSITIONAL = new Set([
+          "anode",
+          "cathode",
+          "pos",
+          "neg",
+          "positive",
+          "negative",
+          "left",
+          "right",
+          "top",
+          "bottom",
+        ])
+
+        // Among labels, find the highest-scoring "descriptive" one
+        // (i.e. not a generic positional hint). If one exists, promote it.
+        const descriptiveLabel = [...labelCandidates]
+          .filter((label) => !GENERIC_POSITIONAL.has(label.toLowerCase()))
+          .sort((a, b) => scorePhrase(b) - scorePhrase(a))[0]
+
+        let mainPin: string | undefined
+        if (descriptiveLabel) {
+          mainPin = descriptiveLabel
+        } else {
+          mainPin = pinNumberLabel ?? labelCandidates[0]
+        }
+
+        // If we still have nothing to call this pin, skip it rather than
+        // emit "undefined".
+        if (!mainPin) continue
+
+        // Preserve the original label order in aliases so passive component
+        // outputs stay stable (e.g. anode, pos, left rather than pos, anode,
+        // left).
         const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
-        for (const hint of port.port_hints ?? []) {
-          if (hint === String(port.pin_number)) continue
-          if (hint !== mainPin && hint !== port.name) aliases.push(hint)
+        for (const label of labelCandidates) {
+          if (label !== mainPin) aliases.push(label)
+        }
+        // Surface pinN as an alias when a richer label became the main
+        // name, so the numeric pin is still recoverable.
+        if (pinNumberLabel && pinNumberLabel !== mainPin) {
+          aliases.push(pinNumberLabel)
         }
         const aliasPart =
           aliases.length > 0
