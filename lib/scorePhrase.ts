@@ -13,6 +13,11 @@ const wordQualityScore = {
   SCLK: 1.2,
   SDA: 1.2,
   SCL: 1.2,
+  VBAT: 1.2,
+  RTC: 1.2,
+  CLKOUT: 1.2,
+  INTB: 1.15,
+  SQW: 1.15,
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
@@ -35,7 +40,16 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const rtcBackupWordQualityScoreEntries = wordQualityScoreEntries.filter(
+  ([word]) => ["VBAT", "RTC", "CLKOUT", "INTB", "SQW"].includes(word),
+)
+
 export const scorePhrase = (phrase: string) => {
+  for (const [word, score] of rtcBackupWordQualityScoreEntries) {
+    if (phrase.includes(word)) {
+      return score
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
