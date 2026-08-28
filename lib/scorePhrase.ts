@@ -35,7 +35,24 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const sentPsi5SensorSignalPatterns = [
+  /^SENT(?:[_-].*)?$/,
+  /^SPC(?:[_-].*)?$/,
+  /^PSI5(?:[_-].*)?$/,
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+
+  // Automotive sensor-interface labels often include signal or bus indexes.
+  if (
+    sentPsi5SensorSignalPatterns.some((pattern) =>
+      pattern.test(normalizedPhrase),
+    )
+  ) {
+    return 1.25
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
