@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const pinballTokens = [
+  "FLIPPER_COIL",
+  "SLINGSHOT_SW",
+  "TROUGH_OPTO",
+  "KNOCKER_COIL",
+  "GI_LAMP",
+  "BUMPER_SWITCH",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (pinballTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
