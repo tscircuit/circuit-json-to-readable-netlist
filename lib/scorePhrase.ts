@@ -35,7 +35,15 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const bemfAliases = ["BEMF_U", "BEMF_V", "BEMF_W"]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  for (const alias of bemfAliases) {
+    if (normalizedPhrase.includes(alias)) {
+      return 1.2
+    }
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
