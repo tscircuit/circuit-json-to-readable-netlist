@@ -35,7 +35,20 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const carWashTokens = [
+  "PRE_SOAK",
+  "FOAM_BRUSH",
+  "WAX_VALVE",
+  "RINSE_PUMP",
+  "AIR_DRYER",
+  "BAY_DOOR",
+]
+
 export const scorePhrase = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  if (carWashTokens.some((token) => normalizedPhrase.includes(token))) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
