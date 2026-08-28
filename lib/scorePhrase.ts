@@ -35,7 +35,18 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isPs2KeyboardMouseAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  return (
+    /^PS2_?(CLK|CLOCK|DATA|DAT)\d*$/.test(normalizedPhrase) ||
+    /^(KBD|KEYBOARD|MOUSE)_(CLK|CLOCK|DATA|DAT)\d*$/.test(normalizedPhrase)
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isPs2KeyboardMouseAlias(phrase)) {
+    return 1.18
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
