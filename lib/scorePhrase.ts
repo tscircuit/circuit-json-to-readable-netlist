@@ -35,7 +35,21 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const isCoolingFanAlias = (phrase: string) => {
+  const normalizedPhrase = phrase.toUpperCase()
+  const fanControlWords = ["PWM", "TACH", "SENSE", "FG", "RPM", "ALERT"]
+
+  return (
+    normalizedPhrase.includes("FAN") &&
+    fanControlWords.some((word) => normalizedPhrase.includes(word))
+  )
+}
+
 export const scorePhrase = (phrase: string) => {
+  if (isCoolingFanAlias(phrase)) {
+    return 1.16
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
