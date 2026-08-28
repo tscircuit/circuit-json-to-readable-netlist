@@ -142,22 +142,42 @@ export const convertCircuitJsonToReadableNetlist = (
       const cadComponent = su(circuitJson).cad_component.getWhere({
         source_component_id: component.source_component_id,
       })
-      const footprint = cadComponent?.footprinter_string
+      const footprint = cadComponent?.footprinter_string ?? ""
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${component.name} (${component.display_resistance}${
+          footprint ? ` ${footprint}` : ""
+        })`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${component.name} (${component.display_capacitance}${
+          footprint ? ` ${footprint}` : ""
+        })`
       } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+        header = `${component.name} (${component.manufacturer_part_number}${
+          footprint ? ` ${footprint}` : ""
+        })`
       }
       netlist.push(header)
       const ports = source_ports
         .filter((p) => p.source_component_id === component.source_component_id)
-        .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
+        .sort((a, b) => {
+          if (
+            typeof a.pin_number === "number" &&
+            typeof b.pin_number === "number"
+          ) {
+            return a.pin_number - b.pin_number
+          }
+          return String(a.pin_number || a.name || "").localeCompare(
+            String(b.pin_number || b.name || ""),
+            undefined,
+            { numeric: true },
+          )
+        })
       for (const port of ports) {
         const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+          port.pin_number !== undefined
+            ? `pin${port.pin_number}`
+            : port.name || "unknown"
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
