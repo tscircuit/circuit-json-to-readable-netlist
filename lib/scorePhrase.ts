@@ -15,6 +15,10 @@ const wordQualityScore = {
   SCL: 1.2,
   RX: 1.15,
   TX: 1.15,
+  CPHY: 1.2,
+  "C-PHY": 1.2,
+  C_PHY: 1.2,
+  TRIO: 1.2,
   GPIO: 1.1,
   cathode: 0.5,
   anode: 0.5,
@@ -36,6 +40,9 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
 )
 
 export const scorePhrase = (phrase: string) => {
+  if (phrase.match(/(?:CPHY|C-PHY|C_PHY|TRIO)/)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
