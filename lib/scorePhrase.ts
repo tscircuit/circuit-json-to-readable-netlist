@@ -16,6 +16,11 @@ const wordQualityScore = {
   RX: 1.15,
   TX: 1.15,
   GPIO: 1.1,
+  HVAC_COMP: 1.12,
+  COMPRESSOR: 1.12,
+  FAN_RELAY: 1.12,
+  DEFROST: 1.12,
+  THERMOSTAT: 1.12,
   cathode: 0.5,
   anode: 0.5,
   GND: 1.1,
@@ -35,14 +40,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
-export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+export const scorePhrase = (phrase: string): number => {
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
       return score
     }
+  }
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
