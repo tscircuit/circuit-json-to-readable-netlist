@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const ethernetBackplanePinPattern =
+  /^(?:(?:XFI|SFI)_(?:TXP|TXN|RXP|RXN)\d*|(?:KR|KX|KR4|KX4)_(?:TXP|TXN|RXP|RXN|REFCLK|LINK|TRAIN)\d*|(?:10GBASE_KR|1000BASE_KX)_(?:TXP|TXN|RXP|RXN|REFCLK)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (ethernetBackplanePinPattern.test(phrase)) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
