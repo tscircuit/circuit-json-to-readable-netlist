@@ -35,7 +35,14 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const loadSwitchLabelPattern =
+  /^((LOADSW|LOAD[_-]?SWITCH|PWR[_-]?SWITCH|POWER[_-]?SWITCH)[_-]?(IN|OUT|ON|EN|FLT|FAULT|ILIM|OC|PGOOD)\d*)$/i
+
 export const scorePhrase = (phrase: string) => {
+  if (loadSwitchLabelPattern.test(phrase)) {
+    return 1.2
+  }
+
   if (phrase.match(/\d+/)) {
     return 0.5
   }
