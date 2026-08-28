@@ -35,7 +35,13 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const batteryManagementAliasPattern =
+  /(^|[_\W])(?:VBAT|BAT(?:T|TERY)?|CELL\d*|CHG(?:_STAT)?\d*|CHARGE|FUEL|GAUGE|SOC|PACK)(?=$|[_\W]|\d)/
+
 export const scorePhrase = (phrase: string) => {
+  if (batteryManagementAliasPattern.test(phrase.toUpperCase())) {
+    return 1.2
+  }
   if (phrase.match(/\d+/)) {
     return 0.5
   }
