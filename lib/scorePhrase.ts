@@ -35,14 +35,19 @@ const wordQualityScoreEntries = Object.entries(wordQualityScore).sort(
   (a, b) => b[1] - a[1],
 )
 
+const midiSignalPattern = /(^|_)MIDI(_|$)/
+const midiSignalScore = 1.15
+
 export const scorePhrase = (phrase: string) => {
-  if (phrase.match(/\d+/)) {
-    return 0.5
-  }
+  const scoreFloor = midiSignalPattern.test(phrase) ? midiSignalScore : 0
   for (const [word, score] of wordQualityScoreEntries) {
     if (phrase.includes(word)) {
-      return score
+      return Math.max(score, scoreFloor)
     }
+  }
+  if (scoreFloor) return scoreFloor
+  if (phrase.match(/\d+/)) {
+    return 0.5
   }
   return 1
 }
