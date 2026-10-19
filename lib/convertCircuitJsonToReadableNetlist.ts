@@ -145,13 +145,20 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
       netlist.push(header)
+      const isNonPolarizedResistor = component.ftype === "simple_resistor"
       const ports = source_ports
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
@@ -159,9 +166,18 @@ export const convertCircuitJsonToReadableNetlist = (
         const mainPin =
           port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
         const aliases: string[] = []
-        if (port.name && port.name !== mainPin) aliases.push(port.name)
+        if (
+          port.name &&
+          port.name !== mainPin &&
+          !(isNonPolarizedResistor && (port.name === "anode" || port.name === "cathode"))
+        ) {
+          aliases.push(port.name)
+        }
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
+          if (isNonPolarizedResistor && (hint === "anode" || hint === "cathode")) {
+            continue
+          }
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
         }
         const aliasPart =

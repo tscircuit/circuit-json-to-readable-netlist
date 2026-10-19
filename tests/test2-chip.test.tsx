@@ -78,8 +78,8 @@ it("test2 chip", () => {
     - pin8(VDD): NETS(V5)
 
     R1 (1kΩ 0402)
-    - pin1(anode, pos, left): NETS(C1_pos)
-    - pin2(cathode, neg, right): NETS(U1_SDA)
+    - pin1(pos, left): NETS(C1_pos)
+    - pin2(neg, right): NETS(U1_SDA)
 
     C1 (1nF 0402)
     - pin1(pos, anode, left): NETS(C1_pos)
