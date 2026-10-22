@@ -144,12 +144,17 @@ export const convertCircuitJsonToReadableNetlist = (
       })
       const footprint = cadComponent?.footprinter_string
       let header = component.name
-      if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
-      } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
-      } else if (component.manufacturer_part_number) {
-        header = `${component.name} (${component.manufacturer_part_number})`
+      const detailParts = [
+        component.ftype === "simple_resistor"
+          ? component.display_resistance
+          : component.ftype === "simple_capacitor"
+            ? component.display_capacitance
+            : component.manufacturer_part_number,
+        footprint,
+      ].filter(Boolean)
+
+      if (detailParts.length > 0) {
+        header = `${component.name} (${detailParts.join(" ")})`
       }
       netlist.push(header)
       const ports = source_ports
@@ -160,8 +165,15 @@ export const convertCircuitJsonToReadableNetlist = (
           port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
         const aliases: string[] = []
         if (port.name && port.name !== mainPin) aliases.push(port.name)
+        const POLARITY_HINTS = new Set(["anode", "cathode", "pos", "positive", "neg", "negative"])
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
+          if (
+            component.ftype === "simple_resistor" &&
+            POLARITY_HINTS.has(hint.toLowerCase())
+          ) {
+            continue
+          }
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
         }
         const aliasPart =
