@@ -9,6 +9,54 @@ import { getFullConnectivityMapFromCircuitJson } from "circuit-json-to-connectiv
 import { generateNetName } from "./generateNetName"
 import { getReadableNameForPin } from "./getReadableNameForPin"
 
+const ORIENTATION_HINTS = new Set(["left", "right", "top", "bottom"])
+const POLARITY_HINTS = new Set([
+  "anode",
+  "cathode",
+  "pos",
+  "neg",
+  "positive",
+  "negative",
+])
+
+const isGenericPinLabel = (label: string | undefined, pinNumber?: number) => {
+  if (!label) return true
+  if (
+    pinNumber !== undefined &&
+    (label.toLowerCase() === `pin${pinNumber}` || label === String(pinNumber))
+  ) {
+    return true
+  }
+  if (/^\d+$/.test(label)) return true
+  if (ORIENTATION_HINTS.has(label.toLowerCase())) return true
+  return /^pin\d+$/i.test(label)
+}
+
+const getPrimaryPinLabel = (
+  port: {
+    name?: string
+    pin_number?: number
+    port_hints?: string[]
+  },
+  component?: { ftype?: string },
+) => {
+  const hintedLabel = port.port_hints?.find((hint) => {
+    if (
+      component?.ftype === "simple_resistor" &&
+      POLARITY_HINTS.has(hint.toLowerCase())
+    ) {
+      return false
+    }
+    return !isGenericPinLabel(hint, port.pin_number)
+  })
+  if (port.name && !isGenericPinLabel(port.name, port.pin_number))
+    return port.name
+  if (hintedLabel) return hintedLabel
+  return port.pin_number !== undefined
+    ? `pin${port.pin_number}`
+    : (port.name ?? "")
+}
+
 export const convertCircuitJsonToReadableNetlist = (
   circuitJson: AnyCircuitElement[],
 ): string => {
@@ -36,13 +84,13 @@ export const convertCircuitJsonToReadableNetlist = (
     const footprint = cadComponent?.footprinter_string
 
     if (component.ftype === "simple_resistor") {
-      componentDescription = `${component.display_resistance}${
-        footprint ? ` ${footprint}` : ""
-      } resistor`
+      const parts = [component.display_resistance, footprint].filter(Boolean)
+      componentDescription =
+        parts.length > 0 ? `${parts.join(" ")} resistor` : "resistor"
     } else if (component.ftype === "simple_capacitor") {
-      componentDescription = `${component.display_capacitance}${
-        footprint ? ` ${footprint}` : ""
-      } capacitor`
+      const parts = [component.display_capacitance, footprint].filter(Boolean)
+      componentDescription =
+        parts.length > 0 ? `${parts.join(" ")} capacitor` : "capacitor"
     } else if (component.ftype === "simple_chip") {
       const manufacturerPartNumber = component.manufacturer_part_number
       componentDescription = [manufacturerPartNumber, footprint]
@@ -145,9 +193,15 @@ export const convertCircuitJsonToReadableNetlist = (
       const footprint = cadComponent?.footprinter_string
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        const details = [component.display_resistance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        const details = [component.display_capacitance, footprint]
+          .filter(Boolean)
+          .join(" ")
+        header = details ? `${component.name} (${details})` : component.name
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -156,12 +210,23 @@ export const convertCircuitJsonToReadableNetlist = (
         .filter((p) => p.source_component_id === component.source_component_id)
         .sort((a, b) => (a.pin_number ?? 0) - (b.pin_number ?? 0))
       for (const port of ports) {
-        const mainPin =
-          port.pin_number !== undefined ? `pin${port.pin_number}` : port.name
+        const mainPin = getPrimaryPinLabel(port, component)
         const aliases: string[] = []
+        if (
+          port.pin_number !== undefined &&
+          mainPin !== `pin${port.pin_number}`
+        ) {
+          aliases.push(`pin${port.pin_number}`)
+        }
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
+          if (
+            component.ftype === "simple_resistor" &&
+            POLARITY_HINTS.has(hint.toLowerCase())
+          ) {
+            continue
+          }
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
         }
         const aliasPart =

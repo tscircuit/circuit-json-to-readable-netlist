@@ -22,6 +22,7 @@
     "@tscircuit/core": "^0.0.401",
     "@tscircuit/math-utils": "^0.0.35",
     "@tscircuit/props": "^0.0.178",
+    "@tscircuit/soup-util": "^0.0.38",
     "@types/bun": "^1.2.13",
     "@types/react": "18",
     "circuit-json": "^0.0.170",

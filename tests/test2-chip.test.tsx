@@ -68,22 +68,22 @@ it("test2 chip", () => {
 
     COMPONENT_PINS:
     U1 (ATMEGA328P)
-    - pin1(GND): NETS(GND)
-    - pin2(AGND): NETS(GND)
-    - pin3(GPIO1, SCL): NETS(GND)
-    - pin4(GPIO2, SDA): NETS(U1_SDA)
-    - pin5(GPIO3): NETS(GPIO4)
-    - pin6(GPIO4, UART_TX): NOT_CONNECTED
-    - pin7(GPIO5, UART_RX): NOT_CONNECTED
-    - pin8(VDD): NETS(V5)
+    - GND(pin1): NETS(GND)
+    - AGND(pin2): NETS(GND)
+    - GPIO1(pin3, SCL): NETS(GND)
+    - GPIO2(pin4, SDA): NETS(U1_SDA)
+    - GPIO3(pin5): NETS(GPIO4)
+    - GPIO4(pin6, UART_TX): NOT_CONNECTED
+    - GPIO5(pin7, UART_RX): NOT_CONNECTED
+    - VDD(pin8): NETS(V5)
 
     R1 (1kΩ 0402)
-    - pin1(anode, pos, left): NETS(C1_pos)
-    - pin2(cathode, neg, right): NETS(U1_SDA)
+    - pin1(left): NETS(C1_pos)
+    - pin2(right): NETS(U1_SDA)
 
     C1 (1nF 0402)
-    - pin1(pos, anode, left): NETS(C1_pos)
-    - pin2(neg, cathode, right): NOT_CONNECTED
+    - pos(pin1, anode, left): NETS(C1_pos)
+    - neg(pin2, cathode, right): NOT_CONNECTED
     "
   `)
 })

@@ -38,12 +38,12 @@ it("test1 should render a basic circuit", () => {
 
     COMPONENT_PINS:
     R1 (1kΩ 0402)
-    - pin1(anode, pos, left): NETS(C1_pos)
-    - pin2(cathode, neg, right): NOT_CONNECTED
+    - pin1(left): NETS(C1_pos)
+    - pin2(right): NOT_CONNECTED
 
     C1 (1nF 0402)
-    - pin1(pos, anode, left): NETS(C1_pos)
-    - pin2(neg, cathode, right): NOT_CONNECTED
+    - pos(pin1, anode, left): NETS(C1_pos)
+    - neg(pin2, cathode, right): NOT_CONNECTED
     "
   `)
 })

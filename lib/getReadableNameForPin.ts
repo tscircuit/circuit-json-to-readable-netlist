@@ -46,6 +46,14 @@ export const getReadableNameForPin = ({
 
   for (const port_hint of port.port_hints ?? []) {
     if (port_hint === mainPinName) continue
+    if (
+      component.ftype === "simple_resistor" &&
+      ["anode", "cathode", "pos", "neg", "positive", "negative"].includes(
+        port_hint.toLowerCase(),
+      )
+    ) {
+      continue
+    }
     const score = scorePhrase(port_hint)
     if (score > 1) {
       additionalPinLabels.push(port_hint)
