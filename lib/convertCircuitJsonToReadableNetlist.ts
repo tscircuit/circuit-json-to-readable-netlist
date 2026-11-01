@@ -143,11 +143,12 @@ export const convertCircuitJsonToReadableNetlist = (
         source_component_id: component.source_component_id,
       })
       const footprint = cadComponent?.footprinter_string
+      const footprintSuffix = footprint ? ` ${footprint}` : ""
       let header = component.name
       if (component.ftype === "simple_resistor") {
-        header = `${component.name} (${component.display_resistance} ${footprint})`
+        header = `${component.name} (${component.display_resistance}${footprintSuffix})`
       } else if (component.ftype === "simple_capacitor") {
-        header = `${component.name} (${component.display_capacitance} ${footprint})`
+        header = `${component.name} (${component.display_capacitance}${footprintSuffix})`
       } else if (component.manufacturer_part_number) {
         header = `${component.name} (${component.manufacturer_part_number})`
       }
@@ -162,6 +163,15 @@ export const convertCircuitJsonToReadableNetlist = (
         if (port.name && port.name !== mainPin) aliases.push(port.name)
         for (const hint of port.port_hints ?? []) {
           if (hint === String(port.pin_number)) continue
+          // anode/cathode only describe polarized parts, but core also adds
+          // them to parts with interchangeable pins (resistors, inductors and
+          // non-polarized capacitors)
+          if (
+            component.are_pins_interchangeable &&
+            (hint === "anode" || hint === "cathode")
+          ) {
+            continue
+          }
           if (hint !== mainPin && hint !== port.name) aliases.push(hint)
         }
         const aliasPart =
